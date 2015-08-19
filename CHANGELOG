@@ -1,0 +1,83 @@
++++++++++++
+LabKey Python Client API News
++++++++++++
+
+
+What's New in the LabKey 0.24 package
+==============================
+
+*Release date: 03/20/2015*
+
+- Fixed bug in updateWiki due to changes in LabKey Server v15.1 
+
+
+What's New in the LabKey 0.23 package
+==============================
+
+*Release date: 11/24/2014*
+
+- Force all SSL connections to use TLSv1 Protocol or higher. 
+  This disables the use of SSLv2(Heartbleed) and SSLv3(Poodle) to 
+  protect against the Heartbleed and Poodle vulnerabilities. 
+
+
+What's New in the LabKey 0.22 package
+==============================
+
+*Release date: 04/15/2014*
+
+- Fixed bug in updateWiki when updating a wiki where Guests have read access
+
+
+What's New in the LabKey 0.21 package
+==============================
+
+*Release date: 03/30/2012*
+
+- Fixed bug in updateWiki due to changes in LabKey Server v12.1
+
+
+What's New in the LabKey 0.20 package
+==============================
+
+*Release date: 01/25/2012*
+
+- Fixed authentication bug in labkey.wiki and labkey.messageboard
+  functions.
+
+
+What's New in the LabKey 0.19 package
+==============================
+
+*Release date: 11/02/2011*
+
+- Updated name of the sample labkeycredentials file
+
+- Cleaned up docstring comments in each module file. 
+
+- Checked into the LabKey subversion repository.
+
+
+What's New in the LabKey 0.18 package
+==============================
+
+*Release date: 10/25/2011*
+
+- Created README.txt, MANIFEST.in. Added further package information to 
+  setup.py 
+
+- Added empty test directory that will be used in future releases 
+  for unit tests
+
+
+What's New in the LabKey 0.16 package
+==============================
+
+*Release date: Unreleased*
+
+- Ported labkeyquery.py from a stand-alone module to be part of this 
+  package. To access the functions that were in labkeyquery.py, you 
+  will need to import labkey or import labkey.query
+
+- Added collaboration module which allows programmatic access to 
+  wikis and message boards on the LabKey Server
