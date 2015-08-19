@@ -42,14 +42,14 @@ setup(
   name='labkey',
   version='0.24',
   description='Python client API for LabKey Server',
-  long_description=long_desc
+  long_description=long_desc,
   license="Apache License 2.0",
   author='Elizabeth Nelson',
   author_email='eknelson@labkey.com',
   maintainer='Brian Connolly',
   maintainer_email='brian@labkey.com',
   url='https://www.labkey.org/wiki/home/Documentation/page.view?name=python',
-  install_requires=install_requires
+  install_requires=install_requires,
   packages=packages,
   package_data={},
   keywords="labkey api client",
