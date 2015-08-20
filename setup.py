@@ -28,13 +28,11 @@ if sys.version_info < (2, 6):
         file=sys.stderr)
   sys.exit(1)
 
-from setuptools import setup
+from distutils.core import setup
 
 packages = [
-  'labkeyapi'
+  'labkey'
 ]
-
-install_requires = []
 
 long_desc = "Python client API for LabKey Server. Supports for query, wiki, and messageboard APIs."
 
@@ -49,7 +47,6 @@ setup(
   maintainer='Brian Connolly',
   maintainer_email='brian@labkey.com',
   url='https://www.labkey.org/wiki/home/Documentation/page.view?name=python',
-  install_requires=install_requires,
   packages=packages,
   package_data={},
   keywords="labkey api client",
