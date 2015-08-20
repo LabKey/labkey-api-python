@@ -1,0 +1,4 @@
+# Build Artifacts
+*.py[cod]
+build/
+dist/
