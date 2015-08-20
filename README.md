@@ -2,10 +2,10 @@
 Python client API for LabKey Server. To get started, please see the [full documentation for this library](https://www.labkey.org/wiki/home/Documentation/page.view?name=python).
 
 # Installation
-Currently, the labkey-api-python library can only be installed via source. To install, clone this repository then run:
+To install, simply use `pip`:
 
 ```bash
-$ python setup.py install
+$ pip install labkey
 ```
 
 # Credentials
