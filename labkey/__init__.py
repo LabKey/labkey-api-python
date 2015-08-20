@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 __title__ = 'labkey'
-__version__ = '0.24'
+__version__ = '0.3.0'
 __author__ = 'LabKey Software'
 __license__ = 'Apache 2.0'
 

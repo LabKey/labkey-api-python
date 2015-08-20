@@ -2,6 +2,14 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 0.3.0 package
+==============================
+
+*Release date: 08/20/2015*
+
+- Migrated package repository to GitHub.
+- Switch package to use semantic versioning.
+- Minor changes to setup.py.
 
 What's New in the LabKey 0.24 package
 ==============================
