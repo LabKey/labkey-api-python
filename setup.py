@@ -19,16 +19,8 @@ Setup script for Python client API for LabKey Server.
 Also installs included versions of third party libraries, if those libraries
 are not already installed.
 """
-from __future__ import print_function
-
-import sys
-
-if sys.version_info < (2, 6):
-  print('labkey-api-python requires python version >= 2.6.',
-        file=sys.stderr)
-  sys.exit(1)
-
 from distutils.core import setup
+from labkey import __version__
 
 packages = [
   'labkey'
@@ -38,7 +30,7 @@ long_desc = "Python client API for LabKey Server. Supports for query, wiki, and 
 
 setup(
   name='labkey',
-  version='0.24',
+  version=__version__,
   description='Python client API for LabKey Server',
   long_description=long_desc,
   license="Apache License 2.0",
@@ -46,20 +38,20 @@ setup(
   author_email='eknelson@labkey.com',
   maintainer='Brian Connolly',
   maintainer_email='brian@labkey.com',
-  url='https://www.labkey.org/wiki/home/Documentation/page.view?name=python',
+  url='https://github.com/LabKey/labkey-api-python',
   packages=packages,
   package_data={},
   keywords="labkey api client",
   classifiers=[
-    'Development Status :: 4 - Beta',
-    'Environment :: Console',
-    'Intended Audience :: Science/Research',
-    'Intended Audience :: System Administrators',
-    'License :: OSI Approved :: Apache Software License',
-    'Operating System :: MacOS',
-    'Operating System :: Microsoft',
-    'Operating System :: POSIX',
-    'Programming Language :: Python :: 2',
-    'Topic :: Scientific/Engineering'
+      'Development Status :: 4 - Beta',
+      'Environment :: Console',
+      'Intended Audience :: Science/Research',
+      'Intended Audience :: System Administrators',
+      'License :: OSI Approved :: Apache Software License',
+      'Operating System :: MacOS',
+      'Operating System :: Microsoft',
+      'Operating System :: POSIX',
+      'Programming Language :: Python :: 2',
+      'Topic :: Scientific/Engineering'
   ]
 )
