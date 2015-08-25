@@ -48,7 +48,7 @@ from __future__ import unicode_literals
 import json
 
 from requests.exceptions import SSLError
-from utils import build_url, handle_response
+from labkey.utils import build_url, handle_response
 
 _query_headers = {
     'Content-Type': 'application/json'
