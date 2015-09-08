@@ -17,7 +17,7 @@ from __future__ import unicode_literals
 import json
 
 from requests.exceptions import SSLError
-from utils import build_url, handle_response
+from labkey.utils import build_url, handle_response
 
 
 # EXAMPLE
@@ -91,14 +91,39 @@ def save_batch(assay_id, batch, server_context):
     :param server_context: A LabKey server context. See utils.create_server_context.
     :return:
     """
-    if not isinstance(batch, Batch):
-        raise Exception('save_batch() "batch" expected to be instance of Batch')
+    result = save_batches(assay_id,[batch],server_context)
+
+    if result is not None:
+        return result[0]
+    else:
+        return None
+
+
+def save_batches(assay_id, batches, server_context):
+    """
+    Saves a modified batches.
+    :param assay_id: The assay protocol id.
+    :param batch: The Batch(es) to save.
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :return:
+    """
 
     save_batch_url = build_url('assay', 'saveAssayBatch.api', server_context)
     session = server_context['session']
+
+    json_batches = []
+    if batches is None:
+        return None  # Nothing to save
+
+    for batch in batches:
+        if isinstance(batch, Batch):
+            json_batches.append(batch.to_json())
+        else:
+            raise Exception('save_batch() "batches" expected to be a set Batch instances')
+
     payload = {
         'assayId': assay_id,
-        'batches': [batch.to_json()]
+        'batches': json_batches
     }
     headers = {
         'Content-type': 'application/json',
@@ -110,7 +135,8 @@ def save_batch(assay_id, batch, server_context):
         response = session.post(save_batch_url, data=json.dumps(payload), headers=headers)
         json_body = handle_response(response)
         if json_body is not None:
-            return Batch.from_data(json_body['batch'])
+            resp_batches = json_body['batches']
+            return [Batch.from_data(resp_batch) for resp_batch in resp_batches]
     except SSLError as e:
         raise Exception("Failed to match server SSL configuration. Failed to save batch.")
 
@@ -132,7 +158,7 @@ class ExpObject(object):
 
     def to_json(self):
         data = {
-            'id': self.id,
+            # 'id': self.id,
             'lsid': self.lsid,
             'comment': self.comment,
             'name': self.name,
@@ -168,6 +194,8 @@ class Batch(ExpObject):
     def to_json(self):
 
         data = super(Batch, self).to_json()
+
+        data['batchProtocolId'] = self.batch_protocol_id
 
         json_runs = []
         for run in self.runs:
@@ -212,7 +240,6 @@ class Run(ExpObject):
 
     def to_json(self):
         data = super(Run, self).to_json()
-
         data['dataInputs'] = self.data_inputs
         data['dataRows'] = self.data_rows
         data['experiments'] = self.experiments
