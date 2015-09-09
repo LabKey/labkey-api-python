@@ -240,7 +240,8 @@ class Run(ExpObject):
 
     def to_json(self):
         data = super(Run, self).to_json()
-        data['dataInputs'] = self.data_inputs
+
+        data['dataInputs'] = [data_input.to_json() for data_input in self.data_inputs]
         data['dataRows'] = self.data_rows
         data['experiments'] = self.experiments
         data['filePathRoot'] = self.file_path_root
@@ -256,13 +257,24 @@ class ProtocolOutput(ExpObject):
 
         self.source_protocol = kwargs.pop('source_protocol', kwargs.pop('sourceProtocol', None))
         self.run = kwargs.pop('run', None)  # TODO Check if this should be a Run instance
-        self.target_applications = kwargs.pop('target_applications', kwargs.pop('targetApplications'), None)
-        self.successor_runs = kwargs.pop('successor_runs', kwargs.pop('sucessorRuns', None))  # sic
+        self.target_applications = kwargs.pop('target_applications', kwargs.pop('targetApplications', None))
+        self.successor_runs = kwargs.pop('successor_runs', kwargs.pop('successorRuns', kwargs.pop('sucessorRuns', None)))  # sic
         self.cpas_type = kwargs.pop('cpas_type', kwargs.pop('cpasType', None))
 
     @staticmethod
     def from_data(data):
         return ProtocolOutput(**data)
+
+    def to_json(self):
+        data = super(ProtocolOutput, self).to_json()
+
+        data['sourceProtocol'] = self.source_protocol
+        data['run'] = self.run
+        data['targetApplications'] = self.target_applications
+        data['sucessorRuns'] = self.successor_runs
+        data['cpasType'] = self.cpas_type
+
+        return data
 
 
 class Data(ProtocolOutput):
@@ -271,9 +283,19 @@ class Data(ProtocolOutput):
 
         self.data_type = kwargs.pop('data_type', kwargs.pop('dataType', None))
         self.data_file_url = kwargs.pop('data_file_url', kwargs.pop('dataFileURL', None))
-        self.pipeline_path = kwargs.pop('pipeline_path', kwargs.pop('pipeline_path', None))
+        self.pipeline_path = kwargs.pop('pipeline_path', kwargs.pop('pipelinePath', None))
         self.role = kwargs.pop('role', None)
 
     @staticmethod
     def from_data(data):
         return Data(**data)
+
+    def to_json(self):
+        data = super(Data, self).to_json()
+
+        data['dataFileURL'] = self.data_file_url
+        data['dataType'] = self.data_type
+        data['pipelinePath'] = self.pipeline_path
+        data['role'] = self.role
+
+        return data
