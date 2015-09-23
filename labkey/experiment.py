@@ -32,7 +32,7 @@ from labkey.utils import build_url, handle_response
 # print("Load an Assay batch from the server")
 # assay_id = # provide one from your server
 # batch_id = # provide one from your server
-# run_group = load_batch(assay_id, batch_id, server_context)
+# run_group = load_batch(server_context, assay_id, batch_id)
 #
 # if run_group is not None:
 # 	print("Batch Id: " + str(run_group.id))
@@ -44,23 +44,24 @@ from labkey.utils import build_url, handle_response
 # 	run_group.properties[batch_property_name] = batch_property_value
 #
 # 	print("Save the batch")
-# 	save_batch(assay_id, run_group, server_context)
+# 	save_batch(server_context, assay_id, run_group)
 
 # --------
 # /EXAMPLE
 
 # TODO Incorporate logging
 
-def load_batch(assay_id, batch_id, server_context):
+def load_batch(server_context, assay_id, batch_id):
     """
     Loads a batch from the server.
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param assay_id: The protocol id of the assay from which to load a batch.
     :param batch_id:
-    :param server_context: A LabKey server context. See utils.create_server_context.
     :return:
     """
-    load_batch_url = build_url('assay', 'getAssayBatch.api', server_context)
+    load_batch_url = build_url(server_context, 'assay', 'getAssayBatch.api')
     session = server_context['session']
+    loaded_batch = None
 
     payload = {
         'assayId': assay_id,
@@ -76,39 +77,38 @@ def load_batch(assay_id, batch_id, server_context):
         response = session.post(load_batch_url, data=json.dumps(payload), headers=headers)
         json_body = handle_response(response)
         if json_body is not None:
-            return Batch.from_data(json_body['batch'])
+            loaded_batch = Batch.from_data(json_body['batch'])
     except SSLError as e:
         raise Exception("Failed to match server SSL configuration. Failed to load batch.")
 
-    return None
+    return loaded_batch
 
 
-def save_batch(assay_id, batch, server_context):
+def save_batch(server_context, assay_id, batch):
     """
     Saves a modified batch.
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param assay_id: The assay protocol id.
     :param batch: The Batch to save.
-    :param server_context: A LabKey server context. See utils.create_server_context.
     :return:
     """
-    result = save_batches(assay_id,[batch],server_context)
+    result = save_batches(server_context, assay_id, [batch])
 
     if result is not None:
         return result[0]
-    else:
-        return None
+    return None
 
 
-def save_batches(assay_id, batches, server_context):
+def save_batches(server_context, assay_id, batches):
     """
     Saves a modified batches.
-    :param assay_id: The assay protocol id.
-    :param batch: The Batch(es) to save.
     :param server_context: A LabKey server context. See utils.create_server_context.
+    :param assay_id: The assay protocol id.
+    :param batches: The Batch(es) to save.
     :return:
     """
 
-    save_batch_url = build_url('assay', 'saveAssayBatch.api', server_context)
+    save_batch_url = build_url(server_context, 'assay', 'saveAssayBatch.api')
     session = server_context['session']
 
     json_batches = []
@@ -145,7 +145,7 @@ def save_batches(assay_id, batches, server_context):
 
 class ExpObject(object):
     def __init__(self, **kwargs):
-        self.lsid = kwargs.pop('lsid', None)
+        self.lsid = kwargs.pop('lsid', None)  # Life Science identifier
         self.name = kwargs.pop('name', None)
         self.id = kwargs.pop('id', 0)
         self.row_id = self.id

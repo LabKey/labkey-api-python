@@ -55,8 +55,8 @@ _query_headers = {
 }
 
 
-def delete_rows(schema_name, query_name, rows, server_context, container_path=None):
-    url = build_url('query', 'deleteRows.api', server_context, container_path=container_path)
+def delete_rows(server_context, schema_name, query_name, rows, container_path=None):
+    url = build_url(server_context, 'query', 'deleteRows.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,
@@ -68,9 +68,9 @@ def delete_rows(schema_name, query_name, rows, server_context, container_path=No
     return delete_rows_response
 
 
-def execute_sql(schema_name, sql, server_context, container_path=None,
+def execute_sql(server_context, schema_name, sql, container_path=None,
                 max_rows=None, sort=None, offset=None, container_filter=None):
-    url = build_url('query', 'executeSql.api', server_context, container_path=container_path)
+    url = build_url(server_context, 'query', 'executeSql.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,
@@ -93,8 +93,8 @@ def execute_sql(schema_name, sql, server_context, container_path=None,
     return execute_sql_response
 
 
-def insert_rows(schema_name, query_name, rows, server_context, container_path=None):
-    url = build_url('query', 'insertRows.api', server_context, container_path=container_path)
+def insert_rows(server_context, schema_name, query_name, rows, container_path=None):
+    url = build_url(server_context, 'query', 'insertRows.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,
@@ -107,11 +107,11 @@ def insert_rows(schema_name, query_name, rows, server_context, container_path=No
 
 
 # TODO: Support all the properties
-def select_rows(schema_name, query_name, server_context, view_name=None,
+def select_rows(server_context, schema_name, query_name, view_name=None,
                 filter_array=None, container_path=None, columns=None, max_rows=None, sort=None,
                 offset=None, container_filter=None):
     # TODO: Support data_region_name
-    url = build_url('query', 'getQuery.api', server_context, container_path=container_path)
+    url = build_url(server_context, 'query', 'getQuery.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,
@@ -146,8 +146,8 @@ def select_rows(schema_name, query_name, server_context, view_name=None,
     return select_rows_response
 
 
-def update_rows(schema_name, query_name, rows, server_context, container_path=None):
-    url = build_url('query', 'updateRows.api', server_context, container_path=container_path)
+def update_rows(server_context, schema_name, query_name, rows, container_path=None):
+    url = build_url(server_context, 'query', 'updateRows.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,

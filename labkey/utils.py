@@ -33,7 +33,16 @@ class SafeTLSAdapter(HTTPAdapter):
 
 
 def create_server_context(domain, container_path, context_path=None, use_ssl=True):
-    # TODO: Document
+    """
+    Create a LabKey server context. This context is used to encapsulate properties
+    about the LabKey server that is being requested against. This includes, but is not limited to,
+    the domain, container_path, and if the server is using SSL.
+    :param domain:
+    :param container_path:
+    :param context_path:
+    :param use_ssl:
+    :return:
+    """
     server_context = dict(domain=domain, container_path=container_path, context_path=context_path)
 
     if use_ssl:
@@ -55,13 +64,13 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
     return server_context
 
 
-def build_url(controller, action, server_context, container_path=None):
+def build_url(server_context, controller, action, container_path=None):
     """
     Builds a URL from a controller and an action. Users the server context to determine domain,
     context path, container, etc.
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param controller: The controller to use in building the URL
     :param action: The action to use in building the URL
-    :param server_context:
     :param container_path:
     :return:
     """
