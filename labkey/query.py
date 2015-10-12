@@ -45,14 +45,18 @@ https://www.labkey.org/announcements/home/Server/Forum/list.view?
 ############################################################################
 """
 from __future__ import unicode_literals
-import json
+from enum import Enum
 
 from requests.exceptions import SSLError
 from labkey.utils import build_url, handle_response
 
-_query_headers = {
-    'Content-Type': 'application/json'
-}
+
+class Pagination(Enum):
+    paginated = 0
+    selected = 1
+    unselected = 2
+    all = 3
+    none = 4
 
 
 def delete_rows(schema_name, query_name, rows, server_context, container_path=None):
@@ -107,15 +111,29 @@ def insert_rows(schema_name, query_name, rows, server_context, container_path=No
 
 
 # TODO: Support all the properties
-def select_rows(schema_name, query_name, server_context, view_name=None,
-                filter_array=None, container_path=None, columns=None, max_rows=None, sort=None,
-                offset=None, container_filter=None):
+def select_rows(schema_name, query_name, server_context,
+                view_name=None,
+                filter_array=None,
+                container_path=None,
+                columns=None,
+                max_rows=None,
+                sort=None,
+                offset=None,
+                container_filter=None,
+                parameters=None,
+                show_rows=None,
+                include_total_count=None,
+                include_details_column=None,
+                include_update_column=None,
+                # selection_key=None,
+                timeout=None,
+                required_version=None
+                ):
     # TODO: Support data_region_name
     url = build_url('query', 'getQuery.api', server_context, container_path=container_path)
-
     payload = {
         'schemaName': schema_name,
-        'query.queryName': query_name
+        'query.queryName': query_name,
     }
 
     # TODO: Roll these checks up
@@ -142,6 +160,27 @@ def select_rows(schema_name, query_name, server_context, view_name=None,
     if container_filter is not None:
         payload['query.containerFilter'] = container_filter
 
+    if parameters is not None:
+        payload['query.parameters'] = parameters
+
+    if show_rows is not None:
+        payload['query.showRows'] = show_rows
+
+    if include_total_count is not None:
+        payload['query.includeTotalCount'] = include_total_count
+
+    if include_details_column is not None:
+        payload['query.includeDetailsColumn'] = include_details_column
+
+    if include_update_column is not None:
+        payload['query.includeUpdateColumn'] = include_update_column
+
+    if timeout is not None:
+        payload['query.timeout'] = timeout
+
+    if required_version is not None:
+        payload['query.requiredVersion'] = required_version
+
     select_rows_response = _make_request(server_context, url, payload)
     return select_rows_response
 
@@ -162,7 +201,9 @@ def update_rows(schema_name, query_name, rows, server_context, container_path=No
 def _make_request(server_context, url, payload):
     try:
         session = server_context['session']
-        raw_response = session.post(url, headers=_query_headers, data=json.dumps(payload))
+        raw_response = session.post(url, data=payload)
         return handle_response(raw_response)
     except SSLError as e:
         raise Exception('Failed to match server SSL configuration. Ensure the server_context is configured correctly.')
+
+
