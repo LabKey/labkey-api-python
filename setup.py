@@ -30,7 +30,7 @@ requires = [
     'requests'
 ]
 
-long_desc = "Python client API for LabKey Server. Supports for query, wiki, and messageboard APIs."
+long_desc = "Python client API for LabKey Server. Supports query and experiment APIs."
 
 setup(
     name='labkey',
@@ -57,6 +57,7 @@ setup(
         'Operating System :: Microsoft',
         'Operating System :: POSIX',
         'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
         'Topic :: Scientific/Engineering'
     ]
 )

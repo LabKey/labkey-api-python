@@ -9,26 +9,37 @@ $ pip install labkey
 ```
 
 # Credentials
-In order to the use the Python client API for LabKey Server, you will need to specify your login credentials in a credential file. The package assumes that this file will be located either:
+The api no longer supports using a ``.labkeycredentials.txt`` file, and now uses the .netrc files similar to the other labkey apis. Additional .netrc [setup instructions](https://www.labkey.org/wiki/Staff/steveh/DocsSandbox/page.view?name=netrc&_docid=wiki%3Ae780ab5b-241e-1033-93dd-22a830bccfbb) can be found at the link.
 
-1. ``$HOME/.labkeycredentials.txt``
-2. The location will be specified in the ``LABKEY_CREDENTIALS`` environment variable.
+## Set Up a netrc File
 
-The ``labkeycredentials`` file must be in the following format. (3 separate lines):
+On a Mac, UNIX, or Linux system the netrc file should be named ``.netrc`` (dot netrc) and on Windows it should be named ``_netrc`` (underscore netrc). The file should be located in your home directory and the permissions on the file must be set so that you are the only user who can read it, i.e. it is unreadable to everyone else.
+
+To create the netrc on a Windows machine, first create an environment variable called ’HOME’ that is set to your home directory (c:/Users/<User-Name> on Vista or Windows 7) or any directory you want to use.
+
+In that directory, create a text file with the prefix appropriate to your system, either an underscore or dot.
+
+The following three lines must be included in the file. The lines must be separated by either white space (spaces, tabs, or newlines) or commas:
 ```
-machine https://hosted.labkey.com
-login labkeypython@gmail.com
-password python
+machine <remote-instance-of-labkey-server>
+login <user-email>
+password <user-password>
 ```
-where:
-- machine: URL of your LabKey Server
-- login: email address to be used to login to the LabKey Server
-- password: password associated with the login
 
-A sample ``labkeycredentials`` file has been shipped with the source and named ``.labkeycredentials.sample``.
+One example would be:
+```
+machine mymachine.labkey.org
+login user@labkey.org
+password mypassword
+```
+Another example would be:
+```
+machine mymachine.labkey.org login user@labkey.org password mypassword
+```
 
 # Supported Versions
-Python 2.6 or 2.7 are fully supported.
+Python 2.6 or 2.7 and 3.4 are fully supported.
+
 LabKey Server v11.1 and later.
 
 # Contributing
