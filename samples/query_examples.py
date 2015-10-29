@@ -9,6 +9,7 @@ Sample data from the New Study tutorial on labkey.org:
 
 from __future__ import unicode_literals
 from labkey.utils import create_server_context
+from labkey.exceptions import RequestError, QueryNotFoundError, ServerContextError, ServerNotFoundError
 from labkey.query import select_rows, update_rows, Pagination, QueryFilter, \
     insert_rows, delete_rows, execute_sql
 from requests.exceptions import Timeout
@@ -26,21 +27,74 @@ table = 'Demographics'
 column1 = 'Group Assignment'
 column2 = 'Participant ID'
 
+
 ###################
 # Test basic select_rows
 ###################
 result = select_rows(server_context, schema, table)
 if result is not None:
+    print(result['rows'][0])
     print("select_rows: There are " + str(result['rowCount']) + " rows.")
 else:
     print('select_rows: Failed to load results from ' + schema + '.' + table)
+
+
+###################
+# Test error handling
+###################
+# catch base error
+try:
+    result = select_rows(server_context, schema, 'badtable')
+    print(result)
+except RequestError:
+    print('Caught base error')
+
+# catch table not found error
+try:
+    result = select_rows(server_context, schema, 'badtable')
+    print(result)
+except QueryNotFoundError:
+    print('Caught bad table')
+
+# catch schema error
+try:
+    result = select_rows(server_context, 'badSchema', table)
+    print(result)
+except QueryNotFoundError:
+    print('Caught bad schema')
+
+# catch SSL error
+ssl_server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=True)
+try:
+    result = select_rows(ssl_server_context, schema, table)
+    print(result)
+except ServerContextError:
+    print('Caught SSL Error')
+
+
+# catch bad context path
+bad_server_context = create_server_context(labkey_server, project_name, '', use_ssl=False)
+try:
+    result = select_rows(bad_server_context, schema, table)
+    print(result)
+except ServerNotFoundError:
+    print('Caught context path')
+
+# catch bad folder path error
+bad_server_context = create_server_context(labkey_server, 'bad_project_name', contextPath, use_ssl=False)
+try:
+    result = select_rows(bad_server_context, schema, table)
+    print(result)
+except ServerNotFoundError:
+    print('Caught bad folder name')
+
 
 ###################
 # Test some parameters of select_rows
 ###################
 result = select_rows(server_context, schema, table,
                      max_rows=5, offset=10, include_total_count=True, include_details_column=True,
-                     include_update_column=True, required_version=12.2)
+                     include_update_column=True)  # , required_version=12.2)
 if result is not None:
     print('select_rows: There are ' + str(len(result['rows'])) + ' rows.')
     print('select_rows: There are ' + str(result['rowCount']) + ' total rows.')
@@ -144,7 +198,6 @@ print('Delete Rows: deleted rowId [ ' + str(deleteResult['rows'][0]['Key']) + ' 
 
 all_rows = select_rows(server_context, schema, table)
 print('Delete Rows: after row count [ ' + str(all_rows['rowCount']) + ' ]')
-
 
 
 ###################

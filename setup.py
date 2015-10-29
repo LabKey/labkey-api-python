@@ -20,32 +20,28 @@ Also installs included versions of third party libraries, if those libraries
 are not already installed.
 """
 from setuptools import setup
-from labkey import __version__
 
 packages = [
     'labkey'
-]
-
-requires = [
-    'requests'
 ]
 
 long_desc = "Python client API for LabKey Server. Supports query and experiment APIs."
 
 setup(
     name='labkey',
-    version=__version__,
+    version='0.3.0',
     description='Python client API for LabKey Server',
     long_description=long_desc,
     license="Apache License 2.0",
-    author='Nick Arnold',
+    author='LabKey Software',
     author_email='nicka@labkey.com',
     maintainer='Nick Arnold',
     maintainer_email='nicka@labkey.com',
     url='https://github.com/LabKey/labkey-api-python',
     packages=packages,
     package_data={},
-    install_requires=requires,
+    install_requires=['requests'],
+    tests_require=['requests', 'mock'],
     keywords="labkey api client",
     classifiers=[
         'Development Status :: 4 - Beta',

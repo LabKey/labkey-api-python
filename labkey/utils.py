@@ -20,6 +20,7 @@ import ssl
 
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
+from labkey.exceptions import RequestError, RequestAuthorizationError, QueryNotFoundError, ServerNotFoundError
 
 
 # _ssl.c:504: error:14077410:SSL routines:SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure
@@ -100,25 +101,16 @@ def handle_response(response):
     if sc == 200 or sc == 207:
         return response.json()
     elif sc == 401:
-        print(str(sc) + ": Authorization failed.")
+        raise RequestAuthorizationError(response)
     elif sc == 404:
-        msg = str(sc) + ": "
-        decoded = response.json()
-        if 'exception' in decoded:
-            msg += decoded['exception']
-        else:
-            msg += 'Not found.'
-        print(msg)
-    elif sc == 500:
-        msg = str(sc) + ": "
-        decoded = response.json()
-        if 'exception' in decoded:
-            msg += decoded['exception']
-        else:
-            msg += 'Internal Server Error.'
-        print(msg)
+        try:
+            response.json()  # attempt to decode response
+            raise QueryNotFoundError(response)
+        except ValueError:
+            # could not decode response
+            raise ServerNotFoundError(response)
     else:
-        print(str(sc))
-        print(response.json())
+        raise RequestError(response)
 
     return None
+

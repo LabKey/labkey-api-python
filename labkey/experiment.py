@@ -18,6 +18,7 @@ import json
 
 from requests.exceptions import SSLError
 from labkey.utils import build_url, handle_response
+from labkey.exceptions import ServerContextError
 
 
 # EXAMPLE
@@ -49,8 +50,8 @@ from labkey.utils import build_url, handle_response
 # --------
 # /EXAMPLE
 
-# TODO Incorporate logging
 
+# TODO Incorporate logging
 def load_batch(server_context, assay_id, batch_id):
     """
     Loads a batch from the server.
@@ -74,12 +75,12 @@ def load_batch(server_context, assay_id, batch_id):
     }
 
     try:
-        response = session.post(load_batch_url, data=json.dumps(payload), headers=headers)
+        response = session.post(load_batch_url, data=json.dumps(payload, sort_keys=True), headers=headers)
         json_body = handle_response(response)
         if json_body is not None:
             loaded_batch = Batch.from_data(json_body['batch'])
     except SSLError as e:
-        raise Exception("Failed to match server SSL configuration. Failed to load batch.")
+        raise ServerContextError(e)
 
     return loaded_batch
 
@@ -132,13 +133,13 @@ def save_batches(server_context, assay_id, batches):
 
     try:
         # print(payload)
-        response = session.post(save_batch_url, data=json.dumps(payload), headers=headers)
+        response = session.post(save_batch_url, data=json.dumps(payload, sort_keys=True), headers=headers)
         json_body = handle_response(response)
         if json_body is not None:
             resp_batches = json_body['batches']
             return [Batch.from_data(resp_batch) for resp_batch in resp_batches]
     except SSLError as e:
-        raise Exception("Failed to match server SSL configuration. Failed to save batch.")
+        raise ServerContextError(e)
 
     return None
 

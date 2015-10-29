@@ -1,9 +1,15 @@
-# Sample code to submit a single batch of Assay data containing a run with three rows of data
+"""
+Examples using the Experiment.py API
+
+Sample code to submit a single batch of Assay data containing a run with three rows of data
+
+"""
+
 
 from labkey.utils import create_server_context
-from labkey.experiment import save_batch, save_batches, Batch, Run
+from labkey.experiment import save_batch, Batch, Run
 
-assay_id = 1168  # provide one from your server. rowid from the URL query parameters
+assay_id = 2809  # provide one from your server. rowid from the URL query parameters
 
 print("Create a server context")
 project_name = 'ModuleAssayTest'

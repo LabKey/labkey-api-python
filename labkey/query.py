@@ -49,6 +49,7 @@ import json
 
 from requests.exceptions import SSLError
 from labkey.utils import build_url, handle_response
+from labkey.exceptions import ServerContextError
 
 
 _query_headers = {
@@ -59,6 +60,9 @@ _default_timeout = 30  # in seconds
 
 
 class Pagination:
+    """
+    Enum of paging styles
+    """
     PAGINATED = 'paginated'
     SELECTED = 'selected'
     UNSELECTED = 'unselected'
@@ -66,7 +70,17 @@ class Pagination:
     NONE = 'none'
 
 
-def delete_rows(server_context, schema_name, query_name, rows, container_path=None, transacted=None, timeout=_default_timeout):
+def delete_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
+    """
+    Delete a set of rows from the schema.query
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name to delete from
+    :param rows: Set of rows to delete
+    :param container_path: labkey container path if not already set in context
+    :param timeout: timeout of request in seconds (defaults to 30s)
+    :return:
+    """
     url = build_url(server_context, 'query', 'deleteRows.api', container_path=container_path)
 
     payload = {
@@ -76,7 +90,8 @@ def delete_rows(server_context, schema_name, query_name, rows, container_path=No
     }
 
     # explicit json payload and headers required for form generation
-    delete_rows_response = _make_request(server_context, url, json.dumps(payload), headers=_query_headers, timeout=timeout)
+    delete_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
+                                         headers=_query_headers, timeout=timeout)
     return delete_rows_response
 
 
@@ -89,6 +104,24 @@ def execute_sql(server_context, schema_name, sql, container_path=None,
                 parameters=None,
                 required_version=None,
                 timeout=_default_timeout):
+    """
+    Execute a string a labkey sql against a LabKey server.
+
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param sql: String of labkey sql to execute
+    :param container_path: labkey container path if not already set in context
+    :param max_rows: max number of rows to return
+    :param sort: comma separated list of column names to sort by
+    :param offset: number of rows to offset results by
+    :param container_filter: enumeration of the various container filters available. See:
+        https://www.labkey.org/download/clientapi_docs/javascript-api/symbols/LABKEY.Query.html#.containerFilter
+    :param save_in_session: save query result as a named view to the session
+    :param parameters: parameter values to pass through to a parameterized query
+    :param required_version: Api version of response
+    :param timeout: timeout of request in seconds (defaults to 30s)
+    :return:
+    """
     url = build_url(server_context, 'query', 'executeSql.api', container_path=container_path)
 
     payload = {
@@ -122,6 +155,16 @@ def execute_sql(server_context, schema_name, sql, container_path=None,
 
 
 def insert_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
+    """
+    Insert row(s) into table
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name to insert into
+    :param rows: set of rows to insert
+    :param container_path: labkey container path if not already set in context
+    :param timeout: timeout of request in seconds (defaults to 30s)
+    :return:
+    """
     url = build_url(server_context, 'query', 'insertRows.api', container_path=container_path)
 
     payload = {
@@ -131,7 +174,8 @@ def insert_rows(server_context, schema_name, query_name, rows, container_path=No
     }
 
     # explicit json payload and headers required for form generation
-    insert_rows_response = _make_request(server_context, url, json.dumps(payload), headers=_query_headers, timeout=timeout)
+    insert_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
+                                         headers=_query_headers, timeout=timeout)
     return insert_rows_response
 
 
@@ -152,6 +196,30 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
                 required_version=None,
                 timeout=_default_timeout
                 ):
+    """
+    Query data from a labkey server
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name to select from
+    :param view_name: pre-existing named view
+    :param filter_array: set of filter objects to apply
+    :param container_path: folder path if not already part of server_context
+    :param columns: set of columns to retrieve
+    :param max_rows: max number of rows to retrieve
+    :param sort: comma separated list of column names to sort by, prefix a column with '-' to sort descending
+    :param offset: number of rows to offset results by
+    :param container_filter: enumeration of the various container filters available. See:
+        https://www.labkey.org/download/clientapi_docs/javascript-api/symbols/LABKEY.Query.html#.containerFilter
+    :param parameters: Set of parameters to pass along to a parameterized query
+    :param show_rows: An enumeration of various paging styles
+    :param include_total_count: Boolean value that indicates whether to include a total count value in response
+    :param include_details_column: Boolean value that indicates whether to include a Details link column in results
+    :param include_update_column: Boolean value that indicates whether to include an Update link column in results
+    :param selection_key:
+    :param required_version: decimal value that indicates the response version of the api
+    :param timeout: Request timeout in seconds (defaults to 30s)
+    :return:
+    """
     # TODO: Support data_region_name
     url = build_url(server_context, 'query', 'getQuery.api', container_path=container_path)
 
@@ -210,6 +278,17 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
 
 
 def update_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
+    """
+    Update a set of rows
+
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name to update
+    :param rows: Set of rows to update
+    :param container_path: labkey container path if not already set in context
+    :param timeout: timeout of request in seconds (defaults to 30s)
+    :return:
+    """
     url = build_url(server_context, 'query', 'updateRows.api', container_path=container_path)
 
     payload = {
@@ -219,7 +298,8 @@ def update_rows(server_context, schema_name, query_name, rows, container_path=No
     }
 
     # explicit json payload and headers required for form generation
-    update_rows_response = _make_request(server_context, url, json.dumps(payload), headers=_query_headers, timeout=timeout)
+    update_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
+                                         headers=_query_headers, timeout=timeout)
     return update_rows_response
 
 
@@ -229,7 +309,7 @@ def _make_request(server_context, url, payload, headers=None, timeout=_default_t
         raw_response = session.post(url, data=payload, headers=headers, timeout=timeout)
         return handle_response(raw_response)
     except SSLError as e:
-        raise Exception('Failed to match server SSL configuration. Ensure the server_context is configured correctly.')
+        raise ServerContextError(e)
 
 
 # TODO: Provide filter generators.
@@ -240,8 +320,13 @@ def _make_request(server_context, url, payload, headers=None, timeout=_default_t
 #
 # https://www.labkey.org/download/clientapi_docs/javascript-api/symbols/LABKEY.Filter.html
 class QueryFilter:
-
+    """
+    Filter object to simplify generation of query filters
+    """
     class Types:
+        """
+        Enumeration of acceptable filter types
+        """
         HAS_ANY_VALUE = '',
 
         EQUAL = 'eq',
