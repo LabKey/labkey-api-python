@@ -1,8 +1,9 @@
 """
 Example server responses to be used for mocking
 """
-import string
+from __future__ import unicode_literals
 import requests
+
 
 try:
     import mock
@@ -70,12 +71,6 @@ class MockSelectRows(MockLabKey):
     api = 'getQuery.api'
     default_success_body = '{"columnModel": [{"align": "right", "dataIndex": "Participant ID", "editable": true , "header": "Participant ID", "hidden": false , "required": false , "scale": 10 , "sortable": true , "width": 60 }] , "formatVersion": 8.3 , "metaData": {"description": null , "fields": [{"autoIncrement": false , "calculated": false , "caption": "Participant ID", "conceptURI": null , "defaultScale": "LINEAR", "defaultValue": null , "dimension": false , "excludeFromShifting": false , "ext": {} , "facetingBehaviorType": "AUTOMATIC", "fieldKey": "Participant ID", "fieldKeyArray": ["Participant ID"] , "fieldKeyPath": "Participant ID", "friendlyType": "Integer", "hidden": false , "inputType": "text", "isAutoIncrement": false , "isHidden": false , "isKeyField": false , "isMvEnabled": false , "isNullable": true , "isReadOnly": false , "isSelectable": true , "isUserEditable": true , "isVersionField": false , "jsonType": "int", "keyField": false , "measure": false , "mvEnabled": false , "name": "Participant ID", "nullable": true , "protected": false , "rangeURI": "http://www.w3.org/2001/XMLSchema#int", "readOnly": false , "recommendedVariable": false , "required": false , "selectable": true , "shortCaption": "Participant ID", "shownInDetailsView": true , "shownInInsertView": true , "shownInUpdateView": true , "sqlType": "int", "type": "int", "userEditable": true , "versionField": false }] , "id": "Key", "importMessage": null , "importTemplates": [{"label": "Download Template", "url": ""}] , "root": "rows", "title": "Demographics", "totalProperty": "rowCount"} , "queryName": "Demographics", "rowCount": 224 , "rows": [{	"Participant ID": 133428 } , {	"Participant ID": 138488 } , {	"Participant ID": 140163 } , {	"Participant ID": 144740 } , {	"Participant ID": 150489 } ] , "schemaName": "lists"}'
 
-    def __init__(self, schema_name, query_name, **kwargs):
-        MockLabKey.__init__(self, **kwargs)
-        self.schema_name = schema_name
-        self.query_name = query_name
-
-
 
 class MockInsertRows(MockLabKey):
     api = 'insertRows.api'
@@ -98,7 +93,10 @@ class MockLoadBatch(MockLabKey):
     default_action = 'assay'
     default_success_body = {"assayId": 2809, "batch": {"lsid": "urn:lsid:labkey.com:Experiment.Folder-1721:465ad7db-58d8-1033-a587-7eb0c02c2efe", "createdBy": "", "created": "2015/10/19 18:21:57", "name": "python batch", "modified": "2015/10/19 18:21:57", "modifiedBy": "", "comment": None, "id": 120, "runs": [{"dataOutputs": [], "dataRows": [{"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}, {"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}, {"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}], "dataInputs": [], "created": "2015/10/19 18:21:57", "materialInputs": [{"lsid": "urn:lsid:labkey.com:AssayRunMaterial.Folder-1721:Unknown", "role": "Sample", "created": "2015/10/19 18:21:57", "name": "Unknown", "modified": "2015/10/19 18:21:57", "id": 7641}], "lsid": "urn:lsid:labkey.com:GeneralAssayRun.Folder-1721:465ad7dd-58d8-1033-a587-7eb0c02c2efe", "materialOutputs": [], "createdBy": "", "name": "python upload", "modified": "2015/10/19 18:21:57", "modifiedBy": "", "comment": None, "id": 1526, "properties": {}}], "properties": {"ParticipantVisitResolver": None, "TargetStudy": None}}}
 
+
 class MockSaveBatch(MockLabKey):
     api = 'saveAssayBatch.api'
     default_action = 'assay'
     default_success_body = {"batches": [{"lsid": "urn:lsid:labkey.com:Experiment.Folder-1721:50666e45-609f-1033-ba4a-ca4935e31f28", "createdBy": "", "created": "2015/10/29 12:17:50", "name": "python batch 7", "modified": "2015/10/29 12:17:51", "modifiedBy": "", "comment": None, "id": 139, "runs": [{"dataOutputs": [], "dataRows": [{"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}, {"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}, {"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}], "dataInputs": [], "created": "2015/10/29 12:17:50", "materialInputs": [{"lsid": "urn:lsid:labkey.com:AssayRunMaterial.Folder-1721:Unknown", "role": "Sample", "created": "2015/10/19 18:21:57", "name": "Unknown", "modified": "2015/10/19 18:21:57", "id": 7641}], "lsid": "urn:lsid:labkey.com:GeneralAssayRun.Folder-1721:50666e47-609f-1033-ba4a-ca4935e31f28", "materialOutputs": [], "createdBy": "", "name": "python upload", "modified": "2015/10/29 12:17:51", "modifiedBy": "", "comment": None, "id": 1673, "properties": {}}], "properties": {"ParticipantVisitResolver": None, "TargetStudy": None}}], "assayId": 2809}
+
+
