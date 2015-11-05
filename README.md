@@ -9,7 +9,7 @@ $ pip install labkey
 ```
 
 # Credentials
-The api no longer supports using a ``.labkeycredentials.txt`` file, and now uses the .netrc files similar to the other labkey apis. Additional .netrc [setup instructions](https://www.labkey.org/wiki/Staff/steveh/DocsSandbox/page.view?name=netrc&_docid=wiki%3Ae780ab5b-241e-1033-93dd-22a830bccfbb) can be found at the link.
+As of v0.4.0 this API no longer supports using a ``.labkeycredentials.txt`` file, and now uses the .netrc files similar to the other labkey APIs. Additional .netrc [setup instructions](https://www.labkey.org/wiki/home/Documentation/page.view?name=netrc) can be found at the link.
 
 ## Set Up a netrc File
 
@@ -38,9 +38,9 @@ machine mymachine.labkey.org login user@labkey.org password mypassword
 ```
 
 # Supported Versions
-Python 2.6 or 2.7 and 3.4 are fully supported.
+Python 2.6+ and 3.4+ are fully supported.
 
-LabKey Server v11.1 and later.
+LabKey Server v13.3 and later.
 
 # Contributing
 This library and the LabKey Server are maintained by the LabKey Software Foundation. If you have any questions or need support, please use the [LabKey Server support forum](https://www.labkey.org/wiki/home/page.view?name=support).
