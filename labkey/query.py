@@ -56,7 +56,7 @@ _query_headers = {
     'Content-Type': 'application/json'
 }
 
-_default_timeout = 30  # in seconds
+_default_timeout = 60 * 5  # 5 minutes
 
 
 class Pagination:
@@ -105,7 +105,7 @@ def execute_sql(server_context, schema_name, sql, container_path=None,
                 required_version=None,
                 timeout=_default_timeout):
     """
-    Execute a string a labkey sql against a LabKey server.
+    Execute sql query against a LabKey server.
 
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param schema_name: schema of table
@@ -197,7 +197,7 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
                 timeout=_default_timeout
                 ):
     """
-    Query data from a labkey server
+    Query data from a LabKey server
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param schema_name: schema of table
     :param query_name: table name to select from
@@ -220,7 +220,6 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
     :param timeout: Request timeout in seconds (defaults to 30s)
     :return:
     """
-    # TODO: Support data_region_name
     url = build_url(server_context, 'query', 'getQuery.api', container_path=container_path)
 
     payload = {
@@ -228,7 +227,6 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
         'query.queryName': query_name
     }
 
-    # TODO: Roll these checks up
     if view_name is not None:
         payload['query.viewName'] = view_name
 
