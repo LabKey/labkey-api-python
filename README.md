@@ -1,5 +1,3 @@
-[Credentials](#cred)
-
 # About
 The Python client API for LabKey Server lets you query, insert and update data on a LabKey Server from a Python client.
 
