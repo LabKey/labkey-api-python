@@ -1,5 +1,5 @@
 # About
-Python client API for LabKey Server. To get started, please see the [full documentation for this library](https://www.labkey.org/wiki/home/Documentation/page.view?name=python).
+Python client API for LabKey Server. To get started, please see the [full documentation for this library](https://www.labkey.org/wiki/home/Documentation/Archive/15.2/page.view?name=python).
 
 # Installation
 To install, simply use `pip`:
