@@ -28,16 +28,16 @@ to Message Boards/Forums on the LabKey Server
 
 Documentation:
 LabKey Python API:
-https://www.labkey.org/wiki/home/Documentation/Archive/15.2/page.view?name=python
+https://www.labkey.org/wiki/home/Documentation/page.view?name=python
 
 Setup, configuration of the LabKey Python API:
-https://www.labkey.org/wiki/home/Documentation/Archive/15.2/page.view?name=setupPython
+https://www.labkey.org/wiki/home/Documentation/page.view?name=setupPython
 
 Using the LabKey Python API:
-https://www.labkey.org/wiki/home/Documentation/Archive/15.2/page.view?name=usingPython
+https://www.labkey.org/wiki/home/Documentation/page.view?name=usingPython
 
 Documentation for the LabKey client APIs:
-https://www.labkey.org/wiki/home/Documentation/Archive/15.2/page.view?name=viewAPIs
+https://www.labkey.org/wiki/home/Documentation/page.view?name=viewAPIs
 
 Support questions should be directed to the LabKey forum:
 https://www.labkey.org/announcements/home/Server/Forum/list.view?
