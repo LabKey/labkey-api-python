@@ -7,10 +7,12 @@ Changes in the current release:
 
 - Support for Python 3
 - Support for netrc files (.labkeycredentials.txt files are now deprecated)
-- server_context parameter on all methods
-- PEP standards - the latest update follows PEP code styling standards
-- New samples
-- New methods: load_batch and save_batch
+- New methods for working with assay data: 
+ - [load_batch](https://github.com/LabKey/labkey-api-python/tree/master/labkey/experment.py) 
+ - [save_batch](https://github.com/LabKey/labkey-api-python/tree/master/labkey/experment.py)
+- server_context parameter added to all methods
+- PEP standards - the latest version follows PEP code styling standards
+- New [samples](https://github.com/LabKey/labkey-api-python/tree/master/samples)
 
 # Installation
 To install, simply use `pip`:
