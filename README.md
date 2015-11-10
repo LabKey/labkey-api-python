@@ -59,7 +59,7 @@ Note that the netrc file only deals with connections at the machine level and sh
 
 # Examples
 
-Sample code is availabe in the [samples](https://github.com/LabKey/labkey-api-python/tree/experiment/samples) directory.
+Sample code is available in the [samples](https://github.com/LabKey/labkey-api-python/tree/experiment/samples) directory.
 
 The following gets data from the Users table on your local machine:
 
