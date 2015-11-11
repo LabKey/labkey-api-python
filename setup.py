@@ -19,39 +19,41 @@ Setup script for Python client API for LabKey Server.
 Also installs included versions of third party libraries, if those libraries
 are not already installed.
 """
-from distutils.core import setup
-from labkey import __version__
+from setuptools import setup
 
 packages = [
-  'labkey'
+    'labkey'
 ]
 
-long_desc = "Python client API for LabKey Server. Supports for query, wiki, and messageboard APIs."
+long_desc = "Python client API for LabKey Server. Supports query and experiment APIs."
 
 setup(
-  name='labkey',
-  version=__version__,
-  description='Python client API for LabKey Server',
-  long_description=long_desc,
-  license="Apache License 2.0",
-  author='Elizabeth Nelson',
-  author_email='eknelson@labkey.com',
-  maintainer='Brian Connolly',
-  maintainer_email='brian@labkey.com',
-  url='https://github.com/LabKey/labkey-api-python',
-  packages=packages,
-  package_data={},
-  keywords="labkey api client",
-  classifiers=[
-      'Development Status :: 4 - Beta',
-      'Environment :: Console',
-      'Intended Audience :: Science/Research',
-      'Intended Audience :: System Administrators',
-      'License :: OSI Approved :: Apache Software License',
-      'Operating System :: MacOS',
-      'Operating System :: Microsoft',
-      'Operating System :: POSIX',
-      'Programming Language :: Python :: 2',
-      'Topic :: Scientific/Engineering'
-  ]
+    name='labkey',
+    version='0.3.0',
+    description='Python client API for LabKey Server',
+    long_description=long_desc,
+    license="Apache License 2.0",
+    author='LabKey Software',
+    author_email='nicka@labkey.com',
+    maintainer='Nick Arnold',
+    maintainer_email='nicka@labkey.com',
+    url='https://github.com/LabKey/labkey-api-python',
+    packages=packages,
+    package_data={},
+    install_requires=['requests'],
+    tests_require=['requests', 'mock'],
+    keywords="labkey api client",
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: MacOS',
+        'Operating System :: Microsoft',
+        'Operating System :: POSIX',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+        'Topic :: Scientific/Engineering'
+    ]
 )

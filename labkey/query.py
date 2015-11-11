@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011-2014 LabKey Corporation
+# Copyright (c) 2011-2015 LabKey Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,561 +44,347 @@ https://www.labkey.org/announcements/home/Server/Forum/list.view?
 
 ############################################################################
 """
-
-import os
-import sys
-import ssl
-from functools import wraps
+from __future__ import unicode_literals
 import json
-import urllib2
-import urllib
-import pprint
 
-def selectRows(baseUrl, containerPath, schemaName, queryName, viewName=None,
-    filterArray=None, columns=None, maxRows=None, sort=None, offset=None,
-    containerFilter=None, debug=False):
-    
+from requests.exceptions import SSLError
+from labkey.utils import build_url, handle_response
+from labkey.exceptions import ServerContextError
+
+
+_query_headers = {
+    'Content-Type': 'application/json'
+}
+
+_default_timeout = 60 * 5  # 5 minutes
+
+
+class Pagination:
     """
-############################################################################
-selectRows()
-
-selectRows() can be used to query data from LabKey server
-
-The following are the minimum required params:
-		
-myresults = labkey.query.selectRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'study',
-    queryName = 'Physical Exam')
-    
-The following are optional parameters:
-
-	viewName => 'view1',
-	filterArray => [
-        ['ParticipantID', 'eq', 249318596], 
-        ['Pulse', 'gt', '0'] 
-	], 
-	maxRows = 10,	#the max number of rows returned
-	sort = 'ColumnA,ColumnB',	#sort order used for this query
-	offset = 100,	#the offset used when running the query
-	columns = 'ColumnA,ColumnB',  #A comma-delimited list of column names to include in the results.
-	containerFilter = 'currentAndSubfolders',
-	debug = True	#will result in a more verbose output
-
-----------------------------------------------------------------------------
-Test code:
-
-import labkey
-myresults = labkey.query.selectRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'study',
-    queryName = 'Physical Exam',
-    maxRows = 2,
-    filterArray = [
-        ['ParticipantID', 'eq', 249318596], 
-        ['Pulse', 'gt', '0']], 
-    debug = True)    
-
-myresults = labkey.query.selectRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'lists',
-    queryName = 'Lab Machines', 
-    debug = True)    
-    
-# Alternative baseUrl:
-#     baseUrl = 'http://localhost:8080/labkey',   
-    
-############################################################################
+    Enum of paging styles
     """
+    PAGINATED = 'paginated'
+    SELECTED = 'selected'
+    UNSELECTED = 'unselected'
+    ALL = 'all'
+    NONE = 'none'
 
-    # Build the URL for querying LabKey Server
-    myurl = baseUrl.rstrip('/') +\
-        "/query/" +\
-        urllib2.quote(containerPath.strip('/')) +\
-        "/getQuery.api?schemaName=" + urllib2.quote(schemaName) +\
-        "&query.queryName=" + urllib2.quote(queryName)       
-    if viewName!=None: myurl += "&query.viewName=" + urllib2.quote(viewName)
-    if filterArray!=None:
-        for filter_row in filterArray:
-            myurl += "&query." + str(filter_row[0]) + "~" + str(filter_row[1]) + "=" + str(filter_row[2])
-    if columns!=None: myurl += "&query.columns=" + urllib2.quote(columns)
-    if maxRows!=None: myurl += "&query.maxRows=" + str(maxRows)
-    if sort!=None: myurl += "&query.sort=" + urllib2.quote(sort)
-    if offset!=None: myurl += "&query.offset=" + str(offset)
-    if containerFilter!=None: myurl += "&query.containerFilter=" + urllib2.quote(containerFilter)    
-    
-    # Get authenticated to send URL requests
-    opener =_create_opener()
-    
-    # Use the opener to fetch a URL request
-    myrequest = urllib2.Request(myurl)
+
+def delete_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
+    """
+    Delete a set of rows from the schema.query
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name to delete from
+    :param rows: Set of rows to delete
+    :param container_path: labkey container path if not already set in context
+    :param timeout: timeout of request in seconds (defaults to 30s)
+    :return:
+    """
+    url = build_url(server_context, 'query', 'deleteRows.api', container_path=container_path)
+
+    payload = {
+        'schemaName': schema_name,
+        'queryName': query_name,
+        'rows': rows
+    }
+
+    # explicit json payload and headers required for form generation
+    delete_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
+                                         headers=_query_headers, timeout=timeout)
+    return delete_rows_response
+
+
+def execute_sql(server_context, schema_name, sql, container_path=None,
+                max_rows=None,
+                sort=None,
+                offset=None,
+                container_filter=None,
+                save_in_session=None,
+                parameters=None,
+                required_version=None,
+                timeout=_default_timeout):
+    """
+    Execute sql query against a LabKey server.
+
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param sql: String of labkey sql to execute
+    :param container_path: labkey container path if not already set in context
+    :param max_rows: max number of rows to return
+    :param sort: comma separated list of column names to sort by
+    :param offset: number of rows to offset results by
+    :param container_filter: enumeration of the various container filters available. See:
+        https://www.labkey.org/download/clientapi_docs/javascript-api/symbols/LABKEY.Query.html#.containerFilter
+    :param save_in_session: save query result as a named view to the session
+    :param parameters: parameter values to pass through to a parameterized query
+    :param required_version: Api version of response
+    :param timeout: timeout of request in seconds (defaults to 30s)
+    :return:
+    """
+    url = build_url(server_context, 'query', 'executeSql.api', container_path=container_path)
+
+    payload = {
+        'schemaName': schema_name,
+        'sql': sql
+    }
+
+    if container_filter is not None:
+        payload['containerFilter'] = container_filter
+
+    if max_rows is not None:
+        payload['maxRows'] = max_rows
+
+    if offset is not None:
+        payload['offset'] = offset
+
+    if sort is not None:
+        payload['query.sort'] = sort
+
+    if save_in_session is not None:
+        payload['saveInSession'] = save_in_session
+
+    if parameters is not None:
+        payload['query.parameters'] = parameters
+
+    if required_version is not None:
+        payload['apiVersion'] = required_version
+
+    execute_sql_response = _make_request(server_context, url, payload, timeout=timeout)
+    return execute_sql_response
+
+
+def insert_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
+    """
+    Insert row(s) into table
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name to insert into
+    :param rows: set of rows to insert
+    :param container_path: labkey container path if not already set in context
+    :param timeout: timeout of request in seconds (defaults to 30s)
+    :return:
+    """
+    url = build_url(server_context, 'query', 'insertRows.api', container_path=container_path)
+
+    payload = {
+        'schemaName': schema_name,
+        'queryName': query_name,
+        'rows': rows
+    }
+
+    # explicit json payload and headers required for form generation
+    insert_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
+                                         headers=_query_headers, timeout=timeout)
+    return insert_rows_response
+
+
+def select_rows(server_context, schema_name, query_name, view_name=None,
+                filter_array=None,
+                container_path=None,
+                columns=None,
+                max_rows=None,
+                sort=None,
+                offset=None,
+                container_filter=None,
+                parameters=None,
+                show_rows=None,
+                include_total_count=None,
+                include_details_column=None,
+                include_update_column=None,
+                selection_key=None,
+                required_version=None,
+                timeout=_default_timeout
+                ):
+    """
+    Query data from a LabKey server
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name to select from
+    :param view_name: pre-existing named view
+    :param filter_array: set of filter objects to apply
+    :param container_path: folder path if not already part of server_context
+    :param columns: set of columns to retrieve
+    :param max_rows: max number of rows to retrieve
+    :param sort: comma separated list of column names to sort by, prefix a column with '-' to sort descending
+    :param offset: number of rows to offset results by
+    :param container_filter: enumeration of the various container filters available. See:
+        https://www.labkey.org/download/clientapi_docs/javascript-api/symbols/LABKEY.Query.html#.containerFilter
+    :param parameters: Set of parameters to pass along to a parameterized query
+    :param show_rows: An enumeration of various paging styles
+    :param include_total_count: Boolean value that indicates whether to include a total count value in response
+    :param include_details_column: Boolean value that indicates whether to include a Details link column in results
+    :param include_update_column: Boolean value that indicates whether to include an Update link column in results
+    :param selection_key:
+    :param required_version: decimal value that indicates the response version of the api
+    :param timeout: Request timeout in seconds (defaults to 30s)
+    :return:
+    """
+    url = build_url(server_context, 'query', 'getQuery.api', container_path=container_path)
+
+    payload = {
+        'schemaName': schema_name,
+        'query.queryName': query_name
+    }
+
+    if view_name is not None:
+        payload['query.viewName'] = view_name
+
+    if filter_array is not None:
+        for query_filter in filter_array:
+            prefix = query_filter.get_url_parameter_name()
+            payload[prefix] = query_filter.get_url_parameter_value()
+
+    if columns is not None:
+        payload['query.columns'] = columns
+
+    if max_rows is not None:
+        payload['query.maxRows'] = max_rows
+
+    if sort is not None:
+        payload['query.sort'] = sort
+
+    if offset is not None:
+        payload['query.offset'] = offset
+
+    if container_filter is not None:
+        payload['containerFilter'] = container_filter
+
+    if parameters is not None:
+        payload['query.parameters'] = parameters
+
+    if show_rows is not None:
+        payload['query.showRows'] = show_rows
+
+    if include_total_count is not None:
+        payload['includeTotalCount'] = include_total_count
+
+    if include_details_column is not None:
+        payload['includeDetailsColumn'] = include_details_column
+
+    if include_update_column is not None:
+        payload['includeUpdateColumn'] = include_update_column
+
+    if selection_key is not None:
+        payload['query.selectionKey'] = selection_key
+
+    if required_version is not None:
+        payload['apiVersion'] = required_version
+
+    select_rows_response = _make_request(server_context, url, payload, timeout=timeout)
+    return select_rows_response
+
+
+def update_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
+    """
+    Update a set of rows
+
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name to update
+    :param rows: Set of rows to update
+    :param container_path: labkey container path if not already set in context
+    :param timeout: timeout of request in seconds (defaults to 30s)
+    :return:
+    """
+    url = build_url(server_context, 'query', 'updateRows.api', container_path=container_path)
+
+    payload = {
+        'schemaName': schema_name,
+        'queryName': query_name,
+        'rows': rows
+    }
+
+    # explicit json payload and headers required for form generation
+    update_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
+                                         headers=_query_headers, timeout=timeout)
+    return update_rows_response
+
+
+def _make_request(server_context, url, payload, headers=None, timeout=_default_timeout):
     try:
-        response = opener.open(myrequest)
-    except urllib2.HTTPError, e:
-        print e.code
-        print e.read()
-        return
-    data= response.read()
+        session = server_context['session']
+        raw_response = session.post(url, data=payload, headers=headers, timeout=timeout)
+        return handle_response(raw_response)
+    except SSLError as e:
+        raise ServerContextError(e)
 
-    # Decode the JSON into a Python "dictionary" - an associative array
-    data_dict = json.loads(data, object_hook=_decode_dict)
 
-    if debug:
-        _print_debug_info(data_dict, myurl)
-        
-    return(data_dict)
-    
-def executeSql(baseUrl, containerPath, schemaName, sql, maxRows=None, sort=None, offset=None,  
-    containerFilter=None, debug=False):
-    
+# TODO: Provide filter generators.
+#
+# There are some inconsistencies between the different filter types with multiple values,
+# some use ';' and others use ',' to delimit values within string list; and still others use an array of value objects.
+# This is a historical artifact of the api and isn't clearly documented.
+#
+# https://www.labkey.org/download/clientapi_docs/javascript-api/symbols/LABKEY.Filter.html
+class QueryFilter:
     """
-############################################################################
-executeSql()
-
-executeSql() can be used to execute arbitrary SQL
-
-The following are the minimum required params:
-
-myresults = labkey.query.executeSql(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'study',
-    sql = 'SELECT * FROM "Physical Exam"')
-		
-The following are optional:
-
-	maxRows = 10,	#the max number of rows returned
-	sort = 'ColumnA,ColumnB',	#sort order used for this query
-	offset = 100,	#the offset used when running the query
-	containerFilter = 'currentAndSubfolders',
-	debug = True	#will result in a more verbose output
-
-----------------------------------------------------------------------------
-Test Code:
-
-import labkey
-myresults = labkey.query.executeSql(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'study',
-    sql = 'SELECT "Physical Exam".ParticipantId, "Physical Exam".Pulse \
-        FROM "Physical Exam" WHERE "Physical Exam".ParticipantId.ParticipantId=\'249318596\'',
-    maxRows = 4,
-    debug = True)
-
-Reminder:  
-
-In Python, if there are ' or \ characters in string arguments, the characters must 
-be escaped as \' and \\  -- see the example above for \'
-    
-############################################################################
+    Filter object to simplify generation of query filters
     """
+    class Types:
+        """
+        Enumeration of acceptable filter types
+        """
+        HAS_ANY_VALUE = '',
 
-    # Build the URL for querying LabKey Server      
-    myurl = baseUrl.rstrip('/') +\
-        "/query/" +\
-        urllib2.quote(containerPath.strip('/')) +\
-        "/executeSql.api?"
-        
-    myurldata_unencoded = {\
-        'schemaName': schemaName,
-        'sql': sql}
-    myurldata = urllib.urlencode(myurldata_unencoded)
-    
-    if maxRows!=None: myurldata += "&query.maxRows=" + str(maxRows)
-    if sort!=None: myurldata += "&query.sort=" + urllib2.quote(sort)
-    if offset!=None: myurldata += "&query.offset=" + str(offset)
-    if containerFilter!=None: myurldata += "&query.containerFilter=" + urllib2.quote(containerFilter)
-         
-    #Get authenticated to send URL requests
-    opener =_create_opener()
+        EQUAL = 'eq',
+        DATE_EQUAL = 'dateeq',
 
-    # Use the opener to fetch a URL request
-    myrequest = urllib2.Request(myurl, myurldata)
-    try:
-        response = opener.open(myrequest)
-    except urllib2.HTTPError, e:
-        print e.code
-        print e.read()
-        return
-    data= response.read()
-    
-    # Decode the JSON into a Python "dictionary" - an associative array
-    data_dict = json.loads(data, object_hook=_decode_dict)
+        NEQ = 'neq',
+        NOT_EQUAL = 'neq',
+        DATE_NOT_EQUAL = 'dateneq',
 
-    if debug:
-        _print_debug_info(data_dict, myurl, myurldata)
- 
-    return(data_dict)
+        NEQ_OR_NULL = 'neqornull',
+        NOT_EQUAL_OR_MISSING = 'neqornull',
 
-def insertRows(baseUrl, containerPath, schemaName, queryName, rows, debug=False):
-    
-    """
-############################################################################
-insertRows()
+        GT = 'gt',
+        GREATER_THAN = 'gt',
+        DATE_GREATER_THAN = 'dategt',
 
-insertRows() can be used to insert records into a LabKey table
+        LT = 'lt',
+        LESS_THAN = 'lt',
+        DATE_LESS_THAN = 'datelt',
 
-The following are the minimum required params:
- 
-myresults = labkey.query.insertRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'study',
-    queryName = 'Physical Exam',
-    rows = [{'DiastolicBloodPressure': 90,
-        'Language': 'English',
-        'ParticipantId': '249325718', #The combo of ParticipantId + date must be unique
-        'Pregnancy': '0',
-        'Pulse': 77,
-        'Respirations': 13,
-        'Signature': 0,
-        'SystolicBloodPressure': 137,
-        'Temp_C': 38,
-        'Weight_kg': 111,
-        'date': '21 May 2008 00:00:00'}])
-		
-The following are optional:
+        GTE = 'gte',
+        GREATER_THAN_OR_EQUAL = 'gte',
+        DATE_GREATER_THAN_OR_EQUAL = 'dategte',
 
-	debug = True	#will result in a more verbose output
-    
-----------------------------------------------------------------------------
-Test Code:
+        LTE = 'lte',
+        LESS_THAN_OR_EQUAL = 'lte',
+        DATE_LESS_THAN_OR_EQUAL = 'datelte',
 
-import labkey
-myresults = labkey.query.insertRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'study',
-    queryName = 'Physical Exam',
-    rows = [{'DiastolicBloodPressure': 90,
-        'Language': 'English',
-        'ParticipantId': '249325728', #The combo of ParticipantId + date must be unique
-        'Pregnancy': '0',
-        'Pulse': 77,
-        'Respirations': 13,
-        'Signature': 0,
-        'SystolicBloodPressure': 137,
-        'Temp_C': 38,
-        'Weight_kg': 111,
-        'date': '21 May 2008 00:00:00'}],
-    debug = True)
+        STARTS_WITH = 'startswith',
+        DOES_NOT_START_WITH = 'doesnotstartwith',
 
+        CONTAINS = 'contains',
+        DOES_NOT_CONTAIN = 'doesnotcontain',
 
-myresults = labkey.query.insertRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'lists',
-    queryName = 'Lab Machines', 
-    rows = [{'ContactPerson': 'Elizabeth',
-        'InstrumentID': '7',  # The key for each inserted row must be unique
-        'Name': 'HAL'}],
-    debug = True)    
-        
-############################################################################
-    """
+        CONTAINS_ONE_OF = 'containsoneof',
+        CONTAINS_NONE_OF = 'containsnoneof',
 
-    # Build the URL for querying LabKey Server      
-    myurl = baseUrl.rstrip('/') +\
-        "/query/" +\
-        urllib2.quote(containerPath.strip('/')) +\
-        "/insertRows.api?"
-        
-    mypostdata_unencoded = {\
-        'schemaName': schemaName,
-        'queryName': queryName,
-        'rows': rows}    
-    mypostdata = json.dumps(mypostdata_unencoded)
- 
-    #Get authenticated to send URL requests
-    opener =_create_opener()
-    
-    # Use the opener to fetch a URL request
-    myrequest = urllib2.Request(myurl, mypostdata, {'Content-Type': 'application/json'})
-    try:
-        response = opener.open(myrequest)
-    except urllib2.HTTPError, e:
-        print e.code
-        print e.read()
-        return
-    data= response.read()
+        IN = 'in',
 
-    # Decode the JSON into a Python "dictionary" - an associative array
-    data_dict = json.loads(data, object_hook=_decode_dict)
+        EQUALS_ONE_OF = 'in',
 
-    if debug:
-        _print_debug_info(data_dict, myurl, mypostdata)
-            
-    return(data_dict)
+        NOT_IN = 'notin',
+        EQUALS_NONE_OF = 'notin',
 
-def updateRows(baseUrl, containerPath, schemaName, queryName, rows, debug=False):
-    
-    """
-############################################################################
-updateRows()
+        BETWEEN = 'between',
+        NOT_BETWEEN = 'notbetween',
 
-updateRows() can be used to insert records into a LabKey table
+        MEMBER_OF = 'memberof'
 
-The following are the minimum required params:
- 
-myresults = labkey.query.updateRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'lists',
-    queryName = 'Lab Machines', 
-    rows = [{'InstrumentID': '10', #This is the key - it's required
-        'Name': 'HAL'}])  #This is the update you wish to execute
-		
-The following are optional:
+    def __init__(self, column, value, filter_type = Types.EQUAL):
+        self.column_name = column
+        self.value = value
+        self.filter_type = filter_type
 
-	debug = True	#will result in a more verbose output
-    
-----------------------------------------------------------------------------
-Test Code:
+    def get_url_parameter_name(self):
+        return 'query.' + self.column_name + '~' + self.filter_type[0]
 
-import labkey
-myresults = labkey.query.updateRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'study',
-    queryName = 'Physical Exam',
-    rows = [{'ParticipantId': '249325717', #Not required
-        'SystolicBloodPressure': 1390,     #This is the update
-        'lsid': 'urn:lsid:labkey.com:Study.Data-173:5004.2.0080427E7.249325717'}], #Key    
-    debug = True)
+    def get_url_parameter_value(self):
+        return self.value
 
-myresults = labkey.query.updateRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'lists',
-    queryName = 'Lab Machines', 
-    rows = [{'ContactPerson': 'Elizabeth',
-        'InstrumentID': '10', #This is the key
-        'Name': 'HAL'}],  #This is the update
-    debug = True)    
+    def get_column_name(self):
+        return self.column_name
 
-############################################################################
-    """
-
-    # Build the URL for querying LabKey Server      
-    myurl = baseUrl.rstrip('/') +\
-        "/query/" +\
-        urllib2.quote(containerPath.strip('/')) +\
-        "/updateRows.api?"
-        
-    mypostdata_unencoded = {\
-        'schemaName': schemaName,
-        'queryName': queryName,
-        'rows': rows}    
-    mypostdata = json.dumps(mypostdata_unencoded)
- 
-    #Get authenticated to send URL requests
-    opener =_create_opener()
-    
-    # Use the opener to fetch a URL request
-    myrequest = urllib2.Request(myurl, mypostdata, {'Content-Type': 'application/json'})
-    try:
-        response = opener.open(myrequest)
-    except urllib2.HTTPError, e:
-        print e.code
-        print e.read()
-        return
-    data= response.read()
-
-    # Decode the JSON into a Python "dictionary" - an associative array
-    data_dict = json.loads(data, object_hook=_decode_dict)
-
-    if debug:
-        _print_debug_info(data_dict, myurl, mypostdata)
-            
-    return(data_dict)
-
-def deleteRows(baseUrl, containerPath, schemaName, queryName, rows, debug=False):
-    
-    """
-############################################################################
-deleteRows()
-
-deleteRows() can be used to delete records into a LabKey table
-
-The following are the minimum required params:
- 
-myresults = labkey.query.deleteRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'lists',
-    queryName = 'Lab Machines', 
-    rows = [{'InstrumentID': '10'}])  #The key for each row is required.
-		
-The following are optional:
-
-	debug = True	#will result in a more verbose output
-    
-----------------------------------------------------------------------------
-Test Code:
-
-import labkey
-myresults = labkey.query.deleteRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'study',
-    queryName = 'Physical Exam',
-    rows = [{'lsid': 'urn:lsid:labkey.com:Study.Data-290:5004.2.0080427E7.249325717'}],
-    debug = True)
-
-myresults = labkey.query.deleteRows(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    schemaName = 'lists',
-    queryName = 'Lab Machines', 
-    rows = [{'InstrumentID': '10'}], #Make sure this exists
-    debug = True)    
-   
-############################################################################
-    """
-
-    # Build the URL for querying LabKey Server      
-    myurl = baseUrl.rstrip('/') +\
-        "/query/" +\
-        urllib2.quote(containerPath.strip('/')) +\
-        "/deleteRows.api?"
-        
-    mypostdata_unencoded = {\
-        'schemaName': schemaName,
-        'queryName': queryName,
-        'rows': rows}    
-    mypostdata = json.dumps(mypostdata_unencoded)
- 
-    #Get authenticated to send URL requests
-    opener =_create_opener()
-    
-    # Use the opener to fetch a URL request
-    myrequest = urllib2.Request(myurl, mypostdata, {'Content-Type': 'application/json'})
-    try:
-        response = opener.open(myrequest)
-    except urllib2.HTTPError, e:
-        print e.code
-        print e.read()
-        return
-    data= response.read()
-
-    # Decode the JSON into a Python "dictionary" - an associative array
-    data_dict = json.loads(data, object_hook=_decode_dict)
-
-    if debug:
-        _print_debug_info(data_dict, myurl, mypostdata)
-        
-    return(data_dict)
-
-
-"""
-############################################################################
-############################################################################
-Helper functions
-############################################################################
-"""
-def sslwrap(func):
-    """
-    This is used to force the HTTPS requests to use TLSv1+ instead of 
-    defaulting to SSLv3. Adapted from Stack Overflow:
-        - http://stackoverflow.com/questions/9835506/urllib-urlopen-works-on-sslv3-urls-with-python-2-6-6-on-1-machine-but-not-wit/24158047#24158047
-        - Thank you chnrxn
-    """
-    @wraps(func)
-    def bar(*args, **kw):
-        kw['ssl_version'] = ssl.PROTOCOL_TLSv1
-        return func(*args, **kw)
-    return bar
-
-def _print_debug_info(data_dict, myurl, mydata=None):
-    
-    # Print the URL and any data used to query the server
-    print myurl
-    if mydata: 
-        print mydata
-    
-    # Review the results
-    pp = pprint.PrettyPrinter(4)
-    pp.pprint(data_dict)
-    type(data_dict)
-
-    # Look at the dictionary's keys
-    mykeys = data_dict.keys()	
-    print mykeys
-
-    # Look at the list of rows
-    rowlist = data_dict['rows']
-    # Look at the first row of data
-    if rowlist: 
-        pp.pprint(rowlist[0])
-
-    return
-    
-def _create_opener():
-    """
-    Create an opener and load the login and password into the object. The
-    opener will be used when connecting to the LabKey Server
-    """
-    # Check for credential file (which contains login and password for accessing
-    # your LabKey Server) in either "LABKEY_CREDENTIALS" environment variable 
-    # or in the file .labkeycredentials.txt in your home directory
-    try: 
-        credential_file_name = os.environ["LABKEY_CREDENTIALS"]
-    except KeyError: 
-        credential_file_name = os.environ["HOME"] + '/.labkeycredentials.txt'
-    f = open(credential_file_name, 'r')
-    mymachine = f.readline().strip().split(' ')[1]
-    myusername = f.readline().strip().split(' ')[1]
-    mypassword = f.readline().strip().split(' ')[1]
-    f.close()
-
-    # Force the opener to use TLSv1 or greater SSL Protocol for SSL connections
-    ssl.wrap_socket = sslwrap(ssl.wrap_socket)
-    
-    # Create a password manager
-    passmanager = urllib2.HTTPPasswordMgrWithDefaultRealm()
-
-    # Add login info to the password manager
-    passmanager.add_password(None, mymachine, myusername, mypassword)
-
-    # Create the AuthHandler
-    authhandler = urllib2.HTTPBasicAuthHandler(passmanager)
-
-    # Create opener
-    opener = urllib2.build_opener(authhandler)
-    return opener
-    
-def _decode_list(lst):
-    # Helper function for dealing with unicode
-    # Adapted from Stack Overflow: 
-    #   http://stackoverflow.com/questions/956867/how-to-get-string-objects-instead-unicode-ones-from-json-in-python
-    #   Answer from Mike Brennan: http://stackoverflow.com/users/658138/mike-brennan
-    #   Question from Brutus: http://stackoverflow.com/users/11666/brutus
-    newlist = []
-    for i in lst:
-        if isinstance(i, unicode):
-            i = i.encode('utf-8')
-        elif isinstance(i, list):
-            i = _decode_list(i)
-        newlist.append(i)
-    return newlist
-
-def _decode_dict(dct):
-    # Helper function for dealing with unicode
-    # Adapted from Stack Overflow: 
-    #   http://stackoverflow.com/questions/956867/how-to-get-string-objects-instead-unicode-ones-from-json-in-python
-    #   Answer from Mike Brennan: http://stackoverflow.com/users/658138/mike-brennan
-    #   Question from Brutus: http://stackoverflow.com/users/11666/brutus
-    newdict = {}
-    for k, v in dct.iteritems():
-        if isinstance(k, unicode):
-            k = k.encode('utf-8')
-        if isinstance(v, unicode):
-             v = v.encode('utf-8')
-        elif isinstance(v, list):
-            v = _decode_list(v)
-        newdict[k] = v
-    return newdict

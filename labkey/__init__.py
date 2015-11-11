@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-__title__ = 'labkey'
-__version__ = '0.3.0'
-__author__ = 'LabKey Software'
-__license__ = 'Apache 2.0'
+from labkey import query, experiment, utils  # wiki, messageboard
+from pkg_resources import get_distribution
 
-from labkey import query, wiki, messageboard
+__title__ = get_distribution('labkey').project_name
+__version__ = get_distribution('labkey').version
+__author__ = 'LabKey Software'
+__license__ = 'Apache License 2.0'
