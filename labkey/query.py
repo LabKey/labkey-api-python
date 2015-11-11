@@ -374,13 +374,13 @@ class QueryFilter:
 
         MEMBER_OF = 'memberof'
 
-    def __init__(self, column, value, filter_type = Types.EQUAL):
+    def __init__(self, column, value, filter_type=Types.EQUAL):
         self.column_name = column
         self.value = value
         self.filter_type = filter_type
 
     def get_url_parameter_name(self):
-        return 'query.' + self.column_name + '~' + self.filter_type[0]
+        return 'query.' + self.column_name + '~' + self.filter_type
 
     def get_url_parameter_value(self):
         return self.value
