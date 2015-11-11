@@ -9,10 +9,10 @@ Changes in the current release:
 - Support for netrc files (.labkeycredentials.txt files are now deprecated)
 - New methods for working with assay data: 
  - [load_batch](./labkey/experiment.py) 
- - [save_batch](./master/labkey/experiment.py)
+ - [save_batch](./labkey/experiment.py)
 - server_context parameter added to all methods
 - PEP standards - the latest version follows PEP code styling standards
-- New [samples](./master/samples)
+- New [samples](./samples)
 
 # Installation
 To install, simply use `pip`:
