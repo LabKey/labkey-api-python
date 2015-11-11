@@ -2,6 +2,17 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 0.4.0 package
+==============================
+
+*Release date: 11/11/2015*
+
+- Introduce experiment.py API for save, load batches.
+- Introduce concept of server_context for establishing connection context.
+- Switch credential model from .labkeycredentials.txt to .netrc.
+- Switch to PEP 8 compliant syntax for API in general (e.g. selectRows now select_rows).
+- Deprecate wiki, messageboard APIs (at least for now).
+
 What's New in the LabKey 0.3.0 package
 ==============================
 

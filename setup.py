@@ -29,7 +29,7 @@ long_desc = "Python client API for LabKey Server. Supports query and experiment 
 
 setup(
     name='labkey',
-    version='0.3.0',
+    version='0.4.0',
     description='Python client API for LabKey Server',
     long_description=long_desc,
     license="Apache License 2.0",
