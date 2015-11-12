@@ -325,52 +325,52 @@ class QueryFilter:
         """
         Enumeration of acceptable filter types
         """
-        HAS_ANY_VALUE = '',
+        HAS_ANY_VALUE = ''
 
-        EQUAL = 'eq',
-        DATE_EQUAL = 'dateeq',
+        EQUAL = 'eq'
+        DATE_EQUAL = 'dateeq'
 
-        NEQ = 'neq',
-        NOT_EQUAL = 'neq',
-        DATE_NOT_EQUAL = 'dateneq',
+        NEQ = 'neq'
+        NOT_EQUAL = 'neq'
+        DATE_NOT_EQUAL = 'dateneq'
 
-        NEQ_OR_NULL = 'neqornull',
-        NOT_EQUAL_OR_MISSING = 'neqornull',
+        NEQ_OR_NULL = 'neqornull'
+        NOT_EQUAL_OR_MISSING = 'neqornull'
 
-        GT = 'gt',
-        GREATER_THAN = 'gt',
-        DATE_GREATER_THAN = 'dategt',
+        GT = 'gt'
+        GREATER_THAN = 'gt'
+        DATE_GREATER_THAN = 'dategt'
 
-        LT = 'lt',
-        LESS_THAN = 'lt',
-        DATE_LESS_THAN = 'datelt',
+        LT = 'lt'
+        LESS_THAN = 'lt'
+        DATE_LESS_THAN = 'datelt'
 
-        GTE = 'gte',
-        GREATER_THAN_OR_EQUAL = 'gte',
-        DATE_GREATER_THAN_OR_EQUAL = 'dategte',
+        GTE = 'gte'
+        GREATER_THAN_OR_EQUAL = 'gte'
+        DATE_GREATER_THAN_OR_EQUAL = 'dategte'
 
-        LTE = 'lte',
-        LESS_THAN_OR_EQUAL = 'lte',
-        DATE_LESS_THAN_OR_EQUAL = 'datelte',
+        LTE = 'lte'
+        LESS_THAN_OR_EQUAL = 'lte'
+        DATE_LESS_THAN_OR_EQUAL = 'datelte'
 
-        STARTS_WITH = 'startswith',
-        DOES_NOT_START_WITH = 'doesnotstartwith',
+        STARTS_WITH = 'startswith'
+        DOES_NOT_START_WITH = 'doesnotstartwith'
 
-        CONTAINS = 'contains',
-        DOES_NOT_CONTAIN = 'doesnotcontain',
+        CONTAINS = 'contains'
+        DOES_NOT_CONTAIN = 'doesnotcontain'
 
-        CONTAINS_ONE_OF = 'containsoneof',
-        CONTAINS_NONE_OF = 'containsnoneof',
+        CONTAINS_ONE_OF = 'containsoneof'
+        CONTAINS_NONE_OF = 'containsnoneof'
 
-        IN = 'in',
+        IN = 'in'
 
-        EQUALS_ONE_OF = 'in',
+        EQUALS_ONE_OF = 'in'
 
-        NOT_IN = 'notin',
-        EQUALS_NONE_OF = 'notin',
+        NOT_IN = 'notin'
+        EQUALS_NONE_OF = 'notin'
 
-        BETWEEN = 'between',
-        NOT_BETWEEN = 'notbetween',
+        BETWEEN = 'between'
+        NOT_BETWEEN = 'notbetween'
 
         MEMBER_OF = 'memberof'
 
