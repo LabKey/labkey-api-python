@@ -2,6 +2,14 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 0.4.1 package
+==============================
+
+*Release date: 11/17/2015*
+
+- Fix for QueryFilter.Types to be Python 2/3 compatible.
+- Documentation updates
+
 What's New in the LabKey 0.4.0 package
 ==============================
 
