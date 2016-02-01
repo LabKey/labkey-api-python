@@ -18,7 +18,7 @@ def success_test(test, expected_response, api_method, *args, **expected_kwargs):
         resp = api_method(*args)
 
         # validate response is as expected
-        test.assertEquals(resp, expected_response.text)
+        test.assertEqual(resp, expected_response.text)
 
         # validate call is made as expected
         expected_args = expected_kwargs.pop('expected_args')
@@ -57,7 +57,7 @@ class TestDeleteRows(unittest.TestCase):
             'expected_args': [self.service.get_server_url()]
             , 'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}'
             , 'headers': {u'Content-Type': u'application/json'}
-            , 'timeout': 30
+            , 'timeout': 300
         }
 
         rows = '{id:1234}'
@@ -99,7 +99,7 @@ class TestUpdateRows(unittest.TestCase):
             'expected_args': [self.service.get_server_url()]
             , 'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}'
             , 'headers': {u'Content-Type': u'application/json'}
-            , 'timeout': 30
+            , 'timeout': 300
         }
 
         rows = '{id:1234}'
@@ -141,7 +141,7 @@ class TestInsertRows(unittest.TestCase):
             'expected_args': [self.service.get_server_url()]
             , 'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}'
             , 'headers': {u'Content-Type': u'application/json'}
-            , 'timeout': 30
+            , 'timeout': 300
         }
 
         rows = '{id:1234}'
@@ -184,7 +184,7 @@ class TestExecuteSQL(unittest.TestCase):
             'expected_args': [self.service.get_server_url()]
             , 'data': {'sql': sql, "schemaName": schema}
             , 'headers': None
-            , 'timeout': 30
+            , 'timeout': 300
         }
 
         self.args = [
@@ -225,7 +225,7 @@ class TestSelectRows(unittest.TestCase):
             'expected_args': [self.service.get_server_url()]
             , 'data': {"schemaName": schema, "query.queryName": query}
             , 'headers': None
-            , 'timeout': 30
+            , 'timeout': 300
         }
 
         self.args = [
