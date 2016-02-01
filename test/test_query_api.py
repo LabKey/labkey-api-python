@@ -257,5 +257,15 @@ class TestSelectRows(unittest.TestCase):
                           , select_rows, *self.args, **self.expected_kwargs)
 
 
+def suite():
+    load_tests = unittest.TestLoader().loadTestsFromTestCase
+    return unittest.TestSuite([
+        load_tests(TestDeleteRows),
+        load_tests(TestUpdateRows),
+        load_tests(TestInsertRows),
+        load_tests(TestExecuteSQL),
+        load_tests(TestSelectRows)
+    ])
+
 if __name__ == '__main__':
     unittest.main()
