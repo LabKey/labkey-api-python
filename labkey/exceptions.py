@@ -13,30 +13,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from requests import exceptions
+from requests import exceptions, Response
 
 
 # base exception class for server responses
 class RequestError(exceptions.HTTPError):
     default_msg = 'Server Error'
 
-    def __init__(self, server_response=None):
-        if server_response is not None:
+    def __init__(self, server_response, **kwargs):
+        """
+        :type server_response: Response
+        """
+        super(RequestError, self).__init__(**kwargs)
+
+        # base class allows for kwargs 'request' and 'response'
+        self.response = server_response
+        self.server_exception = None
+
+        if self.response is not None:
+            msg = self.default_msg
             try:
-                decoded = server_response.json()
+                decoded = self.response.json()
                 if 'exception' in decoded:
                     # use labkey server error message if available
                     msg = decoded['exception']
                     self.server_exception = decoded
-                else:
-                    msg = self.default_msg
             except ValueError:
                 # no valid json to decode
-                raise ServerNotFoundError(server_response)
+                pass
 
-            self.message = '{0}: {1}'.format(server_response.status_code, msg)
+            self.message = '{0}: {1}'.format(self.response.status_code, msg)
+        else:
+            self.message = 'No response received'
 
-        self.response = server_response
+    def __str__(self):
+        return repr(self.message)
 
 
 class QueryNotFoundError(RequestError):
@@ -48,11 +59,7 @@ class RequestAuthorizationError(RequestError):
 
 
 class ServerNotFoundError(RequestError):
-    SERVER_NOT_FOUND_MSG = 'Server resource not found. Please verify context path and project path are valid'
-
-    def __init__(self, server_response=None):
-        self.message = '{0}: {1}'.format(server_response.status_code, self.SERVER_NOT_FOUND_MSG)
-        self.response = server_response
+    default_msg = 'Server resource not found. Please verify context path and project path are valid'
 
 
 class ServerContextError(exceptions.HTTPError):
