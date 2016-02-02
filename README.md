@@ -1,7 +1,6 @@
-# About
-The Python client API for LabKey Server lets you query, insert and update data on a LabKey Server from a Python client.
+Python API for LabKey Server. Lets you query, insert, and update data on a LabKey Server using Python.
 
-# Release Notes
+## Release Notes
 
 Changes in the current release:
 
@@ -14,7 +13,7 @@ Changes in the current release:
 - PEP standards - the latest version follows PEP code styling standards
 - New [samples](./samples)
 
-# Installation
+## Installation
 To install, simply use `pip`:
 
 ```bash
@@ -23,10 +22,10 @@ $ pip install labkey
 
 **Note:** For users who installed this package before it was published to PyPI (before v0.3.0) it is recommended you uninstall and reinstall the package rather than attempting to upgrade. This is due to a change in the package's versioning semantics.
 
-# Credentials
+## Credentials
 As of v0.4.0 this API no longer supports using a ``.labkeycredentials.txt`` file, and now uses the .netrc files similar to the other labkey APIs. Additional .netrc [setup instructions](https://www.labkey.org/wiki/home/Documentation/page.view?name=netrc) can be found at the link.
 
-## Set Up a netrc File
+### Set Up a netrc File
 
 On a Mac, UNIX, or Linux system the netrc file should be named ``.netrc`` (dot netrc) and on Windows it should be named ``_netrc`` (underscore netrc). The file should be located in your home directory and the permissions on the file must be set so that you are the only user who can read it, i.e. it is unreadable to everyone else.
 
@@ -49,7 +48,7 @@ password mypassword
 ```
 Note that the netrc file only deals with connections at the machine level and should not include a port or protocol designation, meaning both "mymachine.labkey.org:8888" and "https://mymachine.labkey.org" are incorrect. 
 
-# Supported Functions
+## Supported Functions
 
 - **labkey.query.select_rows()** - Query and get results sets from LabKey Server.
 - **labkey.query.execute_sql()** - Execute SQL (LabKey SQL dialect) through the query module on LabKey Server.
@@ -59,7 +58,7 @@ Note that the netrc file only deals with connections at the machine level and sh
 - **labkey.experiment.load_batch()** - Retreive assay data (batch level) from LabKey Server.
 - **labkey.experiment.save_batch()** - Save assay data (batch level) on LabKey Server. 
 
-# Examples
+## Examples
 
 Sample code is available in the [samples](https://github.com/LabKey/labkey-api-python/tree/experiment/samples) directory.
 
@@ -86,9 +85,22 @@ else:
     print('select_rows: Failed to load results from ' + schema + '.' + table)
 ```
 
-# Supported Versions
+## Supported Versions
 Python 2.6+ and 3.4+ are fully supported.
 LabKey Server v13.3 and later.
 
-# Contributing
-This library and the LabKey Server are maintained by the LabKey Software Foundation. If you have any questions or need support, please use the [LabKey Server support forum](https://www.labkey.org/wiki/home/page.view?name=support).
+## Contributing
+This library and the LabKey Server are maintained by the LabKey Software Foundation. If you have any questions or need support, please use the [LabKey Server support forum](https://www.labkey.org/wiki/home/page.view?name=support
+
+### Testing
+If you are looking to contribute please run the tests before issuing a PR. For now you need to manually get the dependencies:
+
+```bash
+$ pip install mock
+```
+
+Then, to run the tests:
+
+```bash
+$ python test/test_labkey.py
+```
