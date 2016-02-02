@@ -5,7 +5,7 @@ Python API for LabKey Server. Lets you query, insert, and update data on a LabKe
 Changes in the current release:
 
 - Support for Python 3
-- Support for netrc files (.labkeycredentials.txt files are now deprecated)
+- Use netrc files for credentials -- see [Credentials](#credentials)
 - New methods for working with assay data: 
  - [load_batch](./labkey/experiment.py) 
  - [save_batch](./labkey/experiment.py)
