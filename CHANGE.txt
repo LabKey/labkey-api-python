@@ -2,6 +2,15 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 0.4.2 package
+==============================
+
+*Release date: 03/15/2016*
+
+- Fix for 25209: API returns incorrect error messages for 401 responses
+- Update test suites and fix for assertions of timeout
+- Documentation updates
+
 What's New in the LabKey 0.4.1 package
 ==============================
 
