@@ -98,7 +98,7 @@ def build_url(server_context, controller, action, container_path=None):
 def handle_response(response):
     sc = response.status_code
 
-    if sc == 200 or sc == 207:
+    if (200 <= sc < 300) or sc == 304:
         return response.json()
     elif sc == 401:
         raise RequestAuthorizationError(response)
@@ -112,5 +112,4 @@ def handle_response(response):
     else:
         raise RequestError(response)
 
-    return None
 

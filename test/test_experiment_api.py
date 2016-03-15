@@ -153,3 +153,14 @@ class TestSaveBatch(unittest.TestCase):
         test = self
         throws_error_test(test, RequestError, self.service.get_general_error_response()
                           , save_batch, *self.args, **self.expected_kwargs)
+
+
+def suite():
+    load_tests = unittest.TestLoader().loadTestsFromTestCase
+    return unittest.TestSuite([
+        load_tests(TestLoadBatch),
+        load_tests(TestSaveBatch)
+    ])
+
+if __name__ == '__main__':
+    unittest.main()
