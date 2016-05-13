@@ -18,5 +18,5 @@ from pkg_resources import get_distribution
 
 __title__ = get_distribution('labkey').project_name
 __version__ = get_distribution('labkey').version
-__author__ = 'LabKey Software'
+__author__ = 'LabKey'
 __license__ = 'Apache License 2.0'

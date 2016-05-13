@@ -90,7 +90,7 @@ Python 2.6+ and 3.4+ are fully supported.
 LabKey Server v13.3 and later.
 
 ## Contributing
-This library and the LabKey Server are maintained by the LabKey Software Foundation. If you have any questions or need support, please use the [LabKey Server support forum](https://www.labkey.org/wiki/home/page.view?name=support
+This library and the LabKey Server are maintained by LabKey. If you have any questions or need support, please use the [LabKey Server support forum](https://www.labkey.org/wiki/home/page.view?name=support
 
 ### Testing
 If you are looking to contribute please run the tests before issuing a PR. For now you need to manually get the dependencies:

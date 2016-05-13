@@ -33,7 +33,7 @@ setup(
     description='Python client API for LabKey Server',
     long_description=long_desc,
     license="Apache License 2.0",
-    author='LabKey Software',
+    author='LabKey',
     author_email='nicka@labkey.com',
     maintainer='Nick Arnold',
     maintainer_email='nicka@labkey.com',
