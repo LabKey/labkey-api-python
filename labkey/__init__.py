@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from labkey import query, experiment, utils  # wiki, messageboard
+from labkey import query, experiment, utils
+import labkey.unsupported.wiki, labkey.unsupported.messageboard
 from pkg_resources import get_distribution
 
 __title__ = get_distribution('labkey').project_name
