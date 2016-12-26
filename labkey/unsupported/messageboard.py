@@ -95,6 +95,6 @@ Test Code:
     except SSLError as e:
         print("There was problem while attempting to submit the message to " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
         print("The HTTP client error was: "+ format(e))
-        return(1)
+        return(0)
         
-    return(0)
+    return(1)
