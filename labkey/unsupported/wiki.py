@@ -47,6 +47,7 @@ https://www.labkey.org/announcements/home/Server/Forum/list.view?
 
 import json
 from labkey.utils import build_url, handle_response
+import requests
 from requests.exceptions import SSLError
 
 def updateWiki(server_context, wikiName, wikiBody, container_path=None):
@@ -86,22 +87,21 @@ Test Code:
     
     # Build the URL for reading the wiki page
     read_wiki_url = build_url(server_context, 'wiki', 'editWiki.api', container_path=container_path)
-    read_wiki_url = read_wiki_url + '?name=' + wikiName  # editWiki action only takes URL parameters, not JSON (JSON is not bound to form)
-    session = server_context['session']
-    data = None
-
+    payload = {'name': wikiName}
     headers = {
         'Content-type': 'application/json'
     }
 
+    data = None
+
     try:
-        read_response = session.get(read_wiki_url, headers=headers)
+        read_response = requests.get(read_wiki_url, params=payload, headers=headers) # editWiki action only takes URL parameters, not JSON (JSON is not bound to form)
     except SSLError as e:
         print("There was a problem while attempting to submit the read for the wiki page " + str(wikiName) + " via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
         print("The HTTP client error was: "+ format(e))
         return(1) # TODO: this is incorrect, should return 'success'/'error' properly like the docs say
 
-    data = read_response.text;
+    data = read_response.text
 
     # Search HTML response for required information on wiki. This is stored in the javascript 
     # variable named 
@@ -136,19 +136,17 @@ Test Code:
     
     # Build the URL for updating the wiki page
     update_wiki_url = build_url(server_context, 'wiki', 'saveWiki.api', container_path=container_path)
-    session = server_context['session']
+    headers = {
+        'Content-type': 'application/json'
+    }
     data = None
 
     # Update wikiVars to use the new wiki content.
     wikiVars['name'] = wikiName
     wikiVars['body'] = wikiBody
 
-    headers = {
-        'Content-type': 'application/json'
-    }
-
     try:
-        response = session.post(update_wiki_url, data=json.dumps(wikiVars, sort_keys=True), headers=headers)
+        response = requests.post(update_wiki_url, data=json.dumps(wikiVars, sort_keys=True), headers=headers)
         data = handle_response(response)
     except SSLError as e:
         print("There was a problem while attempting to submit the read for the wiki page '" + str(wikiName) + "' via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))

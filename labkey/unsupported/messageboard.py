@@ -49,6 +49,7 @@ https://www.labkey.org/announcements/home/Server/Forum/list.view?
 """
 
 from labkey.utils import build_url, handle_response
+import requests
 from requests.exceptions import SSLError
 
 
@@ -91,7 +92,7 @@ Test Code:
     data = None
 
     try:
-        message_response = session.post(message_url, message_data, headers=None)  # seems to be happy with Python dict directly
+        message_response = requests.post(message_url, message_data, headers=None)  # seems to be happy with Python dict directly
     except SSLError as e:
         print("There was problem while attempting to submit the message to " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
         print("The HTTP client error was: "+ format(e))
