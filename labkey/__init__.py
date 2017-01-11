@@ -14,10 +14,8 @@
 # limitations under the License.
 #
 from labkey import query, experiment, utils
-import labkey.unsupported.wiki, labkey.unsupported.messageboard
-from pkg_resources import get_distribution
 
-__title__ = get_distribution('labkey').project_name
-__version__ = get_distribution('labkey').version
+__title__ = 'labkey'
+__version__ = '0.4.2'
 __author__ = 'LabKey'
 __license__ = 'Apache License 2.0'

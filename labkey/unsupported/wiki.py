@@ -14,92 +14,47 @@
 # limitations under the License.
 #
 """
+unsupported.wiki
+~~~~~~~~~~~~~~~~
 WARNING: This module is not officially supported! Use at your own risk.
 
-############################################################################
-NAME: 
-LabKey Collaboration API 
-
-SUMMARY:  
-This module provides functions for interacting with Wikis on LabKey Server.
-
-DESCRIPTION:
-This module is designed to simply programmatic editing of wikis on the LabKey Server
-
-Documentation:
-LabKey Python API:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=python
-
-Setup, configuration of the LabKey Python API:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=setupPython
-
-Using the LabKey Python API:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=usingPython
-
-Documentation for the LabKey client APIs:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=viewAPIs
-
-Support questions should be directed to the LabKey forum:
-https://www.labkey.org/announcements/home/Server/Forum/list.view?
-
-############################################################################
+This module provides functions for interacting with Wiki's on the
+LabKey Server.
 """
-
 import json
 from labkey.utils import build_url, handle_response
-import requests
 from requests.exceptions import SSLError
 
-def updateWiki(server_context, wikiName, wikiBody, container_path=None):
+
+def update_wiki(server_context, wiki_name, wiki_body, container_path=None):
     """
-############################################################################
-updateWiki()
-
-updateWiki() can be used to update an existing wiki page
-
-The following are the minimum required params:
-
-myresults = labkeyApi.updateWiki(
-    baseUrl = 'https://hosted.labkey.com',
-    containerPath = 'PythonProject',
-    wikiName = 'MyWiki',
-    wikiBody = 'New Content for my wiki')
-
-The following are optional:
-
-	debug = True	#will result in a more verbose output
-
-
-This API does not support the ability to change the Render Type for the wiki to be updated. 
-
-This API returns a dictionary containing the response from the server. The 'success' key
-in the dictionary will be true when the wiki was successfully updated. It will be false 
-in the case of a failure.  In the case of a failure, the 'error' key contains the error
-message returned by the server. 
-
-----------------------------------------------------------------------------
-Test Code:
-
-[NOT AVAILABLE]
-
-############################################################################
-"""
-    
+    Used to update an existing wiki page
+    :param server_context: A LabKey server context. See labkey.utils.create_server_context.
+    :param wiki_name: The name of the wiki.
+    :param wiki_body: The body of the wiki.
+    :param container_path: Optional container path that can be used to override the server_context container path
+    :return: returns a dictionary containing the response from the server. The 'success' key
+    in the dictionary will be true when the wiki was successfully updated. It will be false
+    in the case of a failure.  In the case of a failure, the 'error' key contains the error
+    message returned by the server.
+    """
     # Build the URL for reading the wiki page
     read_wiki_url = build_url(server_context, 'wiki', 'editWiki.api', container_path=container_path)
-    payload = {'name': wikiName}
+    payload = {
+        'name': wiki_name
+    }
     headers = {
         'Content-type': 'application/json'
     }
 
-    data = None
+    session = server_context['session']
 
     try:
-        read_response = requests.get(read_wiki_url, params=payload, headers=headers) # editWiki action only takes URL parameters, not JSON (JSON is not bound to form)
+        read_response = session.get(read_wiki_url, params=payload, headers=headers)
     except SSLError as e:
-        print("There was a problem while attempting to submit the read for the wiki page " + str(wikiName) + " via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
-        print("The HTTP client error was: "+ format(e))
-        return(1) # TODO: this is incorrect, should return 'success'/'error' properly like the docs say
+        print("There was a problem while attempting to submit the read for the wiki page " + str(wiki_name) + " via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
+        print("The HTTP client error was: " + format(e))
+        return 1  # TODO: this is incorrect, should return 'success'/'error' properly like the docs say
 
     data = read_response.text
 
@@ -107,50 +62,49 @@ Test Code:
     # variable named 
     #  - _wikiProps: for 14.3 and earlier
     #  - LABKEY._wiki.setProps for 15.1 and later
-    dataList = data.split('\n')
+    data_list = data.split('\n')
 
     # If LabKey Server is v14.3 or earlier find line containing '_wikiProp'
-    v = next((i for i in range(len(dataList)) if '_wikiProp' in dataList[i]), None)
+    v = next((i for i in range(len(data_list)) if '_wikiProp' in data_list[i]), None)
 
     # If v = None, then server is running 15.1 or later and find the line  
     # containing 'LABKEY._wiki.setProps'
-    if v == None: 
-        v = next((i for i in range(len(dataList)) if 'LABKEY._wiki.setProps' in dataList[i]), None)
+    if v is None: 
+        v = next((i for i in range(len(data_list)) if 'LABKEY._wiki.setProps' in data_list[i]), None)
 
     # Verify that we found the variable in the HTML response. If not 
     # do not proceed
-    if v == None: 
-        print("There was a problem while attempting to read the data for the wiki page '" + str(wikiName) + "'.")
+    if v is None: 
+        print("There was a problem while attempting to read the data for the wiki page '" + str(wiki_name) + "'.")
         print("The script is unable to find the wiki properties in the HTML response")
-        return(1) # TODO: this is incorrect, should return 'success'/'error' properly like the docs say
+        return 1  # TODO: this is incorrect, should return 'success'/'error' properly like the docs say
 
-    wikiVars = {} 
+    wiki_vars = {} 
     for j in range(100):
         # Read each line, until find a javascript closing bracket. 
-        if '};' in dataList[v+j+1]:
+        if '};' in data_list[v+j+1]:
             break
-        if '});' in dataList[v+j+1]:
+        if '});' in data_list[v+j+1]:
             break
-        wvar = dataList[v+j+1].rstrip().lstrip().replace('\'','').replace(',','')
-        wikiVars[wvar.split(':')[0]] = wvar.split(':')[1]
+        wvar = data_list[v+j+1].rstrip().lstrip().replace('\'', '').replace(',', '')
+        wiki_vars[wvar.split(':')[0]] = wvar.split(':')[1]
     
     # Build the URL for updating the wiki page
     update_wiki_url = build_url(server_context, 'wiki', 'saveWiki.api', container_path=container_path)
     headers = {
         'Content-type': 'application/json'
     }
-    data = None
 
-    # Update wikiVars to use the new wiki content.
-    wikiVars['name'] = wikiName
-    wikiVars['body'] = wikiBody
+    # Update wiki_vars to use the new wiki content.
+    wiki_vars['name'] = wiki_name
+    wiki_vars['body'] = wiki_body
 
     try:
-        response = requests.post(update_wiki_url, data=json.dumps(wikiVars, sort_keys=True), headers=headers)
+        response = session.post(update_wiki_url, data=json.dumps(wiki_vars, sort_keys=True), headers=headers)
         data = handle_response(response)
     except SSLError as e:
-        print("There was a problem while attempting to submit the read for the wiki page '" + str(wikiName) + "' via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
-        print("The HTTP client error was: "+ format(e))
-        return(1) # TODO: this is incorrect, should return 'success'/'error' properly like the docs say
+        print("There was a problem while attempting to submit the read for the wiki page '" + str(wiki_name) + "' via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
+        print("The HTTP client error was: " + format(e))
+        return 1  # TODO: this is incorrect, should return 'success'/'error' properly like the docs say
 
-    return(data)
+    return data
