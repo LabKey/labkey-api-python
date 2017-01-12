@@ -21,53 +21,41 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from labkey.utils import create_server_context
 from labkey.query import delete_rows, update_rows, insert_rows, select_rows, execute_sql
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
-from mock_server_responses import MockDeleteRows, MockUpdateRows, MockInsertRows, MockSelectRows, MockExecuteSQL
+
+from test_utils import MockLabKey, mock_server_context, success_test, throws_error_test
 
 
-def success_test(test, expected_response, api_method, *args, **expected_kwargs):
-    with mock.patch('labkey.utils.requests.Session.post') as mock_post:
-        mock_post.return_value = expected_response
-        resp = api_method(*args)
-
-        # validate response is as expected
-        test.assertEqual(resp, expected_response.text)
-
-        # validate call is made as expected
-        expected_args = expected_kwargs.pop('expected_args')
-        mock_post.assert_called_once_with(*expected_args, **expected_kwargs)
+class MockSelectRows(MockLabKey):
+    api = 'getQuery.api'
+    default_success_body = '{"columnModel": [{"align": "right", "dataIndex": "Participant ID", "editable": true , "header": "Participant ID", "hidden": false , "required": false , "scale": 10 , "sortable": true , "width": 60 }] , "formatVersion": 8.3 , "metaData": {"description": null , "fields": [{"autoIncrement": false , "calculated": false , "caption": "Participant ID", "conceptURI": null , "defaultScale": "LINEAR", "defaultValue": null , "dimension": false , "excludeFromShifting": false , "ext": {} , "facetingBehaviorType": "AUTOMATIC", "fieldKey": "Participant ID", "fieldKeyArray": ["Participant ID"] , "fieldKeyPath": "Participant ID", "friendlyType": "Integer", "hidden": false , "inputType": "text", "isAutoIncrement": false , "isHidden": false , "isKeyField": false , "isMvEnabled": false , "isNullable": true , "isReadOnly": false , "isSelectable": true , "isUserEditable": true , "isVersionField": false , "jsonType": "int", "keyField": false , "measure": false , "mvEnabled": false , "name": "Participant ID", "nullable": true , "protected": false , "rangeURI": "http://www.w3.org/2001/XMLSchema#int", "readOnly": false , "recommendedVariable": false , "required": false , "selectable": true , "shortCaption": "Participant ID", "shownInDetailsView": true , "shownInInsertView": true , "shownInUpdateView": true , "sqlType": "int", "type": "int", "userEditable": true , "versionField": false }] , "id": "Key", "importMessage": null , "importTemplates": [{"label": "Download Template", "url": ""}] , "root": "rows", "title": "Demographics", "totalProperty": "rowCount"} , "queryName": "Demographics", "rowCount": 224 , "rows": [{	"Participant ID": 133428 } , {	"Participant ID": 138488 } , {	"Participant ID": 140163 } , {	"Participant ID": 144740 } , {	"Participant ID": 150489 } ] , "schemaName": "lists"}'
 
 
-def throws_error_test(test, expected_error, expected_response, api_method, *args, **expected_kwargs):
-    with mock.patch('labkey.utils.requests.Session.post') as mock_post:
-        with test.assertRaises(expected_error):
-            mock_post.return_value = expected_response
-            api_method(*args)
-
-        # validate call is made as expected
-        expected_args = expected_kwargs.pop('expected_args')
-        mock_post.assert_called_once_with(*expected_args, **expected_kwargs)
+class MockInsertRows(MockLabKey):
+    api = 'insertRows.api'
 
 
-configs = {
-    'protocol': 'https://'
-    , 'server': 'my_testServer:8080'
-    , 'context_path': 'testPath'
-    , 'project_path': 'testProject/subfolder'
-}
+class MockDeleteRows(MockLabKey):
+    api = 'deleteRows.api'
+
+
+class MockExecuteSQL(MockLabKey):
+    api = 'executeSql.api'
+
+
+class MockUpdateRows(MockLabKey):
+    api = 'updateRows.api'
+
 
 schema = 'testSchema'
 query = 'testQuery'
-server_context = create_server_context(configs['server'], configs['project_path'], configs['context_path'])
 
 
 class TestDeleteRows(unittest.TestCase):
 
     def setUp(self):
-        self.configs = configs.copy()
-        self.service = MockDeleteRows(**self.configs)
+        self.service = MockDeleteRows()
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()]
             , 'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}'
@@ -77,12 +65,12 @@ class TestDeleteRows(unittest.TestCase):
 
         rows = '{id:1234}'
         self.args = [
-            server_context, schema, query, rows
+            mock_server_context(self.service), schema, query, rows
         ]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), delete_rows, *self.args, **self.expected_kwargs)
+        success_test(test, self.service.get_successful_response(), delete_rows, True, *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
@@ -108,8 +96,7 @@ class TestDeleteRows(unittest.TestCase):
 class TestUpdateRows(unittest.TestCase):
 
     def setUp(self):
-        self.configs = configs.copy()
-        self.service = MockUpdateRows(**self.configs)
+        self.service = MockUpdateRows()
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()]
             , 'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}'
@@ -119,12 +106,12 @@ class TestUpdateRows(unittest.TestCase):
 
         rows = '{id:1234}'
         self.args = [
-            server_context, schema, query, rows
+            mock_server_context(self.service), schema, query, rows
         ]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), update_rows, *self.args, **self.expected_kwargs)
+        success_test(test, self.service.get_successful_response(), update_rows, True, *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
@@ -150,8 +137,7 @@ class TestUpdateRows(unittest.TestCase):
 class TestInsertRows(unittest.TestCase):
 
     def setUp(self):
-        self.configs = configs.copy()
-        self.service = MockInsertRows(**self.configs)
+        self.service = MockInsertRows()
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()]
             , 'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}'
@@ -161,12 +147,12 @@ class TestInsertRows(unittest.TestCase):
 
         rows = '{id:1234}'
         self.args = [
-            server_context, schema, query, rows
+            mock_server_context(self.service), schema, query, rows
         ]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), insert_rows, *self.args, **self.expected_kwargs)
+        success_test(test, self.service.get_successful_response(), insert_rows, True, *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
@@ -192,8 +178,7 @@ class TestInsertRows(unittest.TestCase):
 class TestExecuteSQL(unittest.TestCase):
 
     def setUp(self):
-        self.configs = configs.copy()
-        self.service = MockExecuteSQL(**self.configs)
+        self.service = MockExecuteSQL()
         sql = 'select * from ' + schema + '.' + query
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()]
@@ -203,12 +188,12 @@ class TestExecuteSQL(unittest.TestCase):
         }
 
         self.args = [
-            server_context, schema, sql
+            mock_server_context(self.service), schema, sql
         ]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), execute_sql, *self.args, **self.expected_kwargs)
+        success_test(test, self.service.get_successful_response(), execute_sql, True, *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
@@ -234,8 +219,7 @@ class TestExecuteSQL(unittest.TestCase):
 class TestSelectRows(unittest.TestCase):
 
     def setUp(self):
-        self.configs = configs.copy()
-        self.service = MockSelectRows(**self.configs)
+        self.service = MockSelectRows()
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()]
             , 'data': {"schemaName": schema, "query.queryName": query}
@@ -244,12 +228,12 @@ class TestSelectRows(unittest.TestCase):
         }
 
         self.args = [
-            server_context, schema, query
+            mock_server_context(self.service), schema, query
         ]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), select_rows, *self.args, **self.expected_kwargs)
+        success_test(test, self.service.get_successful_response(), select_rows, True, *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self

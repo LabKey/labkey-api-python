@@ -19,17 +19,26 @@ Setup script for Python client API for LabKey Server.
 Also installs included versions of third party libraries, if those libraries
 are not already installed.
 """
+import re
 from setuptools import setup
 
 packages = [
-    'labkey'
+    'labkey',
+    'labkey.unsupported'
 ]
+
+with open('labkey/__init__.py', 'r') as fd:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                        fd.read(), re.MULTILINE).group(1)
+
+if not version:
+    raise RuntimeError('Cannot find version information')
 
 long_desc = "Python client API for LabKey Server. Supports query and experiment APIs."
 
 setup(
     name='labkey',
-    version='0.4.2',
+    version=version,
     description='Python client API for LabKey Server',
     long_description=long_desc,
     license="Apache License 2.0",
