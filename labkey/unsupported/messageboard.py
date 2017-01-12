@@ -21,6 +21,7 @@ WARNING: This module is not officially supported! Use at your own risk.
 This module provides functions for interacting with Message Boards on the
 LabKey Server.
 """
+from __future__ import unicode_literals
 from requests.exceptions import SSLError
 from labkey.utils import build_url
 

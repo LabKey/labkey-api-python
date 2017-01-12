@@ -23,7 +23,8 @@ import re
 from setuptools import setup
 
 packages = [
-    'labkey'
+    'labkey',
+    'labkey.unsupported'
 ]
 
 with open('labkey/__init__.py', 'r') as fd:

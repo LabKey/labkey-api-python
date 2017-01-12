@@ -21,6 +21,7 @@ WARNING: This module is not officially supported! Use at your own risk.
 This module provides functions for interacting with Wiki's on the
 LabKey Server.
 """
+from __future__ import unicode_literals
 import json
 from labkey.utils import build_url, handle_response
 from requests.exceptions import SSLError
