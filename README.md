@@ -1,17 +1,18 @@
-Python API for LabKey Server. Lets you query, insert, and update data on a LabKey Server using Python.
+# Python API for LabKey Server
+<p>
+ <a href="https://pypi.python.org/pypi/labkey"><img src="https://img.shields.io/pypi/v/labkey.svg" alt="pypi version"></a>
+</p>
+Lets you query, insert, and update data on a [LabKey Server](http://www.labkey.com/) using Python.
 
-## Release Notes
+## Features
 
-Changes in the current release:
-
-- Support for Python 3
-- Use netrc files for credentials -- see [Credentials](#credentials)
-- New methods for working with assay data: 
- - [load_batch](./labkey/experiment.py) 
- - [save_batch](./labkey/experiment.py)
-- server_context parameter added to all methods
-- PEP standards - the latest version follows PEP code styling standards
-- New [samples](./samples)
+- **labkey.query.select_rows()** - Query and get results sets from LabKey Server.
+- **labkey.query.execute_sql()** - Execute SQL (LabKey SQL dialect) through the query module on LabKey Server.
+- **labkey.query.insert_rows()** - Insert rows into a table on LabKey Server.
+- **labkey.query.update_rows()** - Update rows in a table on LabKey Server.
+- **labkey.query.delete_rows()** - Delete records in a table on LabKey Server.
+- **labkey.experiment.load_batch()** - Retreive assay data (batch level) from LabKey Server.
+- **labkey.experiment.save_batch()** - Save assay data (batch level) on LabKey Server. 
 
 ## Installation
 To install, simply use `pip`:
@@ -48,16 +49,6 @@ password mypassword
 ```
 Note that the netrc file only deals with connections at the machine level and should not include a port or protocol designation, meaning both "mymachine.labkey.org:8888" and "https://mymachine.labkey.org" are incorrect. 
 
-## Supported Functions
-
-- **labkey.query.select_rows()** - Query and get results sets from LabKey Server.
-- **labkey.query.execute_sql()** - Execute SQL (LabKey SQL dialect) through the query module on LabKey Server.
-- **labkey.query.insert_rows()** - Insert rows into a table on LabKey Server.
-- **labkey.query.update_rows()** - Update rows in a table on LabKey Server.
-- **labkey.query.delete_rows()** - Delete records in a table on LabKey Server.
-- **labkey.experiment.load_batch()** - Retreive assay data (batch level) from LabKey Server.
-- **labkey.experiment.save_batch()** - Save assay data (batch level) on LabKey Server. 
-
 ## Examples
 
 Sample code is available in the [samples](https://github.com/LabKey/labkey-api-python/tree/master/samples) directory.
@@ -90,7 +81,7 @@ Python 2.6+ and 3.4+ are fully supported.
 LabKey Server v13.3 and later.
 
 ## Contributing
-This library and the LabKey Server are maintained by LabKey. If you have any questions or need support, please use the [LabKey Server support forum](https://www.labkey.org/wiki/home/page.view?name=support)
+This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the [LabKey Server support forum](https://www.labkey.org/wiki/home/page.view?name=support).
 
 ### Testing
 If you are looking to contribute please run the tests before issuing a PR. For now you need to manually get the dependencies:
