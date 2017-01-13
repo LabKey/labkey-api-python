@@ -2,6 +2,14 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 0.4.3 package
+==============================
+
+*Release date: 01/12/2017*
+
+- Reintroduce portions of messageboard, wiki APIs (unsupported, not recommended for public use)
+- Documentation updates
+
 What's New in the LabKey 0.4.2 package
 ==============================
 

@@ -16,6 +16,6 @@
 from labkey import query, experiment, utils
 
 __title__ = 'labkey'
-__version__ = '0.4.2'
+__version__ = '0.4.3'
 __author__ = 'LabKey'
 __license__ = 'Apache License 2.0'
