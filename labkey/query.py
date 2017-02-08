@@ -145,7 +145,8 @@ def execute_sql(server_context, schema_name, sql, container_path=None,
         payload['saveInSession'] = save_in_session
 
     if parameters is not None:
-        payload['query.parameters'] = parameters
+        for key, value in parameters.items():
+            payload['query.param.' + key] = value
 
     if required_version is not None:
         payload['apiVersion'] = required_version
@@ -251,7 +252,8 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
         payload['containerFilter'] = container_filter
 
     if parameters is not None:
-        payload['query.parameters'] = parameters
+        for key, value in parameters.items():
+            payload['query.param.' + key] = value
 
     if show_rows is not None:
         payload['query.showRows'] = show_rows
