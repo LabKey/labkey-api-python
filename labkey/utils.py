@@ -46,18 +46,13 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
     """
     server_context = dict(domain=domain, container_path=container_path, context_path=context_path)
 
-    if use_ssl:
-        scheme = 'https'
-    else:
-        scheme = 'http'
-    scheme += '://'
+    session = requests.Session()
 
     if use_ssl:
-        session = requests.Session()
+        scheme = 'https://'
         session.mount(scheme, SafeTLSAdapter())
     else:
-        # TODO: Is there a better way? Can we have session.mount('http')?
-        session = requests
+        scheme = 'http://'
 
     server_context['scheme'] = scheme
     server_context['session'] = session
@@ -83,14 +78,12 @@ def build_url(server_context, controller, action, container_path=None):
     if server_context['context_path'] is not None:
         url += sep + server_context['context_path']
 
-    url += sep + controller
-
     if container_path is not None:
         url += sep + container_path
-    else:
+    elif server_context['container_path'] is not None:
         url += sep + server_context['container_path']
 
-    url += sep + action
+    url += sep + controller + '-' + action
 
     return url
 

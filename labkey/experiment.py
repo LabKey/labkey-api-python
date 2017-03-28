@@ -16,9 +16,9 @@
 from __future__ import unicode_literals
 import json
 
-from requests.exceptions import SSLError
+from requests.exceptions import SSLError, ConnectionError
 from labkey.utils import build_url, handle_response
-from labkey.exceptions import ServerContextError
+from labkey.exceptions import ServerContextError, ServerNotFoundError
 
 
 # EXAMPLE
@@ -81,6 +81,8 @@ def load_batch(server_context, assay_id, batch_id):
             loaded_batch = Batch.from_data(json_body['batch'])
     except SSLError as e:
         raise ServerContextError(e)
+    except ConnectionError as e:
+        raise ServerNotFoundError(e)
 
     return loaded_batch
 
