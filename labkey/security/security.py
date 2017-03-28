@@ -231,15 +231,6 @@ def rotate_password(server_context, user_id, password, container_path=None):
 def __make_request(server_context, url, payload=None, headers=None, timeout=_default_timeout):
     try:
         session = server_context['session']
-        session.get(url)
-        csrftoken = session.cookies['X-LABKEY-CSRF']
-        print(url)
-        if csrftoken is not None:
-            if headers is None:
-                headers = {}
-
-            headers['X-LABKEY-CSRF'] = csrftoken
-
         raw_response = session.post(url, data=payload, headers=headers, timeout=timeout)
         return handle_response(raw_response)
     except SSLError as e:

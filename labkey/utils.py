@@ -57,6 +57,11 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
     server_context['scheme'] = scheme
     server_context['session'] = session
 
+    # Run a test request against the server and record the CSRF token for future use
+    url = build_url(server_context, 'login', 'whoami.api')
+    response = handle_response(session.get(url))
+    session.headers.update({'X-LABKEY-CSRF': response['CSRF']})
+
     return server_context
 
 

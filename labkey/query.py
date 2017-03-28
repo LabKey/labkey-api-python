@@ -90,8 +90,8 @@ def delete_rows(server_context, schema_name, query_name, rows, container_path=No
     }
 
     # explicit json payload and headers required for form generation
-    delete_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
-                                         headers=_query_headers, timeout=timeout)
+    delete_rows_response = __make_request(server_context, url, json.dumps(payload, sort_keys=True),
+                                          headers=_query_headers, timeout=timeout)
     return delete_rows_response
 
 
@@ -151,7 +151,7 @@ def execute_sql(server_context, schema_name, sql, container_path=None,
     if required_version is not None:
         payload['apiVersion'] = required_version
 
-    execute_sql_response = _make_request(server_context, url, payload, timeout=timeout)
+    execute_sql_response = __make_request(server_context, url, payload, timeout=timeout)
     return execute_sql_response
 
 
@@ -175,8 +175,8 @@ def insert_rows(server_context, schema_name, query_name, rows, container_path=No
     }
 
     # explicit json payload and headers required for form generation
-    insert_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
-                                         headers=_query_headers, timeout=timeout)
+    insert_rows_response = __make_request(server_context, url, json.dumps(payload, sort_keys=True),
+                                          headers=_query_headers, timeout=timeout)
     return insert_rows_response
 
 
@@ -273,7 +273,7 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
     if required_version is not None:
         payload['apiVersion'] = required_version
 
-    select_rows_response = _make_request(server_context, url, payload, timeout=timeout)
+    select_rows_response = __make_request(server_context, url, payload, timeout=timeout)
     return select_rows_response
 
 
@@ -298,12 +298,12 @@ def update_rows(server_context, schema_name, query_name, rows, container_path=No
     }
 
     # explicit json payload and headers required for form generation
-    update_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
-                                         headers=_query_headers, timeout=timeout)
+    update_rows_response = __make_request(server_context, url, json.dumps(payload, sort_keys=True),
+                                          headers=_query_headers, timeout=timeout)
     return update_rows_response
 
 
-def _make_request(server_context, url, payload, headers=None, timeout=_default_timeout):
+def __make_request(server_context, url, payload, headers=None, timeout=_default_timeout):
     try:
         session = server_context['session']
         raw_response = session.post(url, data=payload, headers=headers, timeout=timeout)
