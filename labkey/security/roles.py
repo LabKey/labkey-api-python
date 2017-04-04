@@ -87,27 +87,32 @@ class SharedViewEditorRole(Role):
         return 'org.labkey.api.security.roles.SharedViewEditorRole'
 
 
-def lookup_roles(role_name):
-        roles = {
-            'SiteAdminRole': SiteAdminRole(),
-            'ProjectAdminRole': ProjectAdminRole(),
-            'FolderAdminRole': FolderAdminRole(),
-            'EditorRole': EditorRole(),
-            'AuthorRole': AuthorRole(),
-            'ReaderRole': ReaderRole(),
-            'RestrictedReaderRole': RestrictedReaderRole(),
-            'SubmitterRole': SubmitterRole(),
-            'NoPermissionsRole': NoPermissionsRole(),
-            'OwnerRole': OwnerRole(),
-            'DeveloperRole': DeveloperRole(),
-            'TroubleshooterRole': TroubleshooterRole(),
-            'SeeEmailAddressesRole': SeeEmailAddressesRole(),
-            'CanSeeAuditLogRole': CanSeeAuditLogRole(),
-            'EmailNonUsersRole': EmailNonUsersRole(),
-            'SharedViewEditorRole': SharedViewEditorRole()
-        }
+__roles = {
+        'SiteAdminRole': SiteAdminRole(),
+        'ProjectAdminRole': ProjectAdminRole(),
+        'FolderAdminRole': FolderAdminRole(),
+        'EditorRole': EditorRole(),
+        'AuthorRole': AuthorRole(),
+        'ReaderRole': ReaderRole(),
+        'RestrictedReaderRole': RestrictedReaderRole(),
+        'SubmitterRole': SubmitterRole(),
+        'NoPermissionsRole': NoPermissionsRole(),
+        'OwnerRole': OwnerRole(),
+        'DeveloperRole': DeveloperRole(),
+        'TroubleshooterRole': TroubleshooterRole(),
+        'SeeEmailAddressesRole': SeeEmailAddressesRole(),
+        'CanSeeAuditLogRole': CanSeeAuditLogRole(),
+        'EmailNonUsersRole': EmailNonUsersRole(),
+        'SharedViewEditorRole': SharedViewEditorRole()
+}
 
-        if role_name in roles:
-            return roles[role_name]
-        else:
-            return None
+
+def lookup_roles(role_name):
+    if role_name in __roles:
+        return __roles[role_name]
+    else:
+        return None
+
+
+def get_roles():
+    return __roles
