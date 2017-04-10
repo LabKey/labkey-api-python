@@ -20,7 +20,6 @@ import ssl
 
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
-from json import JSONDecodeError
 from labkey.exceptions import RequestError, RequestAuthorizationError, QueryNotFoundError, ServerNotFoundError
 
 
@@ -100,7 +99,7 @@ def handle_response(response):
     if (200 <= sc < 300) or sc == 304:
         try:
             return response.json()
-        except JSONDecodeError:
+        except ValueError:
             result = dict(
                 status_code=sc,
                 message="Request was successful but did not return valid json",

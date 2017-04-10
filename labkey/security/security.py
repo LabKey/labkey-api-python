@@ -5,11 +5,9 @@ from __future__ import unicode_literals
 from requests.exceptions import SSLError
 from labkey.utils import build_url, handle_response
 from labkey.exceptions import ServerContextError
-from labkey.query import QueryFilter, select_rows
 
 _default_timeout = 60 * 5  # 5 minutes
 security_controller = 'security'
-login_controller = 'login'
 user_controller = 'user'
 
 
@@ -72,7 +70,11 @@ def deactivate_users(server_context, target_ids, container_path=None, **kwargs):
     :param container_path:
     :return:
     """
-    return __make_user_api_request(server_context, target_ids=target_ids, api='DeactivateUsers.api', container_path=container_path, **kwargs)
+    result = __make_user_api_request(server_context, target_ids=target_ids, api='DeactivateUsers.api', container_path=container_path, **kwargs)
+    if result is not None and result['status_code'] == 200:
+        return dict(success=True)
+    else:
+        raise ValueError("Unable to delete users {0}".format(target_ids))
 
 
 def delete_user(server_context, target_id, container_path=None, **kwargs):
@@ -94,8 +96,11 @@ def delete_users(server_context, target_ids, container_path=None, **kwargs):
     :param container_path:
     :return:
     """
-    return __make_user_api_request(server_context, target_ids=target_ids, api='DeleteUsers.api', container_path=container_path, **kwargs)
-
+    result = __make_user_api_request(server_context, target_ids=target_ids, api='DeleteUsers.api', container_path=container_path, **kwargs)
+    if result is not None and result['status_code'] == 200:
+        return dict(success=True)
+    else:
+        raise ValueError("Unable to delete users {0}".format(target_ids))
 
 def __make_user_api_request(server_context, target_ids, api, container_path=None, **kwargs):
     """
@@ -240,22 +245,20 @@ def list_groups(server_context, include_site_groups=False, container_path=None, 
     return __make_request(server_context, url, payload, **kwargs)
 
 
-# TODO: this should just hit an api instead of the query service as this misses disabled accounts
-def get_user_by_email(server_context, email):
-    schema = 'core'
-    table = 'Users'
-    column = 'Email'
-    filters = [
-        QueryFilter(column, email)
-    ]
+def get_user_by_email(server_context, email, **kwargs):
 
-    result = select_rows(server_context, schema, table, filter_array=filters)
-    if result is None or result.get('rows') is None:
-        raise ValueError("User not found: " + email)
-    elif len(result.get('rows')) != 1:
-        raise ValueError("Wrong number of results returned")
+    url = build_url(server_context, user_controller, 'getUsers.api')
+    payload = dict(includeDeactivatedAccounts=True)
+    result = __make_request(server_context, url, payload, **kwargs)
+
+    if result is None or result['users'] is None:
+        raise ValueError("No Users in container" + email)
+
+    for user in result['users']:
+        if user['email'] == email:
+            return user
     else:
-        return result.get('rows')[0]
+        raise ValueError("User not found: " + email)
 
 
 def __make_request(server_context, url, payload=None, headers=None, timeout=_default_timeout, **kwargs):
