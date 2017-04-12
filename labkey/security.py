@@ -13,7 +13,7 @@ user_controller = 'user'
 
 def create_user(server_context, email, container_path=None, send_email=False, **kwargs):
     """
-    Create new account (specify username, email and all other fields in user properties)
+    Create new account
     :param server_context:
     :param email:
     :param container_path:
@@ -102,6 +102,7 @@ def delete_users(server_context, target_ids, container_path=None, **kwargs):
     else:
         raise ValueError("Unable to delete users {0}".format(target_ids))
 
+
 def __make_user_api_request(server_context, target_ids, api, container_path=None, **kwargs):
     """
     Make a request to the LabKey User Controller
@@ -167,13 +168,13 @@ def __make_security_group_api_request(server_context, api, user_ids, group_id, c
     return __make_request(server_context, url, payload, **kwargs)
 
 
-def __make_security_role_api_request(server_context, api, role_name, email=None, user_id=None, container_path=None, **kwargs):
+def __make_security_role_api_request(server_context, api, role, email=None, user_id=None, container_path=None, **kwargs):
     """
     Execute a request against the LabKey Security Controller Group Membership apis
     :param server_context: Labkey Server context
     :param api: Action to execute
     :param user_id: user ids to apply action to
-    :param role_name: group id to apply action to
+    :param role_name: unique role name to add user
     :param container_path: Additional container context path
     :return: Request json object
     """
@@ -183,7 +184,7 @@ def __make_security_role_api_request(server_context, api, role_name, email=None,
     url = build_url(server_context, security_controller, api, container_path)
 
     payload = {
-        'roleClassName': role_name,
+        'roleClassName': role['uniqueName'],
         'principalId': user_id,
         'email': email
     }
@@ -195,13 +196,13 @@ def add_to_role(server_context, role, user_id=None, email=None, container_path=N
     """
     Add user/group to security role
     :param server_context: LabKey server context
-    :param role: to add user to
+    :param role: (from get_roles) to add user to
     :param user_id: to add permissions role to (must supply this or email or both)
     :param email: to add permissions role to (must supply this or user_id or both)
     :param container_path: additional project path context
     :return:
     """
-    return __make_security_role_api_request(server_context, 'AddAssignment.api', role.get_unique_name(), user_id=user_id, email=email,
+    return __make_security_role_api_request(server_context, 'AddAssignment.api', role, user_id=user_id, email=email,
                                             container_path=container_path, **kwargs)
 
 
@@ -209,13 +210,13 @@ def remove_from_role(server_context, role, user_id=None, email=None, container_p
     """
     Remove user/group from security role
     :param server_context: LabKey server context
-    :param role: to remove user from
+    :param role: (from get_roles) to remove user from
     :param user_id: to remove permissions from (must supply this or email or both)
     :param email: to remove permissions from (must supply this or user_id or both)
     :param container_path: additional project path context
     :return:
     """
-    return __make_security_role_api_request(server_context, 'RemoveAssignment.api', role.get_unique_name(), user_id=user_id, email=email, container_path=container_path, **kwargs)
+    return __make_security_role_api_request(server_context, 'RemoveAssignment.api', role, user_id=user_id, email=email, container_path=container_path, **kwargs)
 
 
 def reset_password(server_context, email, container_path=None, **kwargs):
@@ -243,6 +244,18 @@ def list_groups(server_context, include_site_groups=False, container_path=None, 
     }
 
     return __make_request(server_context, url, payload, **kwargs)
+
+
+def get_roles(server_context, container_path=None, **kwargs):
+    """
+    Gets the set of permissions and roles available from the server
+    :param server_context: 
+    :param container_path: 
+    :param kwargs: 
+    :return: 
+    """
+    url = build_url(server_context, security_controller, 'GetRoles.api', container_path=container_path)
+    return __make_request(server_context, url, **kwargs)
 
 
 def get_user_by_email(server_context, email, **kwargs):

@@ -18,7 +18,7 @@ import unittest
 
 from labkey.unsupported import messageboard
 
-from test_utils import MockLabKey, mock_server_context, success_test
+from test.test_utils import MockLabKey, mock_server_context, success_test
 
 
 class MockPostMessage(MockLabKey):

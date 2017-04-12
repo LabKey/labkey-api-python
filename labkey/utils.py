@@ -118,5 +118,3 @@ def handle_response(response):
             raise ServerNotFoundError(response)
     else:
         raise RequestError(response)
-
-
