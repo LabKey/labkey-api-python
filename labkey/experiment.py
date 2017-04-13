@@ -162,7 +162,6 @@ class ExpObject(object):
     def to_json(self):
         data = {
             # 'id': self.id,
-            'lsid': self.lsid,
             'comment': self.comment,
             'name': self.name,
             'created': self.created,
@@ -171,6 +170,9 @@ class ExpObject(object):
             'modifiedBy': self.modified_by,
             'properties': self.properties
         }
+        if self.lsid is not None:
+            data.update({'lsid': self.lsid})
+            
         return data
 
 
