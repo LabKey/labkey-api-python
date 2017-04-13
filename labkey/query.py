@@ -47,9 +47,7 @@ https://www.labkey.org/announcements/home/Server/Forum/list.view?
 from __future__ import unicode_literals
 import json
 
-from requests.exceptions import SSLError
-from labkey.utils import build_url, handle_response
-from labkey.exceptions import ServerContextError
+from labkey.utils import build_url, make_request
 
 
 _query_headers = {
@@ -90,9 +88,8 @@ def delete_rows(server_context, schema_name, query_name, rows, container_path=No
     }
 
     # explicit json payload and headers required for form generation
-    delete_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
-                                         headers=_query_headers, timeout=timeout)
-    return delete_rows_response
+    return make_request(server_context, url, json.dumps(payload, sort_keys=True), headers=_query_headers,
+                        timeout=timeout)
 
 
 def execute_sql(server_context, schema_name, sql, container_path=None,
@@ -151,8 +148,7 @@ def execute_sql(server_context, schema_name, sql, container_path=None,
     if required_version is not None:
         payload['apiVersion'] = required_version
 
-    execute_sql_response = _make_request(server_context, url, payload, timeout=timeout)
-    return execute_sql_response
+    return make_request(server_context, url, payload, timeout=timeout)
 
 
 def insert_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
@@ -175,9 +171,8 @@ def insert_rows(server_context, schema_name, query_name, rows, container_path=No
     }
 
     # explicit json payload and headers required for form generation
-    insert_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
-                                         headers=_query_headers, timeout=timeout)
-    return insert_rows_response
+    return make_request(server_context, url, json.dumps(payload, sort_keys=True), headers=_query_headers,
+                        timeout=timeout)
 
 
 def select_rows(server_context, schema_name, query_name, view_name=None,
@@ -273,8 +268,7 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
     if required_version is not None:
         payload['apiVersion'] = required_version
 
-    select_rows_response = _make_request(server_context, url, payload, timeout=timeout)
-    return select_rows_response
+    return make_request(server_context, url, payload, timeout=timeout)
 
 
 def update_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
@@ -298,18 +292,8 @@ def update_rows(server_context, schema_name, query_name, rows, container_path=No
     }
 
     # explicit json payload and headers required for form generation
-    update_rows_response = _make_request(server_context, url, json.dumps(payload, sort_keys=True),
-                                         headers=_query_headers, timeout=timeout)
-    return update_rows_response
-
-
-def _make_request(server_context, url, payload, headers=None, timeout=_default_timeout):
-    try:
-        session = server_context['session']
-        raw_response = session.post(url, data=payload, headers=headers, timeout=timeout)
-        return handle_response(raw_response)
-    except SSLError as e:
-        raise ServerContextError(e)
+    return make_request(server_context, url, json.dumps(payload, sort_keys=True), headers=_query_headers,
+                        timeout=timeout)
 
 
 # TODO: Provide filter generators.

@@ -25,7 +25,11 @@ from labkey.utils import create_server_context
 
 
 def mock_server_context(mock_action):
-    return create_server_context(mock_action.server_name, mock_action.project_path, mock_action.context_path)
+    # mock the CSRF token
+    with mock.patch('labkey.utils.requests.sessions.Session.get') as mock_get:
+
+        mock_get.return_value = mock_action.get_csrf_response()
+        return create_server_context(mock_action.server_name, mock_action.project_path, mock_action.context_path)
 
 
 def success_test(test, expected_response, api_method, compare_response, *args, **expected_kwargs):
@@ -101,8 +105,9 @@ class MockLabKey:
         return mock_response
 
     def get_server_url(self):
-        return self.protocol + '/'.join([self.server_name, self.context_path,
-                                        self.action, self.project_path, self.api])
+        return "{protocol}{server}/{context}/{container}/{action}-{api}"\
+            .format(protocol=self.protocol, server=self.server_name, context=self.context_path,
+                    container=self.project_path, action=self.action, api=self.api)
 
     def get_successful_response(self, code=200):
         return self._get_mock_response(code, self.get_server_url(), self.success_body)
@@ -121,3 +126,6 @@ class MockLabKey:
 
     def get_general_error_response(self, code=500):
         return self._get_mock_response(code, self.get_server_url(), self.general_server_error_body)
+
+    def get_csrf_response(self, code=200):
+        return self._get_mock_response(code, self.get_server_url(), {'CSRF': 'MockCSRF'})

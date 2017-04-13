@@ -57,10 +57,10 @@ class TestDeleteRows(unittest.TestCase):
     def setUp(self):
         self.service = MockDeleteRows()
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()]
-            , 'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}'
-            , 'headers': {u'Content-Type': u'application/json'}
-            , 'timeout': 300
+            'expected_args': [self.service.get_server_url()],
+            'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
+            'headers': {u'Content-Type': u'application/json'},
+            'timeout': 300
         }
 
         rows = '{id:1234}'
@@ -70,27 +70,28 @@ class TestDeleteRows(unittest.TestCase):
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), delete_rows, True, *self.args, **self.expected_kwargs)
+        success_test(test, self.service.get_successful_response(),
+                     delete_rows, True, *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response()
-                          , delete_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+                          delete_rows, *self.args, **self.expected_kwargs)
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response()
-                          , delete_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
+                          delete_rows, *self.args, **self.expected_kwargs)
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response()
-                          , delete_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
+                          delete_rows, *self.args, **self.expected_kwargs)
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response()
-                          , delete_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestError, self.service.get_general_error_response(),
+                          delete_rows, *self.args, **self.expected_kwargs)
 
 
 class TestUpdateRows(unittest.TestCase):
@@ -98,10 +99,10 @@ class TestUpdateRows(unittest.TestCase):
     def setUp(self):
         self.service = MockUpdateRows()
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()]
-            , 'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}'
-            , 'headers': {u'Content-Type': u'application/json'}
-            , 'timeout': 300
+            'expected_args': [self.service.get_server_url()],
+            'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
+            'headers': {u'Content-Type': u'application/json'},
+            'timeout': 300
         }
 
         rows = '{id:1234}'
@@ -111,27 +112,28 @@ class TestUpdateRows(unittest.TestCase):
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), update_rows, True, *self.args, **self.expected_kwargs)
+        success_test(test, self.service.get_successful_response(), update_rows, True,
+                     *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response()
-                          , update_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+                          update_rows, *self.args, **self.expected_kwargs)
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response()
-                          , update_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
+                          update_rows, *self.args, **self.expected_kwargs)
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response()
-                          , update_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
+                          update_rows, *self.args, **self.expected_kwargs)
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response()
-                          , update_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestError, self.service.get_general_error_response(),
+                          update_rows, *self.args, **self.expected_kwargs)
 
 
 class TestInsertRows(unittest.TestCase):
@@ -139,10 +141,10 @@ class TestInsertRows(unittest.TestCase):
     def setUp(self):
         self.service = MockInsertRows()
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()]
-            , 'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}'
-            , 'headers': {u'Content-Type': u'application/json'}
-            , 'timeout': 300
+            'expected_args': [self.service.get_server_url()],
+            'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
+            'headers': {u'Content-Type': u'application/json'},
+            'timeout': 300
         }
 
         rows = '{id:1234}'
@@ -152,27 +154,28 @@ class TestInsertRows(unittest.TestCase):
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), insert_rows, True, *self.args, **self.expected_kwargs)
+        success_test(test, self.service.get_successful_response(), insert_rows, True,
+                     *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response()
-                          , insert_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+                          insert_rows, *self.args, **self.expected_kwargs)
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response()
-                          , insert_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
+                          insert_rows, *self.args, **self.expected_kwargs)
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response()
-                          , insert_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
+                          insert_rows, *self.args, **self.expected_kwargs)
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response()
-                          , insert_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestError, self.service.get_general_error_response(),
+                          insert_rows, *self.args, **self.expected_kwargs)
 
 
 class TestExecuteSQL(unittest.TestCase):
@@ -181,10 +184,10 @@ class TestExecuteSQL(unittest.TestCase):
         self.service = MockExecuteSQL()
         sql = 'select * from ' + schema + '.' + query
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()]
-            , 'data': {'sql': sql, "schemaName": schema}
-            , 'headers': None
-            , 'timeout': 300
+            'expected_args': [self.service.get_server_url()],
+            'data': {'sql': sql, "schemaName": schema},
+            'headers': None,
+            'timeout': 300
         }
 
         self.args = [
@@ -197,23 +200,23 @@ class TestExecuteSQL(unittest.TestCase):
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response()
-                          , execute_sql, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+                          execute_sql, *self.args, **self.expected_kwargs)
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response()
-                          , execute_sql, *self.args, **self.expected_kwargs)
+        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
+                          execute_sql, *self.args, **self.expected_kwargs)
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response()
-                          , execute_sql, *self.args, **self.expected_kwargs)
+        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
+                          execute_sql, *self.args, **self.expected_kwargs)
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response()
-                          , execute_sql, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestError, self.service.get_general_error_response(),
+                          execute_sql, *self.args, **self.expected_kwargs)
 
 
 class TestSelectRows(unittest.TestCase):
@@ -221,10 +224,10 @@ class TestSelectRows(unittest.TestCase):
     def setUp(self):
         self.service = MockSelectRows()
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()]
-            , 'data': {"schemaName": schema, "query.queryName": query}
-            , 'headers': None
-            , 'timeout': 300
+            'expected_args': [self.service.get_server_url()],
+            'data': {"schemaName": schema, "query.queryName": query},
+            'headers': None,
+            'timeout': 300
         }
 
         self.args = [
@@ -237,23 +240,23 @@ class TestSelectRows(unittest.TestCase):
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response()
-                          , select_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+                          select_rows, *self.args, **self.expected_kwargs)
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response()
-                          , select_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
+                          select_rows, *self.args, **self.expected_kwargs)
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response()
-                          , select_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
+                          select_rows, *self.args, **self.expected_kwargs)
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response()
-                          , select_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(test, RequestError, self.service.get_general_error_response(),
+                          select_rows, *self.args, **self.expected_kwargs)
 
 
 def suite():

@@ -19,8 +19,12 @@ import requests
 import ssl
 
 from requests.adapters import HTTPAdapter
+from requests.exceptions import SSLError
 from requests.packages.urllib3.poolmanager import PoolManager
-from labkey.exceptions import RequestError, RequestAuthorizationError, QueryNotFoundError, ServerNotFoundError
+from labkey.exceptions import RequestError, RequestAuthorizationError, QueryNotFoundError, \
+    ServerContextError, ServerNotFoundError
+
+__default_timeout = 60 * 5  # 5 minutes
 
 
 # _ssl.c:504: error:14077410:SSL routines:SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure
@@ -33,34 +37,35 @@ class SafeTLSAdapter(HTTPAdapter):
                                        ssl_version=ssl.PROTOCOL_TLSv1)
 
 
-def create_server_context(domain, container_path, context_path=None, use_ssl=True):
+def create_server_context(domain, container_path, context_path=None, use_ssl=True, request_csrf_token=True):
     """
     Create a LabKey server context. This context is used to encapsulate properties
     about the LabKey server that is being requested against. This includes, but is not limited to,
-    the domain, container_path, and if the server is using SSL.
+    the domain, container_path, if the server is using SSL, and CSRF token request.
     :param domain:
     :param container_path:
     :param context_path:
     :param use_ssl:
+    :param request_csrf_token: boolean Request the CSRF token when creating the server context. If you prefer not
+    to resolve the CSRF token when creating the context set this to False and use utils.request_csrf(server_context)
+    when desired.
     :return:
     """
     server_context = dict(domain=domain, container_path=container_path, context_path=context_path)
 
-    if use_ssl:
-        scheme = 'https'
-    else:
-        scheme = 'http'
-    scheme += '://'
+    session = requests.Session()
 
     if use_ssl:
-        session = requests.Session()
+        scheme = 'https://'
         session.mount(scheme, SafeTLSAdapter())
     else:
-        # TODO: Is there a better way? Can we have session.mount('http')?
-        session = requests
+        scheme = 'http://'
 
     server_context['scheme'] = scheme
     server_context['session'] = session
+
+    if request_csrf_token:
+        request_csrf(server_context)
 
     return server_context
 
@@ -83,14 +88,12 @@ def build_url(server_context, controller, action, container_path=None):
     if server_context['context_path'] is not None:
         url += sep + server_context['context_path']
 
-    url += sep + controller
-
     if container_path is not None:
         url += sep + container_path
-    else:
+    elif server_context['container_path'] is not None:
         url += sep + server_context['container_path']
 
-    url += sep + action
+    url += sep + controller + '-' + action
 
     return url
 
@@ -99,7 +102,16 @@ def handle_response(response):
     sc = response.status_code
 
     if (200 <= sc < 300) or sc == 304:
-        return response.json()
+        try:
+            return response.json()
+        except ValueError:
+            result = dict(
+                status_code=sc,
+                message="Request was successful but did not return valid json",
+                content=response.content
+            )
+            return result
+
     elif sc == 401:
         raise RequestAuthorizationError(response)
     elif sc == 404:
@@ -113,3 +125,26 @@ def handle_response(response):
         raise RequestError(response)
 
 
+def make_request(server_context, url, payload, headers=None, timeout=__default_timeout):
+    try:
+        session = server_context['session']
+        raw_response = session.post(url, data=payload, headers=headers, timeout=timeout)
+        return handle_response(raw_response)
+    except SSLError as e:
+        raise ServerContextError(e)
+
+
+def request_csrf(server_context):
+    """
+    Makes a request against the login-whoami.api action to resolve the CSRF token for this session.
+    This token is subsequently stored in the session headers.
+    :param server_context: LabKey server context
+    :return:
+    """
+    session = server_context['session']
+
+    url = build_url(server_context, 'login', 'whoami.api')
+    response = handle_response(session.get(url))
+    session.headers.update({'X-LABKEY-CSRF': response['CSRF']})
+
+    return server_context

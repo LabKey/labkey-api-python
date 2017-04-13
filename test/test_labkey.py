@@ -18,12 +18,14 @@ import unittest
 
 from test_experiment_api import suite as exp_suite
 from test_query_api import suite as query_suite
+from test_security import suite as security_suite
 from test_unsupported import suite as unsupported_suite
 
 if __name__ == '__main__':
     all_tests = unittest.TestSuite([
         exp_suite(),
         query_suite(),
+        security_suite(),
         unsupported_suite()
     ])
     unittest.TextTestRunner().run(all_tests)
