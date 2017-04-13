@@ -2,17 +2,27 @@
 <p>
  <a href="https://pypi.python.org/pypi/labkey"><img src="https://img.shields.io/pypi/v/labkey.svg" alt="pypi version"></a>
 </p>
-Lets you query, insert, and update data on a [LabKey Server](http://www.labkey.com/) using Python.
+
+Lets you query, insert, and update data on a [LabKey Server](https://www.labkey.com/) using Python.
 
 ## Features
 
-- **labkey.query.select_rows()** - Query and get results sets from LabKey Server.
-- **labkey.query.execute_sql()** - Execute SQL (LabKey SQL dialect) through the query module on LabKey Server.
-- **labkey.query.insert_rows()** - Insert rows into a table on LabKey Server.
-- **labkey.query.update_rows()** - Update rows in a table on LabKey Server.
-- **labkey.query.delete_rows()** - Delete records in a table on LabKey Server.
-- **labkey.experiment.load_batch()** - Retreive assay data (batch level) from LabKey Server.
-- **labkey.experiment.save_batch()** - Save assay data (batch level) on LabKey Server. 
+The following APIs can be used against a LabKey Server instance.
+
+Query API (labkey.query)
+
+- **delete_rows()** - Delete records in a table.
+- **execute_sql()** - Execute SQL (LabKey SQL dialect) through the query module.
+- **insert_rows()** - Insert rows into a table.
+- **select_rows()** - Query and get results sets.
+- **update_rows()** - Update rows in a table.
+
+Experiment API (labkey.experiment)
+
+- **load_batch()** - Retrieve assay data (batch level).
+- **save_batch()** - Save assay data (batch level)
+
+Security API (labkey.security). Available for administrating and configuring user accounts and permissions.
 
 ## Installation
 To install, simply use `pip`:
@@ -78,7 +88,7 @@ else:
 
 ## Supported Versions
 Python 2.6+ and 3.4+ are fully supported.
-LabKey Server v13.3 and later.
+LabKey Server v15.1 and later.
 
 ## Contributing
 This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the [LabKey Server support forum](https://www.labkey.org/wiki/home/page.view?name=support).
