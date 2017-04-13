@@ -22,7 +22,7 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from labkey.security import create_user, reset_password, activate_user, deactivate_user, delete_user, add_to_group, \
+from labkey.security import create_user, reset_password, activate_users, deactivate_users, delete_users, add_to_group, \
     remove_from_group, remove_from_role, add_to_role, get_roles, list_groups
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
 
@@ -140,8 +140,8 @@ class TestResetPassword(unittest.TestCase):
                           reset_password, *self.args, **self.expected_kwargs)
 
 
-class TestActivateUser(unittest.TestCase):
-    __user_id = 123
+class TestActivateUsers(unittest.TestCase):
+    __user_id = [123]
 
     class MockActivateUser(MockUserController):
         api = 'activateUsers.api'
@@ -164,32 +164,32 @@ class TestActivateUser(unittest.TestCase):
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), activate_user, True,
+        success_test(test, self.service.get_successful_response(), activate_users, True,
                      *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
         throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
-                          activate_user, *self.args, **self.expected_kwargs)
+                          activate_users, *self.args, **self.expected_kwargs)
 
     def test_query_not_found(self):
         test = self
         throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
-                          activate_user, *self.args, **self.expected_kwargs)
+                          activate_users, *self.args, **self.expected_kwargs)
 
     def test_server_not_found(self):
         test = self
         throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
-                          activate_user, *self.args, **self.expected_kwargs)
+                          activate_users, *self.args, **self.expected_kwargs)
 
     def test_general_error(self):
         test = self
         throws_error_test(test, RequestError, self.service.get_general_error_response(),
-                          activate_user, *self.args, **self.expected_kwargs)
+                          activate_users, *self.args, **self.expected_kwargs)
 
 
-class TestDeactivateUser(unittest.TestCase):
-    __user_id = 123
+class TestDeactivateUsers(unittest.TestCase):
+    __user_id = [123]
 
     class MockDeactivateUser(MockUserController):
         api = 'deactivateUsers.view'
@@ -212,32 +212,32 @@ class TestDeactivateUser(unittest.TestCase):
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), deactivate_user, False,
+        success_test(test, self.service.get_successful_response(), deactivate_users, False,
                      *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
         throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
-                          deactivate_user, *self.args, **self.expected_kwargs)
+                          deactivate_users, *self.args, **self.expected_kwargs)
 
     def test_query_not_found(self):
         test = self
         throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
-                          deactivate_user, *self.args, **self.expected_kwargs)
+                          deactivate_users, *self.args, **self.expected_kwargs)
 
     def test_server_not_found(self):
         test = self
         throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
-                          deactivate_user, *self.args, **self.expected_kwargs)
+                          deactivate_users, *self.args, **self.expected_kwargs)
 
     def test_general_error(self):
         test = self
         throws_error_test(test, RequestError, self.service.get_general_error_response(),
-                          deactivate_user, *self.args, **self.expected_kwargs)
+                          deactivate_users, *self.args, **self.expected_kwargs)
 
 
-class TestDeleteUser(unittest.TestCase):
-    __user_id = 123
+class TestDeleteUsers(unittest.TestCase):
+    __user_id = [123]
 
     class MockDeleteUser(MockUserController):
         api = 'deleteUsers.view'
@@ -260,28 +260,28 @@ class TestDeleteUser(unittest.TestCase):
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), delete_user, False,
+        success_test(test, self.service.get_successful_response(), delete_users, False,
                      *self.args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self
         throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
-                          delete_user, *self.args, **self.expected_kwargs)
+                          delete_users, *self.args, **self.expected_kwargs)
 
     def test_query_not_found(self):
         test = self
         throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
-                          delete_user, *self.args, **self.expected_kwargs)
+                          delete_users, *self.args, **self.expected_kwargs)
 
     def test_server_not_found(self):
         test = self
         throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
-                          delete_user, *self.args, **self.expected_kwargs)
+                          delete_users, *self.args, **self.expected_kwargs)
 
     def test_general_error(self):
         test = self
         throws_error_test(test, RequestError, self.service.get_general_error_response(),
-                          delete_user, *self.args, **self.expected_kwargs)
+                          delete_users, *self.args, **self.expected_kwargs)
 
 
 class TestAddToGroup(unittest.TestCase):
@@ -589,9 +589,9 @@ def suite():
     load_tests = unittest.TestLoader().loadTestsFromTestCase
     return unittest.TestSuite([
         load_tests(TestCreateUser),
-        load_tests(TestActivateUser),
-        load_tests(TestDeactivateUser),
-        load_tests(TestDeleteUser),
+        load_tests(TestActivateUsers),
+        load_tests(TestDeactivateUsers),
+        load_tests(TestDeleteUsers),
         load_tests(TestRemoveFromGroup),
         load_tests(TestAddToGroup),
         load_tests(TestRemoveFromRole)

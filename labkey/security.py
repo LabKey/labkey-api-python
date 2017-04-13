@@ -15,30 +15,16 @@
 #
 from __future__ import unicode_literals
 
-from requests.exceptions import SSLError
-from labkey.utils import build_url, handle_response
-from labkey.exceptions import ServerContextError
+from labkey.utils import build_url, make_request
 
-_default_timeout = 60 * 5  # 5 minutes
 security_controller = 'security'
 user_controller = 'user'
 
 
-def activate_user(server_context, target_id, container_path=None):
-    """
-    Deactive but do not delete user account
-    :param server_context:
-    :param target_id:
-    :param container_path:
-    :return:
-    """
-    return activate_users(server_context, target_ids=[target_id], container_path=container_path)
-
-
 def activate_users(server_context, target_ids, container_path=None):
     """
-    Deactive but do not delete user account
-    :param server_context:
+    Activate user accounts
+    :param server_context: LabKey server context
     :param target_ids:
     :param container_path:
     :return:
@@ -76,7 +62,7 @@ def add_to_role(server_context, role, user_id=None, email=None, container_path=N
 def create_user(server_context, email, container_path=None, send_email=False):
     """
     Create new account
-    :param server_context:
+    :param server_context: LabKey server context
     :param email:
     :param container_path:
     :param send_email: true to send email notification to user
@@ -88,24 +74,13 @@ def create_user(server_context, email, container_path=None, send_email=False):
         'sendEmail': send_email
     }
 
-    return __make_request(server_context, url, payload)
-
-
-def deactivate_user(server_context, target_id, container_path=None):
-    """
-    Deactivate but do not delete user account
-    :param server_context:
-    :param target_id:
-    :param container_path:
-    :return:
-    """
-    return deactivate_users(server_context, target_ids=[target_id], container_path=container_path)
+    return make_request(server_context, url, payload)
 
 
 def deactivate_users(server_context, target_ids, container_path=None):
     """
-    Deactivate but do not delete user account
-    :param server_context:
+    Deactivate but do not delete user accounts
+    :param server_context: LabKey server context
     :param target_ids:
     :param container_path:
     :return:
@@ -119,22 +94,11 @@ def deactivate_users(server_context, target_ids, container_path=None):
         raise ValueError("Unable to deactivate users {0}".format(target_ids))
 
 
-def delete_user(server_context, target_id, container_path=None):
-    """
-    Delete user account
-    :param target_id:
-    :param server_context:
-    :param container_path:
-    :return:
-    """
-    return delete_users(server_context, target_ids=[target_id], container_path=container_path)
-
-
 def delete_users(server_context, target_ids, container_path=None):
     """
-    Delete user account
+    Delete user accounts
+    :param server_context: LabKey server context
     :param target_ids:
-    :param server_context:
     :param container_path:
     :return:
     """
@@ -155,14 +119,19 @@ def get_roles(server_context, container_path=None):
     :return:
     """
     url = build_url(server_context, security_controller, 'getRoles.api', container_path=container_path)
-    return __make_request(server_context, url)
+    return make_request(server_context, url, None)
 
 
 def get_user_by_email(server_context, email):
-
+    """
+    Get the user with the provided email. Throws a ValueError if not found.
+    :param server_context: LabKey server context
+    :param email:
+    :return:
+    """
     url = build_url(server_context, user_controller, 'getUsers.api')
     payload = dict(includeDeactivatedAccounts=True)
-    result = __make_request(server_context, url, payload)
+    result = make_request(server_context, url, payload)
 
     if result is None or result['users'] is None:
         raise ValueError("No Users in container" + email)
@@ -181,13 +150,13 @@ def list_groups(server_context, include_site_groups=False, container_path=None):
         'includeSiteGroups': include_site_groups
     }
 
-    return __make_request(server_context, url, payload)
+    return make_request(server_context, url, payload)
 
 
 def remove_from_group(server_context, user_ids, group_id, container_path=None):
     """
     Remove user from group
-    :param server_context:
+    :param server_context: LabKey server context
     :param user_ids:
     :param group_id:
     :param container_path:
@@ -225,16 +194,7 @@ def reset_password(server_context, email, container_path=None):
         'email': email
     }
 
-    return __make_request(server_context, url, payload)
-
-
-def __make_request(server_context, url, payload=None, headers=None, timeout=_default_timeout):
-    try:
-        session = server_context['session']
-        raw_response = session.post(url, data=payload, headers=headers, timeout=timeout)
-        return handle_response(raw_response)
-    except SSLError as e:
-        raise ServerContextError(e)
+    return make_request(server_context, url, payload)
 
 
 def __make_security_group_api_request(server_context, api, user_ids, group_id, container_path):
@@ -258,7 +218,7 @@ def __make_security_group_api_request(server_context, api, user_ids, group_id, c
         'principalIds': user_ids
     }
 
-    return __make_request(server_context, url, payload)
+    return make_request(server_context, url, payload)
 
 
 def __make_security_role_api_request(server_context, api, role, email=None, user_id=None, container_path=None):
@@ -267,7 +227,7 @@ def __make_security_role_api_request(server_context, api, role, email=None, user
     :param server_context: LabKey Server context
     :param api: Action to execute
     :param user_id: user ids to apply action to
-    :param role: unique role name to add user
+    :param role: (from get_roles) to remove user from
     :param container_path: Additional container context path
     :return: Request json object
     """
@@ -282,7 +242,7 @@ def __make_security_role_api_request(server_context, api, role, email=None, user
         'email': email
     }
 
-    return __make_request(server_context, url, payload)
+    return make_request(server_context, url, payload)
 
 
 def __make_user_api_request(server_context, target_ids, api, container_path=None):
@@ -299,4 +259,4 @@ def __make_user_api_request(server_context, target_ids, api, container_path=None
         'userId': target_ids
     }
 
-    return __make_request(server_context, url, payload)
+    return make_request(server_context, url, payload)
