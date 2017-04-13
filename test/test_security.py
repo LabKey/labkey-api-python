@@ -26,7 +26,7 @@ from labkey.security import create_user, reset_password, activate_user, deactiva
     remove_from_group, remove_from_role, add_to_role, get_roles, list_groups
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
 
-from test.test_utils import MockLabKey, mock_server_context, success_test, throws_error_test
+from test_utils import MockLabKey, mock_server_context, success_test, throws_error_test
 
 
 class MockSecurityController(MockLabKey):
@@ -48,7 +48,7 @@ class TestCreateUser(unittest.TestCase):
     __email = 'pyTest@labkey.com'
 
     class MockCreateUser(MockSecurityController):
-        api = 'CreateNewUser.api'
+        api = 'createNewUser.api'
 
     def setUp(self):
         self.service = self.MockCreateUser()
@@ -144,7 +144,7 @@ class TestActivateUser(unittest.TestCase):
     __user_id = 123
 
     class MockActivateUser(MockUserController):
-        api = 'ActivateUsers.api'
+        api = 'activateUsers.api'
 
     def setUp(self):
         self.service = self.MockActivateUser()
@@ -192,7 +192,7 @@ class TestDeactivateUser(unittest.TestCase):
     __user_id = 123
 
     class MockDeactivateUser(MockUserController):
-        api = 'DeactivateUsers.api'
+        api = 'deactivateUsers.view'
 
     def setUp(self):
         self.service = self.MockDeactivateUser()
@@ -240,7 +240,7 @@ class TestDeleteUser(unittest.TestCase):
     __user_id = 123
 
     class MockDeleteUser(MockUserController):
-        api = 'DeleteUsers.api'
+        api = 'deleteUsers.view'
 
     def setUp(self):
         self.service = self.MockDeleteUser()
@@ -289,7 +289,7 @@ class TestAddToGroup(unittest.TestCase):
     __group_id = 123
 
     class MockAddGroupMember(MockSecurityController):
-        api = 'AddGroupMember.api'
+        api = 'addGroupMember.api'
 
     def setUp(self):
         self.service = self.MockAddGroupMember()
@@ -340,7 +340,7 @@ class TestRemoveFromGroup(unittest.TestCase):
     __group_id = 123
 
     class MockRemoveGroupMember(MockSecurityController):
-        api = 'RemoveGroupMember.api'
+        api = 'removeGroupMember.api'
 
     def setUp(self):
         self.service = self.MockRemoveGroupMember()
@@ -392,7 +392,7 @@ class TestRemoveFromRole(unittest.TestCase):
     __role = {'uniqueName': 'TestRole'}
 
     class MockRemoveRole(MockSecurityController):
-        api = 'RemoveAssignment.api'
+        api = 'removeAssignment.api'
 
     def setUp(self):
         self.service = self.MockRemoveRole()
@@ -446,7 +446,7 @@ class TestAddToRole(unittest.TestCase):
     __role = {'uniqueName': 'TestRole'}
 
     class MockAddRole(MockSecurityController):
-        api = 'AddAssignment.api'
+        api = 'addAssignment.api'
 
     def setUp(self):
         self.service = self.MockAddRole()
@@ -497,7 +497,7 @@ class TestAddToRole(unittest.TestCase):
 class TestGetRoles(unittest.TestCase):
 
     class MockGetRoles(MockSecurityController):
-        api = 'GetRoles.api'
+        api = 'getRoles.api'
 
     def setUp(self):
         self.service = self.MockGetRoles()
