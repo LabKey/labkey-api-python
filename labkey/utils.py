@@ -25,19 +25,11 @@ from labkey.exceptions import RequestError, RequestAuthorizationError, QueryNotF
     ServerContextError, ServerNotFoundError
 
 __default_timeout = 60 * 5  # 5 minutes
+CSRF_TOKEN = 'X-LABKEY-CSRF'
+DISABLE_CSRF_CHECK = False  # Used by tests to disable CSRF token check
 
 
-# _ssl.c:504: error:14077410:SSL routines:SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure
-# http://lukasa.co.uk/2013/01/Choosing_SSL_Version_In_Requests/
-class SafeTLSAdapter(HTTPAdapter):
-    def init_poolmanager(self, connections, maxsize, block=False):
-        self.poolmanager = PoolManager(num_pools=connections,
-                                       maxsize=maxsize,
-                                       block=block,
-                                       ssl_version=ssl.PROTOCOL_TLSv1)
-
-
-def create_server_context(domain, container_path, context_path=None, use_ssl=True, request_csrf_token=True):
+def create_server_context(domain, container_path, context_path=None, use_ssl=True):
     """
     Create a LabKey server context. This context is used to encapsulate properties
     about the LabKey server that is being requested against. This includes, but is not limited to,
@@ -46,28 +38,10 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
     :param container_path:
     :param context_path:
     :param use_ssl:
-    :param request_csrf_token: boolean Request the CSRF token when creating the server context. If you prefer not
-    to resolve the CSRF token when creating the context set this to False and use utils.request_csrf(server_context)
-    when desired.
     :return:
     """
-    server_context = dict(domain=domain, container_path=container_path, context_path=context_path)
-
-    session = requests.Session()
-
-    if use_ssl:
-        scheme = 'https://'
-        session.mount(scheme, SafeTLSAdapter())
-    else:
-        scheme = 'http://'
-
-    server_context['scheme'] = scheme
-    server_context['session'] = session
-
-    if request_csrf_token:
-        request_csrf(server_context)
-
-    return server_context
+    config = dict(domain=domain, container_path=container_path, context_path=context_path, use_ssl=use_ssl)
+    return ServerContext(**config)
 
 
 def build_url(server_context, controller, action, container_path=None):
@@ -80,22 +54,7 @@ def build_url(server_context, controller, action, container_path=None):
     :param container_path:
     :return:
     """
-    sep = '/'
-
-    url = server_context['scheme']
-    url += server_context['domain']
-
-    if server_context['context_path'] is not None:
-        url += sep + server_context['context_path']
-
-    if container_path is not None:
-        url += sep + container_path
-    elif server_context['container_path'] is not None:
-        url += sep + server_context['container_path']
-
-    url += sep + controller + '-' + action
-
-    return url
+    return server_context.build_url(controller, action, container_path=container_path)
 
 
 def handle_response(response):
@@ -125,26 +84,70 @@ def handle_response(response):
         raise RequestError(response)
 
 
-def make_request(server_context, url, payload, headers=None, timeout=__default_timeout):
-    try:
-        session = server_context['session']
-        raw_response = session.post(url, data=payload, headers=headers, timeout=timeout)
-        return handle_response(raw_response)
-    except SSLError as e:
-        raise ServerContextError(e)
+# _ssl.c:504: error:14077410:SSL routines:SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure
+# http://lukasa.co.uk/2013/01/Choosing_SSL_Version_In_Requests/
+class SafeTLSAdapter(HTTPAdapter):
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = PoolManager(num_pools=connections,
+                                       maxsize=maxsize,
+                                       block=block,
+                                       ssl_version=ssl.PROTOCOL_TLSv1)
 
 
-def request_csrf(server_context):
-    """
-    Makes a request against the login-whoami.api action to resolve the CSRF token for this session.
-    This token is subsequently stored in the session headers.
-    :param server_context: LabKey server context
-    :return:
-    """
-    session = server_context['session']
+class ServerContext(object):
 
-    url = build_url(server_context, 'login', 'whoami.api')
-    response = handle_response(session.get(url))
-    session.headers.update({'X-LABKEY-CSRF': response['CSRF']})
+    def __init__(self, **kwargs):
+        self._container_path = kwargs.pop('container_path', None)
+        self._context_path = kwargs.pop('context_path', None)
+        self._domain = kwargs.pop('domain', None)
+        self._use_ssl = kwargs.pop('use_ssl', True)
 
-    return server_context
+        self._session = requests.Session()
+
+        if self._use_ssl:
+            self._scheme = 'https://'
+            self._session.mount(self._scheme, SafeTLSAdapter())
+        else:
+            self._scheme = 'http://'
+
+    def build_url(self, controller, action, container_path=None):
+        sep = '/'
+
+        url = self._scheme + self._domain
+
+        if self._context_path is not None:
+            url += sep + self._context_path
+
+        if container_path is not None:
+            url += sep + container_path
+        elif self._container_path is not None:
+            url += sep + self._container_path
+
+        url += sep + controller + '-' + action
+
+        return url
+
+    def make_request(self, url, payload, headers=None, timeout=300, method='POST'):
+
+        if not DISABLE_CSRF_CHECK:
+            global CSRF_TOKEN
+
+            # CSRF check
+            if CSRF_TOKEN not in self._session.headers.keys():
+                try:
+                    csrf_url = self.build_url('login', 'whoami.api')
+                    response = handle_response(self._session.get(csrf_url))
+                    self._session.headers.update({
+                        CSRF_TOKEN: response['CSRF']
+                    })
+                except SSLError as e:
+                    raise ServerContextError(e)
+
+        try:
+            if method is 'GET':
+                raw_response = self._session.get(url, params=payload, headers=headers, timeout=timeout)
+            else:
+                raw_response = self._session.post(url, data=payload, headers=headers, timeout=timeout)
+            return handle_response(raw_response)
+        except SSLError as e:
+            raise ServerContextError(e)

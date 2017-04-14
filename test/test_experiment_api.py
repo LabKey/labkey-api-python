@@ -48,9 +48,10 @@ class TestLoadBatch(unittest.TestCase):
     def setUp(self):
         self.service = MockLoadBatch()
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()]
-            , 'data': '{"assayId": 12345, "batchId": 54321}'
-            , 'headers': {'Content-type': 'application/json', 'Accept': 'text/plain'}
+            'expected_args': [self.service.get_server_url()],
+            'data': '{"assayId": 12345, "batchId": 54321}',
+            'headers': {'Content-type': 'application/json', 'Accept': 'text/plain'},
+            'timeout': 300
         }
 
         self.args = [
@@ -97,14 +98,14 @@ class TestSaveBatch(unittest.TestCase):
         # Generate the Batch object(s)
         batch = Batch()
         batch.runs = [run]
-        # batch.name = 'python batch'
         batch.properties['PropertyName'] = 'Property Value'
 
         self.service = MockSaveBatch()
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()]
-            , 'data': '{"assayId": 12345, "batches": [{"batchProtocolId": 0, "comment": null, "created": null, "createdBy": null, "modified": null, "modifiedBy": null, "name": null, "properties": {"PropertyName": "Property Value"}, "runs": [{"comment": null, "created": null, "createdBy": null, "dataInputs": [], "dataRows": [], "experiments": [], "filePathRoot": null, "materialInputs": [], "materialOutputs": [], "modified": null, "modifiedBy": null, "name": "python upload", "properties": {"RunFieldName": "Run Field Value"}}]}]}'
-            , 'headers': {'Content-type': 'application/json', 'Accept': 'text/plain'}
+            'expected_args': [self.service.get_server_url()],
+            'data': '{"assayId": 12345, "batches": [{"batchProtocolId": 0, "comment": null, "created": null, "createdBy": null, "modified": null, "modifiedBy": null, "name": null, "properties": {"PropertyName": "Property Value"}, "runs": [{"comment": null, "created": null, "createdBy": null, "dataInputs": [], "dataRows": [], "experiments": [], "filePathRoot": null, "materialInputs": [], "materialOutputs": [], "modified": null, "modifiedBy": null, "name": "python upload", "properties": {"RunFieldName": "Run Field Value"}}]}]}',
+            'headers': {'Content-type': 'application/json', 'Accept': 'text/plain'},
+            'timeout': 300
         }
 
         self.args = [

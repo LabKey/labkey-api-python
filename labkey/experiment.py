@@ -16,40 +16,6 @@
 from __future__ import unicode_literals
 import json
 
-from requests.exceptions import SSLError, ConnectionError
-from labkey.utils import build_url, handle_response
-from labkey.exceptions import ServerContextError, ServerNotFoundError
-
-
-# EXAMPLE
-# -------
-
-# from utils import create_server_context
-# from experiment import load_batch, save_batch
-#
-# print("Create a server context")
-# server_context = create_server_context('localhost:8080', 'CDSTest Project', 'labkey', use_ssl=False)
-#
-# print("Load an Assay batch from the server")
-# assay_id = # provide one from your server
-# batch_id = # provide one from your server
-# run_group = load_batch(server_context, assay_id, batch_id)
-#
-# if run_group is not None:
-# 	print("Batch Id: " + str(run_group.id))
-# 	print("Created By: " + run_group.created_by)
-#
-# 	print("Modify a property")
-# 	batch_property_name = '' # provide one from your assay
-# 	batch_property_value = '' # provide one
-# 	run_group.properties[batch_property_name] = batch_property_value
-#
-# 	print("Save the batch")
-# 	save_batch(server_context, assay_id, run_group)
-
-# --------
-# /EXAMPLE
-
 
 # TODO Incorporate logging
 def load_batch(server_context, assay_id, batch_id):
@@ -60,8 +26,7 @@ def load_batch(server_context, assay_id, batch_id):
     :param batch_id:
     :return:
     """
-    load_batch_url = build_url(server_context, 'assay', 'getAssayBatch.api')
-    session = server_context['session']
+    load_batch_url = server_context.build_url('assay', 'getAssayBatch.api')
     loaded_batch = None
 
     payload = {
@@ -74,15 +39,9 @@ def load_batch(server_context, assay_id, batch_id):
         'Accept': 'text/plain'
     }
 
-    try:
-        response = session.post(load_batch_url, data=json.dumps(payload, sort_keys=True), headers=headers)
-        json_body = handle_response(response)
-        if json_body is not None:
-            loaded_batch = Batch.from_data(json_body['batch'])
-    except SSLError as e:
-        raise ServerContextError(e)
-    except ConnectionError as e:
-        raise ServerNotFoundError(e)
+    json_body = server_context.make_request(load_batch_url, json.dumps(payload, sort_keys=True), headers=headers)
+    if json_body is not None:
+        loaded_batch = Batch.from_data(json_body['batch'])
 
     return loaded_batch
 
@@ -110,11 +69,9 @@ def save_batches(server_context, assay_id, batches):
     :param batches: The Batch(es) to save.
     :return:
     """
-
-    save_batch_url = build_url(server_context, 'assay', 'saveAssayBatch.api')
-    session = server_context['session']
-
+    save_batch_url = server_context.build_url('assay', 'saveAssayBatch.api')
     json_batches = []
+
     if batches is None:
         return None  # Nothing to save
 
@@ -133,15 +90,10 @@ def save_batches(server_context, assay_id, batches):
         'Accept': 'text/plain'
     }
 
-    try:
-        # print(payload)
-        response = session.post(save_batch_url, data=json.dumps(payload, sort_keys=True), headers=headers)
-        json_body = handle_response(response)
-        if json_body is not None:
-            resp_batches = json_body['batches']
-            return [Batch.from_data(resp_batch) for resp_batch in resp_batches]
-    except SSLError as e:
-        raise ServerContextError(e)
+    json_body = server_context.make_request(save_batch_url, json.dumps(payload, sort_keys=True), headers=headers)
+    if json_body is not None:
+        resp_batches = json_body['batches']
+        return [Batch.from_data(resp_batch) for resp_batch in resp_batches]
 
     return None
 

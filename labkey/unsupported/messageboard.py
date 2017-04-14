@@ -23,7 +23,6 @@ LabKey Server.
 """
 from __future__ import unicode_literals
 from requests.exceptions import SSLError
-from labkey.utils import build_url
 
 
 def post_message(server_context, message_title, message_body, render_as, container_path=None):
@@ -36,8 +35,7 @@ def post_message(server_context, message_title, message_body, render_as, contain
     :param container_path: Optional container path that can be used to override the server_context container path
     :return: Returns 1 if successful, 0 is post failed.
     """
-    # Build the URL for querying LabKey Server
-    message_url = build_url(server_context, 'announcements', 'insert.api', container_path=container_path)
+    message_url = server_context.build_url('announcements', 'insert.api', container_path=container_path)
 
     message_data = {
         'title': message_title,
@@ -45,10 +43,8 @@ def post_message(server_context, message_title, message_body, render_as, contain
         'rendererType': render_as
     }
 
-    session = server_context['session']
-
     try:
-        message_response = session.post(message_url, message_data)
+        server_context.make_request(message_url, message_data)
     except SSLError as e:
         print("There was problem while attempting to submit the message to " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
         print("The HTTP client error was: " + format(e))

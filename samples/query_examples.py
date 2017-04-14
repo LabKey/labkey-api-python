@@ -33,7 +33,7 @@ import copy
 
 print("Create a server context")
 labkey_server = 'localhost:8080'
-project_name = 'moduleAssayTest'  # Project folder name
+project_name = 'ModuleAssayTest'  # Project folder name
 contextPath = 'labkey'
 server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=False)
 
