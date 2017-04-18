@@ -22,8 +22,8 @@ This module provides functions for interacting with Wiki's on the
 LabKey Server.
 """
 from __future__ import unicode_literals
+
 import json
-from labkey.utils import build_url, handle_response
 from requests.exceptions import SSLError
 
 
@@ -40,7 +40,7 @@ def update_wiki(server_context, wiki_name, wiki_body, container_path=None):
     message returned by the server.
     """
     # Build the URL for reading the wiki page
-    read_wiki_url = build_url(server_context, 'wiki', 'editWiki.api', container_path=container_path)
+    read_wiki_url = server_context.build_url('wiki', 'editWiki.api', container_path=container_path)
     payload = {
         'name': wiki_name
     }
@@ -48,10 +48,8 @@ def update_wiki(server_context, wiki_name, wiki_body, container_path=None):
         'Content-type': 'application/json'
     }
 
-    session = server_context['session']
-
     try:
-        read_response = session.get(read_wiki_url, params=payload, headers=headers)
+        read_response = server_context.make_request(read_wiki_url, payload, headers=headers, method='GET')
     except SSLError as e:
         print("There was a problem while attempting to submit the read for the wiki page " + str(wiki_name) + " via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
         print("The HTTP client error was: " + format(e))
@@ -91,7 +89,7 @@ def update_wiki(server_context, wiki_name, wiki_body, container_path=None):
         wiki_vars[wvar.split(':')[0]] = wvar.split(':')[1]
     
     # Build the URL for updating the wiki page
-    update_wiki_url = build_url(server_context, 'wiki', 'saveWiki.api', container_path=container_path)
+    update_wiki_url = server_context.build_url('wiki', 'saveWiki.api', container_path=container_path)
     headers = {
         'Content-type': 'application/json'
     }
@@ -101,8 +99,7 @@ def update_wiki(server_context, wiki_name, wiki_body, container_path=None):
     wiki_vars['body'] = wiki_body
 
     try:
-        response = session.post(update_wiki_url, data=json.dumps(wiki_vars, sort_keys=True), headers=headers)
-        data = handle_response(response)
+        data = server_context.make_request(update_wiki_url, data=json.dumps(wiki_vars, sort_keys=True), headers=headers)
     except SSLError as e:
         print("There was a problem while attempting to submit the read for the wiki page '" + str(wiki_name) + "' via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
         print("The HTTP client error was: " + format(e))

@@ -48,10 +48,10 @@ class TestPostMessage(unittest.TestCase):
 
         self.service = MockPostMessage()
         self.expected_kwargs = {
-            'expected_args': [
-                self.service.get_server_url(),
-                expected_content
-            ]
+            'expected_args': [self.service.get_server_url()],
+            'data': expected_content,
+            'headers': None,
+            'timeout': 300
         }
 
         self.args = [

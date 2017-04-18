@@ -47,9 +47,6 @@ https://www.labkey.org/announcements/home/Server/Forum/list.view?
 from __future__ import unicode_literals
 import json
 
-from labkey.utils import build_url, make_request
-
-
 _query_headers = {
     'Content-Type': 'application/json'
 }
@@ -79,7 +76,7 @@ def delete_rows(server_context, schema_name, query_name, rows, container_path=No
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
-    url = build_url(server_context, 'query', 'deleteRows.api', container_path=container_path)
+    url = server_context.build_url('query', 'deleteRows.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,
@@ -87,9 +84,7 @@ def delete_rows(server_context, schema_name, query_name, rows, container_path=No
         'rows': rows
     }
 
-    # explicit json payload and headers required for form generation
-    return make_request(server_context, url, json.dumps(payload, sort_keys=True), headers=_query_headers,
-                        timeout=timeout)
+    return server_context.make_request(url, json.dumps(payload, sort_keys=True), headers=_query_headers, timeout=timeout)
 
 
 def execute_sql(server_context, schema_name, sql, container_path=None,
@@ -119,7 +114,7 @@ def execute_sql(server_context, schema_name, sql, container_path=None,
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
-    url = build_url(server_context, 'query', 'executeSql.api', container_path=container_path)
+    url = server_context.build_url('query', 'executeSql.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,
@@ -148,7 +143,7 @@ def execute_sql(server_context, schema_name, sql, container_path=None,
     if required_version is not None:
         payload['apiVersion'] = required_version
 
-    return make_request(server_context, url, payload, timeout=timeout)
+    return server_context.make_request(url, payload, timeout=timeout)
 
 
 def insert_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
@@ -162,7 +157,7 @@ def insert_rows(server_context, schema_name, query_name, rows, container_path=No
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
-    url = build_url(server_context, 'query', 'insertRows.api', container_path=container_path)
+    url = server_context.build_url('query', 'insertRows.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,
@@ -170,9 +165,8 @@ def insert_rows(server_context, schema_name, query_name, rows, container_path=No
         'rows': rows
     }
 
-    # explicit json payload and headers required for form generation
-    return make_request(server_context, url, json.dumps(payload, sort_keys=True), headers=_query_headers,
-                        timeout=timeout)
+    return server_context.make_request(url, json.dumps(payload, sort_keys=True), headers=_query_headers,
+                                       timeout=timeout)
 
 
 def select_rows(server_context, schema_name, query_name, view_name=None,
@@ -216,7 +210,7 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
     :param timeout: Request timeout in seconds (defaults to 30s)
     :return:
     """
-    url = build_url(server_context, 'query', 'getQuery.api', container_path=container_path)
+    url = server_context.build_url('query', 'getQuery.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,
@@ -268,7 +262,7 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
     if required_version is not None:
         payload['apiVersion'] = required_version
 
-    return make_request(server_context, url, payload, timeout=timeout)
+    return server_context.make_request(url, payload, timeout=timeout)
 
 
 def update_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
@@ -283,7 +277,7 @@ def update_rows(server_context, schema_name, query_name, rows, container_path=No
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
-    url = build_url(server_context, 'query', 'updateRows.api', container_path=container_path)
+    url = server_context.build_url('query', 'updateRows.api', container_path=container_path)
 
     payload = {
         'schemaName': schema_name,
@@ -291,9 +285,8 @@ def update_rows(server_context, schema_name, query_name, rows, container_path=No
         'rows': rows
     }
 
-    # explicit json payload and headers required for form generation
-    return make_request(server_context, url, json.dumps(payload, sort_keys=True), headers=_query_headers,
-                        timeout=timeout)
+    return server_context.make_request(url, json.dumps(payload, sort_keys=True), headers=_query_headers,
+                                       timeout=timeout)
 
 
 # TODO: Provide filter generators.
