@@ -2,6 +2,16 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 0.5.0 package
+==============================
+
+*Release date: 04/19/2017*
+
+- Security API, see labkey.security
+- ServerContext now a class, support for CSRF
+- Fix for LSID handling in Experiment objects
+- Documentation updates
+
 What's New in the LabKey 0.4.3 package
 ==============================
 
