@@ -30,6 +30,7 @@ from test_utils import MockLabKey, mock_server_context, success_test, throws_err
 class MockSelectRows(MockLabKey):
     api = 'getQuery.api'
     default_success_body = '{"columnModel": [{"align": "right", "dataIndex": "Participant ID", "editable": true , "header": "Participant ID", "hidden": false , "required": false , "scale": 10 , "sortable": true , "width": 60 }] , "formatVersion": 8.3 , "metaData": {"description": null , "fields": [{"autoIncrement": false , "calculated": false , "caption": "Participant ID", "conceptURI": null , "defaultScale": "LINEAR", "defaultValue": null , "dimension": false , "excludeFromShifting": false , "ext": {} , "facetingBehaviorType": "AUTOMATIC", "fieldKey": "Participant ID", "fieldKeyArray": ["Participant ID"] , "fieldKeyPath": "Participant ID", "friendlyType": "Integer", "hidden": false , "inputType": "text", "isAutoIncrement": false , "isHidden": false , "isKeyField": false , "isMvEnabled": false , "isNullable": true , "isReadOnly": false , "isSelectable": true , "isUserEditable": true , "isVersionField": false , "jsonType": "int", "keyField": false , "measure": false , "mvEnabled": false , "name": "Participant ID", "nullable": true , "protected": false , "rangeURI": "http://www.w3.org/2001/XMLSchema#int", "readOnly": false , "recommendedVariable": false , "required": false , "selectable": true , "shortCaption": "Participant ID", "shownInDetailsView": true , "shownInInsertView": true , "shownInUpdateView": true , "sqlType": "int", "type": "int", "userEditable": true , "versionField": false }] , "id": "Key", "importMessage": null , "importTemplates": [{"label": "Download Template", "url": ""}] , "root": "rows", "title": "Demographics", "totalProperty": "rowCount"} , "queryName": "Demographics", "rowCount": 224 , "rows": [{	"Participant ID": 133428 } , {	"Participant ID": 138488 } , {	"Participant ID": 140163 } , {	"Participant ID": 144740 } , {	"Participant ID": 150489 } ] , "schemaName": "lists"}'
+    default_api_key = 'ApiKeyForTesting'
 
 
 class MockInsertRows(MockLabKey):
@@ -59,7 +60,7 @@ class TestDeleteRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
-            'headers': {u'Content-Type': u'application/json', u'apikey': None},
+            'headers': {u'Content-Type': u'application/json'},
             'timeout': 300
         }
 
@@ -101,7 +102,7 @@ class TestUpdateRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
-            'headers': {u'Content-Type': u'application/json', u'apikey': None},
+            'headers': {u'Content-Type': u'application/json'},
             'timeout': 300
         }
 
@@ -143,7 +144,7 @@ class TestInsertRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
-            'headers': {u'Content-Type': u'application/json', u'apikey': None},
+            'headers': {u'Content-Type': u'application/json'},
             'timeout': 300
         }
 
@@ -186,7 +187,7 @@ class TestExecuteSQL(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': {'sql': sql, "schemaName": schema},
-            'headers': {u'apikey': None},
+            'headers': None,
             'timeout': 300
         }
 
@@ -226,7 +227,7 @@ class TestSelectRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': {"schemaName": schema, "query.queryName": query},
-            'headers': {u'apikey': None},
+            'headers': {u'apikey': 'ApiKeyForTesting'},
             'timeout': 300
         }
 

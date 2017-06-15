@@ -133,11 +133,13 @@ class ServerContext(object):
     def make_request(self, url, payload, headers=None, timeout=300, method='POST'):
 
         if headers is None:
-            headers = {
-                'apikey': self._api_key
-            }
+            if self._api_key is not None:
+                headers = {
+                    'apikey': self._api_key
+                }
         else:
-            headers['apikey'] = self._api_key
+            if self._api_key is not None:
+                headers['apikey'] = self._api_key
 
         if not DISABLE_CSRF_CHECK:
             global CSRF_TOKEN
