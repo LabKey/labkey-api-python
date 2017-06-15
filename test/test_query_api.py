@@ -59,7 +59,7 @@ class TestDeleteRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
-            'headers': {u'Content-Type': u'application/json'},
+            'headers': {u'Content-Type': u'application/json', u'apikey': None},
             'timeout': 300
         }
 
@@ -101,7 +101,7 @@ class TestUpdateRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
-            'headers': {u'Content-Type': u'application/json'},
+            'headers': {u'Content-Type': u'application/json', u'apikey': None},
             'timeout': 300
         }
 
@@ -143,7 +143,7 @@ class TestInsertRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
-            'headers': {u'Content-Type': u'application/json'},
+            'headers': {u'Content-Type': u'application/json', u'apikey': None},
             'timeout': 300
         }
 
@@ -186,7 +186,7 @@ class TestExecuteSQL(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': {'sql': sql, "schemaName": schema},
-            'headers': None,
+            'headers': {u'apikey': None},
             'timeout': 300
         }
 
@@ -226,7 +226,7 @@ class TestSelectRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': {"schemaName": schema, "query.queryName": query},
-            'headers': None,
+            'headers': {u'apikey': None},
             'timeout': 300
         }
 

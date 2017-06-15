@@ -29,7 +29,8 @@ def mock_server_context(mock_action):
     with mock.patch('labkey.utils.requests.sessions.Session.get') as mock_get:
 
         mock_get.return_value = mock_action.get_csrf_response()
-        return create_server_context(mock_action.server_name, mock_action.project_path, mock_action.context_path)
+        return create_server_context(mock_action.server_name, mock_action.project_path, mock_action.context_path,
+                                     api_key=mock_action.api_key)
 
 
 def success_test(test, expected_response, api_method, compare_response, *args, **expected_kwargs):
@@ -83,6 +84,7 @@ class MockLabKey:
     default_server_not_found_body = ''
     default_query_not_found_body = ''
     default_general_server_error_body = ''
+    default_api_key = None
 
     def __init__(self, **kwargs):
         self.protocol = kwargs.pop('protocol', self.default_protocol)
@@ -95,6 +97,7 @@ class MockLabKey:
         self.server_not_found_body = kwargs.pop('server_not_found_body', self.default_server_not_found_body)
         self.query_not_found_body = kwargs.pop('query_not_found_body', self.default_query_not_found_body)
         self.general_server_error_body = kwargs.pop('general_server_error_body', self.default_general_server_error_body)
+        self.api_key = kwargs.pop('api_key', self.default_api_key)
 
     def _get_mock_response(self, code, url, body):
         mock_response = mock.Mock(requests.Response)

@@ -50,7 +50,7 @@ class TestPostMessage(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': expected_content,
-            'headers': None,
+            'headers': {'apikey': None},
             'timeout': 300
         }
 
@@ -74,7 +74,7 @@ class TestUpdateWiki(unittest.TestCase):
             'expected_args': [
                 self.service.get_server_url(),
             ],
-            'headers': {'Content-type': 'application/json'},
+            'headers': {'Content-type': 'application/json', 'apikey': None},
             'params': {
                 'name': wiki_name
             }

@@ -29,7 +29,7 @@ CSRF_TOKEN = 'X-LABKEY-CSRF'
 DISABLE_CSRF_CHECK = False  # Used by tests to disable CSRF token check
 
 
-def create_server_context(domain, container_path, context_path=None, use_ssl=True):
+def create_server_context(domain, container_path, context_path=None, use_ssl=True, api_key=None):
     """
     Create a LabKey server context. This context is used to encapsulate properties
     about the LabKey server that is being requested against. This includes, but is not limited to,
@@ -38,9 +38,11 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
     :param container_path:
     :param context_path:
     :param use_ssl:
+    :param api_key:
     :return:
     """
-    config = dict(domain=domain, container_path=container_path, context_path=context_path, use_ssl=use_ssl)
+    config = dict(domain=domain, container_path=container_path, context_path=context_path, use_ssl=use_ssl, api_key=api_key)
+
     return ServerContext(**config)
 
 
@@ -101,6 +103,7 @@ class ServerContext(object):
         self._context_path = kwargs.pop('context_path', None)
         self._domain = kwargs.pop('domain', None)
         self._use_ssl = kwargs.pop('use_ssl', True)
+        self._api_key = kwargs.pop('api_key', None)
 
         self._session = requests.Session()
 
@@ -128,6 +131,13 @@ class ServerContext(object):
         return url
 
     def make_request(self, url, payload, headers=None, timeout=300, method='POST'):
+
+        if headers is None:
+            headers = {
+                'apikey': self._api_key
+            }
+        else:
+            headers['apikey'] = self._api_key
 
         if not DISABLE_CSRF_CHECK:
             global CSRF_TOKEN
