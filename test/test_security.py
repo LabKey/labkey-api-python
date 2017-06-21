@@ -33,7 +33,6 @@ class MockSecurityController(MockLabKey):
     default_action = 'security'
     default_success_body = {'success': True}
     use_ssl = False
-    default_api_key = 'ApiKeyForTesting'
 
 
 class MockUserController(MockLabKey):
@@ -59,9 +58,7 @@ class TestCreateUser(unittest.TestCase):
                 'email': TestCreateUser.__email,
                 'sendEmail': False
             },
-            'headers': {
-                'apikey': 'ApiKeyForTesting'
-            },
+            'headers': None,
             'timeout': 300
         }
 
@@ -108,9 +105,7 @@ class TestResetPassword(unittest.TestCase):
             'data': {
                 'email': TestResetPassword.__email
             },
-            'headers': {
-                'apikey': 'ApiKeyForTesting'
-            },
+            'headers': None,
             'timeout': 300
         }
 
@@ -304,9 +299,7 @@ class TestAddToGroup(unittest.TestCase):
                 'groupId': 123,
                 'principalIds': [321]
             },
-            'headers': {
-                'apikey': 'ApiKeyForTesting'
-            },
+            'headers': None,
             'timeout': 300
         }
 
@@ -357,9 +350,7 @@ class TestRemoveFromGroup(unittest.TestCase):
                 'groupId': 123,
                 'principalIds': [321]
             },
-            'headers': {
-                'apikey': 'ApiKeyForTesting'
-            },
+            'headers': None,
             'timeout': 300
         }
 
@@ -412,9 +403,7 @@ class TestRemoveFromRole(unittest.TestCase):
                 'principalId': 321,
                 'email': 'pyTest@labkey.com'
             },
-            'headers': {
-                'apikey': 'ApiKeyForTesting'
-            },
+            'headers': None,
             'timeout': 300
         }
 
@@ -468,9 +457,7 @@ class TestAddToRole(unittest.TestCase):
                 'principalId': 321,
                 'email': 'pyTest@labkey.com'
             },
-            'headers': {
-                'apikey': 'ApiKeyForTesting'
-            },
+            'headers': None,
             'timeout': 300
         }
 
@@ -517,9 +504,7 @@ class TestGetRoles(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': None,
-            'headers': {
-                'apikey': 'ApiKeyForTesting'
-            },
+            'headers': None,
             'timeout': 300
         }
 
@@ -565,7 +550,7 @@ class TestListGroups(unittest.TestCase):
             'data': {
                 'includeSiteGroups': True
             },
-            'headers': 'ApiKeyForTesting',
+            'headers': None,
             'timeout': 300
         }
 

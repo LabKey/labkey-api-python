@@ -24,14 +24,12 @@ from test_utils import MockLabKey, mock_server_context, success_test
 class MockPostMessage(MockLabKey):
     api = 'insert.api'
     default_action = 'announcements'
-    default_api_key = 'ApiKeyForTesting'
 
 
 class MockUpdateWiki(MockLabKey):
     api = 'editWiki.api'
     default_action = 'wiki'
     default_success_body = '<h1>Some wiki content</h1>'
-    default_api_key = 'ApiKeyForTesting'
 
 
 class TestPostMessage(unittest.TestCase):
@@ -52,7 +50,7 @@ class TestPostMessage(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': expected_content,
-            'headers': {'apikey': 'ApiKeyForTesting'},
+            'headers': None,
             'timeout': 300
         }
 
@@ -76,7 +74,7 @@ class TestUpdateWiki(unittest.TestCase):
             'expected_args': [
                 self.service.get_server_url(),
             ],
-            'headers': {'Content-type': 'application/json', 'apikey': 'ApiKeyForTesting'},
+            'headers': {'Content-type': 'application/json'},
             'params': {
                 'name': wiki_name
             }

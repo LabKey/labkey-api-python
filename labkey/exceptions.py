@@ -17,7 +17,7 @@ from requests import exceptions, Response
 
 
 # base exception class for server responses
-class RequestError(exceptions.HTTPError):
+class RequestError(exceptions.RequestException):
     default_msg = 'Server Error'
 
     def __init__(self, server_response, **kwargs):
@@ -62,14 +62,21 @@ class ServerNotFoundError(RequestError):
     default_msg = 'Server resource not found. Please verify context path and project path are valid'
 
 
-class ServerContextError(exceptions.HTTPError):
-    def __init__(self, inner_exception=None):
-        self.message = self._get_message(inner_exception)
+class ServerContextError(RequestError):
+
+    def __init__(self, server_context, inner_exception):
+        self.message = self._get_message(server_context, inner_exception)
         self.exception = inner_exception
 
-    def _get_message(self, e):
+    @staticmethod
+    def _get_message(server_context, e):
         switcher = {
+            exceptions.ConnectionError:
+                'Failed to connect to server. Ensure the server_context domain, context_path, '
+                'and SSL are configured correctly.',
+            exceptions.InvalidURL:
+                'Failed to parse URL. Context is ' + str(server_context),
             exceptions.SSLError:
                 'Failed to match server SSL configuration. Ensure the server_context is configured correctly.'
         }
-        return switcher.get(type(e), 'Please verify server_context is configured correctly')
+        return switcher.get(type(e), 'Please verify server_context is configured correctly.')

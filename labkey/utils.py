@@ -16,15 +16,13 @@
 from __future__ import unicode_literals
 
 import requests
-import ssl
 
-from requests.adapters import HTTPAdapter
-from requests.exceptions import SSLError
-from requests.packages.urllib3.poolmanager import PoolManager
-from labkey.exceptions import RequestError, RequestAuthorizationError, QueryNotFoundError, \
-    ServerContextError, ServerNotFoundError
+from requests.exceptions import RequestException
+from labkey.exceptions import RequestError, RequestAuthorizationError, QueryNotFoundError, ServerContextError, \
+    ServerNotFoundError
 
 __default_timeout = 60 * 5  # 5 minutes
+API_KEY_TOKEN = 'apikey'
 CSRF_TOKEN = 'X-LABKEY-CSRF'
 DISABLE_CSRF_CHECK = False  # Used by tests to disable CSRF token check
 
@@ -41,7 +39,13 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
     :param api_key:
     :return:
     """
-    config = dict(domain=domain, container_path=container_path, context_path=context_path, use_ssl=use_ssl, api_key=api_key)
+    config = dict(
+        domain=domain,
+        container_path=container_path,
+        context_path=context_path,
+        use_ssl=use_ssl,
+        api_key=api_key
+    )
 
     return ServerContext(**config)
 
@@ -57,6 +61,12 @@ def build_url(server_context, controller, action, container_path=None):
     :return:
     """
     return server_context.build_url(controller, action, container_path=container_path)
+
+
+def handle_request_exception(e, server_context=None):
+    if type(e) in [RequestAuthorizationError, QueryNotFoundError, ServerNotFoundError]:
+        raise e
+    raise ServerContextError(server_context, e)
 
 
 def handle_response(response):
@@ -83,17 +93,8 @@ def handle_response(response):
             # could not decode response
             raise ServerNotFoundError(response)
     else:
+        # consider response.raise_for_status()
         raise RequestError(response)
-
-
-# _ssl.c:504: error:14077410:SSL routines:SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure
-# http://lukasa.co.uk/2013/01/Choosing_SSL_Version_In_Requests/
-class SafeTLSAdapter(HTTPAdapter):
-    def init_poolmanager(self, connections, maxsize, block=False):
-        self.poolmanager = PoolManager(num_pools=connections,
-                                       maxsize=maxsize,
-                                       block=block,
-                                       ssl_version=ssl.PROTOCOL_TLSv1)
 
 
 class ServerContext(object):
@@ -109,7 +110,6 @@ class ServerContext(object):
 
         if self._use_ssl:
             self._scheme = 'https://'
-            self._session.mount(self._scheme, SafeTLSAdapter())
         else:
             self._scheme = 'http://'
 
@@ -132,14 +132,13 @@ class ServerContext(object):
 
     def make_request(self, url, payload, headers=None, timeout=300, method='POST'):
 
-        if headers is None:
-            if self._api_key is not None:
-                headers = {
-                    'apikey': self._api_key
-                }
-        else:
-            if self._api_key is not None:
-                headers['apikey'] = self._api_key
+        if self._api_key is not None:
+            global API_KEY_TOKEN
+
+            if self._session.headers.get(API_KEY_TOKEN) is not self._api_key:
+                self._session.headers.update({
+                    API_KEY_TOKEN: self._api_key
+                })
 
         if not DISABLE_CSRF_CHECK:
             global CSRF_TOKEN
@@ -152,8 +151,8 @@ class ServerContext(object):
                     self._session.headers.update({
                         CSRF_TOKEN: response['CSRF']
                     })
-                except SSLError as e:
-                    raise ServerContextError(e)
+                except RequestException as e:
+                    handle_request_exception(e, server_context=self)
 
         try:
             if method is 'GET':
@@ -161,5 +160,5 @@ class ServerContext(object):
             else:
                 raw_response = self._session.post(url, data=payload, headers=headers, timeout=timeout)
             return handle_response(raw_response)
-        except SSLError as e:
-            raise ServerContextError(e)
+        except RequestException as e:
+            handle_request_exception(e, server_context=self)

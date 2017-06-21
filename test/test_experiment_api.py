@@ -31,14 +31,12 @@ class MockLoadBatch(MockLabKey):
     api = 'getAssayBatch.api'
     default_action = 'assay'
     default_success_body = {"assayId": 2809, "batch": {"lsid": "urn:lsid:labkey.com:Experiment.Folder-1721:465ad7db-58d8-1033-a587-7eb0c02c2efe", "createdBy": "", "created": "2015/10/19 18:21:57", "name": "python batch", "modified": "2015/10/19 18:21:57", "modifiedBy": "", "comment": None, "id": 120, "runs": [{"dataOutputs": [], "dataRows": [{"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}, {"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}, {"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}], "dataInputs": [], "created": "2015/10/19 18:21:57", "materialInputs": [{"lsid": "urn:lsid:labkey.com:AssayRunMaterial.Folder-1721:Unknown", "role": "Sample", "created": "2015/10/19 18:21:57", "name": "Unknown", "modified": "2015/10/19 18:21:57", "id": 7641}], "lsid": "urn:lsid:labkey.com:GeneralAssayRun.Folder-1721:465ad7dd-58d8-1033-a587-7eb0c02c2efe", "materialOutputs": [], "createdBy": "", "name": "python upload", "modified": "2015/10/19 18:21:57", "modifiedBy": "", "comment": None, "id": 1526, "properties": {}}], "properties": {"ParticipantVisitResolver": None, "TargetStudy": None}}}
-    default_api_key = 'ApiKeyForTesting'
 
 
 class MockSaveBatch(MockLabKey):
     api = 'saveAssayBatch.api'
     default_action = 'assay'
     default_success_body = {"batches": [{"lsid": "urn:lsid:labkey.com:Experiment.Folder-1721:50666e45-609f-1033-ba4a-ca4935e31f28", "createdBy": "", "created": "2015/10/29 12:17:50", "name": "python batch 7", "modified": "2015/10/29 12:17:51", "modifiedBy": "", "comment": None, "id": 139, "runs": [{"dataOutputs": [], "dataRows": [{"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}, {"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}, {"Treatment Group": None, "Start Date": None, "Height _inches_": None, "Comments": None, "Status of Infection": None, "Country": None, "Gender": None, "Group Assignment": None, "Participant ID": None, "Date": None}], "dataInputs": [], "created": "2015/10/29 12:17:50", "materialInputs": [{"lsid": "urn:lsid:labkey.com:AssayRunMaterial.Folder-1721:Unknown", "role": "Sample", "created": "2015/10/19 18:21:57", "name": "Unknown", "modified": "2015/10/19 18:21:57", "id": 7641}], "lsid": "urn:lsid:labkey.com:GeneralAssayRun.Folder-1721:50666e47-609f-1033-ba4a-ca4935e31f28", "materialOutputs": [], "createdBy": "", "name": "python upload", "modified": "2015/10/29 12:17:51", "modifiedBy": "", "comment": None, "id": 1673, "properties": {}}], "properties": {"ParticipantVisitResolver": None, "TargetStudy": None}}], "assayId": 2809}
-    default_api_key = 'ApiKeyForTesting'
 
 
 assay_id = 12345
@@ -52,7 +50,7 @@ class TestLoadBatch(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"assayId": 12345, "batchId": 54321}',
-            'headers': {'Content-type': 'application/json', 'Accept': 'text/plain', 'apikey': 'ApiKeyForTesting'},
+            'headers': {'Content-type': 'application/json', 'Accept': 'text/plain'},
             'timeout': 300
         }
 
@@ -106,7 +104,7 @@ class TestSaveBatch(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"assayId": 12345, "batches": [{"batchProtocolId": 0, "comment": null, "created": null, "createdBy": null, "modified": null, "modifiedBy": null, "name": null, "properties": {"PropertyName": "Property Value"}, "runs": [{"comment": null, "created": null, "createdBy": null, "dataInputs": [], "dataRows": [], "experiments": [], "filePathRoot": null, "materialInputs": [], "materialOutputs": [], "modified": null, "modifiedBy": null, "name": "python upload", "properties": {"RunFieldName": "Run Field Value"}}]}]}',
-            'headers': {'Content-type': 'application/json', 'Accept': 'text/plain', 'apikey': 'ApiKeyForTesting'},
+            'headers': {'Content-type': 'application/json', 'Accept': 'text/plain'},
             'timeout': 300
         }
 
