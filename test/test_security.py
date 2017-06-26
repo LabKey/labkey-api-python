@@ -509,7 +509,7 @@ class TestGetRoles(unittest.TestCase):
         }
 
         self.args = [
-            mock_server_context(self.service),
+            mock_server_context(self.service)
         ]
 
     def test_success(self):

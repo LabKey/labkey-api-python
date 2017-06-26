@@ -2,3 +2,6 @@
 *.py[cod]
 build/
 dist/
+
+# Project Artifacts
+.idea/

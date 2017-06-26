@@ -59,7 +59,7 @@ class TestDeleteRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
-            'headers': {u'Content-Type': u'application/json'},
+            'headers': {'Content-Type': 'application/json'},
             'timeout': 300
         }
 
@@ -101,7 +101,7 @@ class TestUpdateRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
-            'headers': {u'Content-Type': u'application/json'},
+            'headers': {'Content-Type': 'application/json'},
             'timeout': 300
         }
 
@@ -143,7 +143,7 @@ class TestInsertRows(unittest.TestCase):
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
             'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
-            'headers': {u'Content-Type': u'application/json'},
+            'headers': {'Content-Type': 'application/json'},
             'timeout': 300
         }
 
