@@ -25,21 +25,17 @@ DESCRIPTION:
 This module is designed to simplify querying and manipulating data in LabKey Server.  
 Its APIs are modeled after the LabKey Server JavaScript APIs of the same names. 
 
-Documentation:
-LabKey Python API:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=python
+Installation and Setup for the LabKey Python API:
+https://github.com/LabKey/labkey-api-python/blob/master/README.md
 
-Setup, configuration of the LabKey Python API:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=setupPython
+Examples of the LabKey Python API:
+https://github.com/LabKey/labkey-api-python/tree/master/samples
 
-Using the LabKey Python API:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=usingPython
+Documentation for the LabKey Client APIs:
+https://www.labkey.org/Documentation/wiki-page.view?name=viewAPIs
 
-Documentation for the LabKey client APIs:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=viewAPIs
-
-Support questions should be directed to the LabKey forum:
-https://www.labkey.org/announcements/home/Server/Forum/list.view?
+Support questions should be directed to the LabKey Developer forum:
+https://www.labkey.org/home/Support/Developer%20Forum/project-begin.view?
 
 
 ############################################################################
