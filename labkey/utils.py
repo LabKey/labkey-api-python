@@ -27,7 +27,7 @@ CSRF_TOKEN = 'X-LABKEY-CSRF'
 DISABLE_CSRF_CHECK = False  # Used by tests to disable CSRF token check
 
 
-def create_server_context(domain, container_path, context_path=None, use_ssl=True, api_key=None):
+def create_server_context(domain, container_path, context_path=None, use_ssl=True, verify_ssl=True, api_key=None):
     """
     Create a LabKey server context. This context is used to encapsulate properties
     about the LabKey server that is being requested against. This includes, but is not limited to,
@@ -36,6 +36,7 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
     :param container_path:
     :param context_path:
     :param use_ssl:
+    :param verify_ssl:
     :param api_key:
     :return:
     """
@@ -44,6 +45,7 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
         container_path=container_path,
         context_path=context_path,
         use_ssl=use_ssl,
+        verify_ssl=verify_ssl,
         api_key=api_key
     )
 
@@ -104,12 +106,15 @@ class ServerContext(object):
         self._context_path = kwargs.pop('context_path', None)
         self._domain = kwargs.pop('domain', None)
         self._use_ssl = kwargs.pop('use_ssl', True)
+        self._verify_ssl = kwargs.pop('verify_ssl', True)
         self._api_key = kwargs.pop('api_key', None)
 
         self._session = requests.Session()
 
         if self._use_ssl:
             self._scheme = 'https://'
+            if not self._verify_ssl:
+                self._session.verify = False
         else:
             self._scheme = 'http://'
 
