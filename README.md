@@ -34,7 +34,6 @@ $ pip install labkey
 **Note:** For users who installed this package before it was published to PyPI (before v0.3.0) it is recommended you uninstall and reinstall the package rather than attempting to upgrade. This is due to a change in the package's versioning semantics.
 
 ## Credentials
-As of v0.4.0 this API no longer supports using a ``.labkeycredentials.txt`` file, and now uses the .netrc files similar to the other labkey APIs. Additional .netrc [setup instructions](https://www.labkey.org/wiki/home/Documentation/page.view?name=netrc) can be found at the link.
 
 ### Set Up a netrc File
 
@@ -58,6 +57,9 @@ login user@labkey.org
 password mypassword
 ```
 Note that the netrc file only deals with connections at the machine level and should not include a port or protocol designation, meaning both "mymachine.labkey.org:8888" and "https://mymachine.labkey.org" are incorrect. 
+
+### Old credentials
+As of v0.4.0 this API no longer supports using a ``.labkeycredentials.txt`` file, and now uses the .netrc files similar to the other labkey APIs. Additional .netrc [setup instructions](https://www.labkey.org/wiki/home/Documentation/page.view?name=netrc) can be found at the link.
 
 ## Examples
 
