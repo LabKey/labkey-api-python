@@ -44,7 +44,7 @@ setup(
     license="Apache License 2.0",
     author='LabKey',
     author_email='nicka@labkey.com',
-    maintainer='Nick Arnold',
+    maintainer='Nick Kerr',
     maintainer_email='nicka@labkey.com',
     url='https://github.com/LabKey/labkey-api-python',
     packages=packages,
