@@ -2,6 +2,16 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 0.6.0 package
+==============================
+
+*Release date: 09/11/2017*
+
+- Support api_key in utils.create_server_context.
+- Support verify_ssl in utils.create_server_context. Thanks to @pescobar for this contribution.
+- Remove SafeTLSAdapter in favor of normal TLS convention.
+- Improve exception messaging when raising ServerContextError.
+
 What's New in the LabKey 0.5.0 package
 ==============================
 
