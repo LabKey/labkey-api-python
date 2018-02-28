@@ -71,11 +71,13 @@ def handle_request_exception(e, server_context=None):
     raise ServerContextError(server_context, e)
 
 
-def handle_response(response):
+def handle_response(response, non_json_response=False):
     sc = response.status_code
 
     if (200 <= sc < 300) or sc == 304:
         try:
+            if non_json_response:
+                return response
             return response.json()
         except ValueError:
             result = dict(
@@ -89,6 +91,8 @@ def handle_response(response):
         raise RequestAuthorizationError(response)
     elif sc == 404:
         try:
+            if non_json_response:
+                return response
             response.json()  # attempt to decode response
             raise QueryNotFoundError(response)
         except ValueError:
@@ -135,7 +139,7 @@ class ServerContext(object):
 
         return url
 
-    def make_request(self, url, payload, headers=None, timeout=300, method='POST'):
+    def make_request(self, url, payload, headers=None, timeout=300, method='POST', non_json_response=False):
 
         if self._api_key is not None:
             global API_KEY_TOKEN
@@ -164,6 +168,6 @@ class ServerContext(object):
                 raw_response = self._session.get(url, params=payload, headers=headers, timeout=timeout)
             else:
                 raw_response = self._session.post(url, data=payload, headers=headers, timeout=timeout)
-            return handle_response(raw_response)
+            return handle_response(raw_response, non_json_response)
         except RequestException as e:
             handle_request_exception(e, server_context=self)

@@ -49,7 +49,8 @@ def update_wiki(server_context, wiki_name, wiki_body, container_path=None):
     }
 
     try:
-        read_response = server_context.make_request(read_wiki_url, payload, headers=headers, method='GET')
+        read_response = server_context.make_request(read_wiki_url, payload, headers=headers, method='GET',
+                                                    non_json_response=True)
     except SSLError as e:
         print("There was a problem while attempting to submit the read for the wiki page " + str(wiki_name) + " via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
         print("The HTTP client error was: " + format(e))
@@ -99,7 +100,8 @@ def update_wiki(server_context, wiki_name, wiki_body, container_path=None):
     wiki_vars['body'] = wiki_body
 
     try:
-        data = server_context.make_request(update_wiki_url, data=json.dumps(wiki_vars, sort_keys=True), headers=headers)
+        data = server_context.make_request(update_wiki_url, payload=json.dumps(wiki_vars, sort_keys=True),
+                                           headers=headers, non_json_response=True)
     except SSLError as e:
         print("There was a problem while attempting to submit the read for the wiki page '" + str(wiki_name) + "' via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
         print("The HTTP client error was: " + format(e))
