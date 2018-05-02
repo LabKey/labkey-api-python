@@ -345,6 +345,30 @@ def get(server_context, schema_name, query_name, container_path=None):
     return domain
 
 
+def infer_fields(server_context, data_file, container_path=None):
+    # type: (ServerContext, any) -> List[PropertyDescriptor]
+    """
+    Infer fields for a domain from a file
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param data_file: the data file from which to determine the fields shape
+    :param container_path: labkey container path if not already set in context
+    :return:
+    """
+    url = server_context.build_url('property', 'inferDomain.api', container_path=container_path)
+
+    raw_infer = server_context.make_request(url, None, file_payload={
+        'inferfile': data_file
+    })
+
+    fields = None
+    if raw_infer['fields'] is not None:
+        fields = []
+        for f in raw_infer['fields']:
+            fields.append(PropertyDescriptor.from_data(f))
+
+    return fields
+
+
 def save(server_context, schema_name, query_name, domain, container_path=None):
     # type: (ServerContext, str, str, Domain, str) -> None
     """
