@@ -27,7 +27,79 @@ CSRF_TOKEN = 'X-LABKEY-CSRF'
 DISABLE_CSRF_CHECK = False  # Used by tests to disable CSRF token check
 
 
+class ServerContext(object):
+
+    def __init__(self, **kwargs):
+        self._container_path = kwargs.pop('container_path', None)
+        self._context_path = kwargs.pop('context_path', None)
+        self._domain = kwargs.pop('domain', None)
+        self._use_ssl = kwargs.pop('use_ssl', True)
+        self._verify_ssl = kwargs.pop('verify_ssl', True)
+        self._api_key = kwargs.pop('api_key', None)
+
+        self._session = requests.Session()
+
+        if self._use_ssl:
+            self._scheme = 'https://'
+            if not self._verify_ssl:
+                self._session.verify = False
+        else:
+            self._scheme = 'http://'
+
+    def build_url(self, controller, action, container_path=None):
+        # type: (self, str, str, str) -> str
+        sep = '/'
+
+        url = self._scheme + self._domain
+
+        if self._context_path is not None:
+            url += sep + self._context_path
+
+        if container_path is not None:
+            url += sep + container_path
+        elif self._container_path is not None:
+            url += sep + self._container_path
+
+        url += sep + controller + '-' + action
+
+        return url
+
+    def make_request(self, url, payload, headers=None, timeout=300, method='POST', non_json_response=False):
+        # type: (self, str, any, dict, int, str, bool) -> any
+        if self._api_key is not None:
+            global API_KEY_TOKEN
+
+            if self._session.headers.get(API_KEY_TOKEN) is not self._api_key:
+                self._session.headers.update({
+                    API_KEY_TOKEN: self._api_key
+                })
+
+        if not DISABLE_CSRF_CHECK:
+            global CSRF_TOKEN
+
+            # CSRF check
+            if CSRF_TOKEN not in self._session.headers.keys():
+                try:
+                    csrf_url = self.build_url('login', 'whoami.api')
+                    response = handle_response(self._session.get(csrf_url))
+                    self._session.headers.update({
+                        CSRF_TOKEN: response['CSRF']
+                    })
+                except RequestException as e:
+                    handle_request_exception(e, server_context=self)
+
+        try:
+            if method is 'GET':
+                raw_response = self._session.get(url, params=payload, headers=headers, timeout=timeout)
+            else:
+                raw_response = self._session.post(url, data=payload, headers=headers, timeout=timeout)
+            return handle_response(raw_response, non_json_response)
+        except RequestException as e:
+            handle_request_exception(e, server_context=self)
+
+
 def create_server_context(domain, container_path, context_path=None, use_ssl=True, verify_ssl=True, api_key=None):
+    # type: (str, str, str, bool, bool, str) -> ServerContext
     """
     Create a LabKey server context. This context is used to encapsulate properties
     about the LabKey server that is being requested against. This includes, but is not limited to,
@@ -53,6 +125,7 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
 
 
 def build_url(server_context, controller, action, container_path=None):
+    # type: (ServerContext, str, str, str) -> str
     """
     Builds a URL from a controller and an action. Users the server context to determine domain,
     context path, container, etc.
@@ -101,73 +174,3 @@ def handle_response(response, non_json_response=False):
     else:
         # consider response.raise_for_status()
         raise RequestError(response)
-
-
-class ServerContext(object):
-
-    def __init__(self, **kwargs):
-        self._container_path = kwargs.pop('container_path', None)
-        self._context_path = kwargs.pop('context_path', None)
-        self._domain = kwargs.pop('domain', None)
-        self._use_ssl = kwargs.pop('use_ssl', True)
-        self._verify_ssl = kwargs.pop('verify_ssl', True)
-        self._api_key = kwargs.pop('api_key', None)
-
-        self._session = requests.Session()
-
-        if self._use_ssl:
-            self._scheme = 'https://'
-            if not self._verify_ssl:
-                self._session.verify = False
-        else:
-            self._scheme = 'http://'
-
-    def build_url(self, controller, action, container_path=None):
-        sep = '/'
-
-        url = self._scheme + self._domain
-
-        if self._context_path is not None:
-            url += sep + self._context_path
-
-        if container_path is not None:
-            url += sep + container_path
-        elif self._container_path is not None:
-            url += sep + self._container_path
-
-        url += sep + controller + '-' + action
-
-        return url
-
-    def make_request(self, url, payload, headers=None, timeout=300, method='POST', non_json_response=False):
-
-        if self._api_key is not None:
-            global API_KEY_TOKEN
-
-            if self._session.headers.get(API_KEY_TOKEN) is not self._api_key:
-                self._session.headers.update({
-                    API_KEY_TOKEN: self._api_key
-                })
-
-        if not DISABLE_CSRF_CHECK:
-            global CSRF_TOKEN
-
-            # CSRF check
-            if CSRF_TOKEN not in self._session.headers.keys():
-                try:
-                    csrf_url = self.build_url('login', 'whoami.api')
-                    response = handle_response(self._session.get(csrf_url))
-                    self._session.headers.update({
-                        CSRF_TOKEN: response['CSRF']
-                    })
-                except RequestException as e:
-                    handle_request_exception(e, server_context=self)
-
-        try:
-            if method is 'GET':
-                raw_response = self._session.get(url, params=payload, headers=headers, timeout=timeout)
-            else:
-                raw_response = self._session.post(url, data=payload, headers=headers, timeout=timeout)
-            return handle_response(raw_response, non_json_response)
-        except RequestException as e:
-            handle_request_exception(e, server_context=self)
