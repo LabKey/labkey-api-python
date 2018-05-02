@@ -64,8 +64,9 @@ class ServerContext(object):
 
         return url
 
-    def make_request(self, url, payload, headers=None, timeout=300, method='POST', non_json_response=False):
-        # type: (self, str, any, dict, int, str, bool) -> any
+    def make_request(self, url, payload, headers=None, timeout=300, method='POST',
+                     non_json_response=False, file_payload=None):
+        # type: (self, str, any, dict, int, str, bool, any) -> any
         if self._api_key is not None:
             global API_KEY_TOKEN
 
@@ -92,7 +93,11 @@ class ServerContext(object):
             if method is 'GET':
                 raw_response = self._session.get(url, params=payload, headers=headers, timeout=timeout)
             else:
-                raw_response = self._session.post(url, data=payload, headers=headers, timeout=timeout)
+                if file_payload is not None:
+                    raw_response = self._session.post(url, data=payload, files=file_payload, headers=headers,
+                                                      timeout=timeout)
+                else:
+                    raw_response = self._session.post(url, data=payload, headers=headers, timeout=timeout)
             return handle_response(raw_response, non_json_response)
         except RequestException as e:
             handle_request_exception(e, server_context=self)
