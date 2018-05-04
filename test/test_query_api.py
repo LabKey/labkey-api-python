@@ -21,6 +21,7 @@ try:
 except ImportError:
     import unittest.mock as mock
 
+from labkey import utils
 from labkey.query import delete_rows, update_rows, insert_rows, select_rows, execute_sql
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
 
@@ -56,14 +57,16 @@ class TestDeleteRows(unittest.TestCase):
 
     def setUp(self):
         self.service = MockDeleteRows()
+
+        rows = '{id:1234}'
+
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
-            'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
+            'data': '{"queryName": "' + query + '", "rows": "' + rows + '", "schemaName": "' + schema + '"}',
             'headers': {'Content-Type': 'application/json'},
             'timeout': 300
         }
 
-        rows = '{id:1234}'
         self.args = [
             mock_server_context(self.service), schema, query, rows
         ]
@@ -98,14 +101,16 @@ class TestUpdateRows(unittest.TestCase):
 
     def setUp(self):
         self.service = MockUpdateRows()
+
+        rows = '{id:1234}'
+
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
-            'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
+            'data': '{"queryName": "' + query + '", "rows": "' + rows + '", "schemaName": "' + schema + '"}',
             'headers': {'Content-Type': 'application/json'},
             'timeout': 300
         }
 
-        rows = '{id:1234}'
         self.args = [
             mock_server_context(self.service), schema, query, rows
         ]
@@ -140,14 +145,16 @@ class TestInsertRows(unittest.TestCase):
 
     def setUp(self):
         self.service = MockInsertRows()
+
+        rows = '{id:1234}'
+
         self.expected_kwargs = {
             'expected_args': [self.service.get_server_url()],
-            'data': '{"queryName": "' + query + '", "rows": "{id:1234}", "schemaName": "' + schema + '"}',
+            'data': '{"queryName": "' + query + '", "rows": "' + rows + '", "schemaName": "' + schema + '"}',
             'headers': {'Content-Type': 'application/json'},
             'timeout': 300
         }
 
-        rows = '{id:1234}'
         self.args = [
             mock_server_context(self.service), schema, query, rows
         ]
@@ -269,5 +276,7 @@ def suite():
         load_tests(TestSelectRows)
     ])
 
+
 if __name__ == '__main__':
+    utils.DISABLE_CSRF_CHECK = True
     unittest.main()

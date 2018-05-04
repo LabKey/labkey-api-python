@@ -16,6 +16,7 @@
 from __future__ import unicode_literals
 import unittest
 
+from labkey import utils
 from labkey.unsupported import messageboard
 
 from test_utils import MockLabKey, mock_server_context, success_test
@@ -97,5 +98,7 @@ def suite():
         load_tests(TestUpdateWiki)
     ])
 
+
 if __name__ == '__main__':
+    utils.DISABLE_CSRF_CHECK = True
     unittest.main()

@@ -22,6 +22,7 @@ try:
 except ImportError:
     import unittest.mock as mock
 
+from labkey import utils
 from labkey.security import create_user, reset_password, activate_users, deactivate_users, delete_users, add_to_group, \
     remove_from_group, remove_from_role, add_to_role, get_roles, list_groups
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
@@ -597,5 +598,7 @@ def suite():
         load_tests(TestRemoveFromRole)
     ])
 
+
 if __name__ == '__main__':
+    utils.DISABLE_CSRF_CHECK = True
     unittest.main()
