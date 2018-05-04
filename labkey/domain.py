@@ -52,7 +52,6 @@ class Domain(object):
         self.description = kwargs.pop('description', None)
         self.domain_id = kwargs.pop('domain_id', kwargs.pop('domainId', None))
         self.domain_uri = kwargs.pop('domain_uri', kwargs.pop('domainURI', None))
-        # self.indices
         self.name = kwargs.pop('name', None)
         self.query_name = kwargs.pop('query_name', kwargs.pop('queryName', None))
         self.schema_name = kwargs.pop('schema_name', kwargs.pop('schemaName', None))
@@ -65,6 +64,14 @@ class Domain(object):
             fields_instances.append(PropertyDescriptor.from_data(field))
 
         self.fields = fields_instances
+
+        indices = kwargs.pop('indices', [])
+        indices_instances = []
+
+        for index in indices:
+            indices_instances.append(FieldIndex.from_data(index))
+
+        self.indices = indices_instances
 
     @staticmethod
     def from_data(data):
@@ -86,6 +93,7 @@ class Domain(object):
         data = {
             'container': self.container,
             'description': self.description,
+            'domainId': self.domain_id,
             'domainURI': self.domain_uri,
             'name': self.name,
             'queryName': self.query_name,
@@ -98,7 +106,10 @@ class Domain(object):
             json_fields.append(field.to_json())
         data['fields'] = json_fields
 
-        # TODO: Include 'indices'
+        json_indices = []
+        for index in self.indices:
+            json_indices.append(index.to_json())
+        data['indices'] = json_indices
 
         return data
 
@@ -114,6 +125,25 @@ class DomainDefinition(object):
         self.kind = kwargs.pop('kind', None)
         self.module = kwargs.pop('module', None)
         self.options = kwargs.pop('options', None)
+
+
+# modeled on org.labkey.api.gwt.client.model.GWTIndex
+class FieldIndex(object):
+    def __init__(self, **kwargs):
+        self.column_names = kwargs.pop('column_names', kwargs.pop('columnNames', None))
+        self.unique = kwargs.pop('unique', None)
+
+    @staticmethod
+    def from_data(data):
+        return FieldIndex(**data)
+
+    def to_json(self):
+        data = {
+            'columnNames': self.column_names,
+            'unique': self.unique
+        }
+
+        return data
 
 
 # modeled on org.labkey.api.gwt.client.model.GWTPropertyDescriptor
@@ -325,7 +355,7 @@ def get(server_context, schema_name, query_name, container_path=None):
     Gets a domain design
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param schema_name: schema of table
-    :param query_name: table name of domain to drop
+    :param query_name: table name of domain to get
     :param container_path: labkey container path if not already set in context
     :return: Domain
     """
@@ -361,7 +391,7 @@ def infer_fields(server_context, data_file, container_path=None):
     })
 
     fields = None
-    if raw_infer['fields'] is not None:
+    if 'fields' in raw_infer:
         fields = []
         for f in raw_infer['fields']:
             fields.append(PropertyDescriptor.from_data(f))
