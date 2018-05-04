@@ -72,6 +72,17 @@ def throws_error_test(test, expected_error, expected_response, api_method, *args
         mock_post.assert_called_once_with(*expected_args, **expected_kwargs)
 
 
+def throws_error_test_get(test, expected_error, expected_response, api_method, *args, **expected_kwargs):
+    with mock.patch('labkey.utils.requests.Session.get') as mock_get:
+        with test.assertRaises(expected_error):
+            mock_get.return_value = expected_response
+            api_method(*args)
+
+        # validate call is made as expected
+        expected_args = expected_kwargs.pop('expected_args')
+        mock_get.assert_called_once_with(*expected_args, **expected_kwargs)
+
+
 class MockLabKey:
     api = ""
     default_protocol = 'https://'
