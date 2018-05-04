@@ -90,7 +90,7 @@ class ServerContext(object):
                     handle_request_exception(e, server_context=self)
 
         try:
-            if method is 'GET':
+            if method == 'GET':
                 raw_response = self._session.get(url, params=payload, headers=headers, timeout=timeout)
             else:
                 if file_payload is not None:
