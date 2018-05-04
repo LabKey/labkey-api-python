@@ -79,4 +79,5 @@ class ServerContextError(RequestError):
             exceptions.SSLError:
                 'Failed to match server SSL configuration. Ensure the server_context is configured correctly.'
         }
-        return switcher.get(type(e), 'Please verify server_context is configured correctly.')
+        # #12 Pass through the exception message if available
+        return switcher.get(type(e), str(e) if str(e) else 'Please verify server_context is configured correctly.')
