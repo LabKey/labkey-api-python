@@ -19,6 +19,15 @@ import json
 from labkey.utils import ServerContext
 
 
+def strip_none_values(data, do_strip=True):
+    # type: (dict, bool) -> dict
+    if do_strip:
+        for k in list(data.keys()):
+            if data[k] is None:
+                del data[k]
+    return data
+
+
 class ConditionalFormat(object):
     def __init__(self, **kwargs):
         self.background_color = kwargs.pop('background_color', kwargs.pop('backgroundColor', None))
@@ -89,7 +98,7 @@ class Domain(object):
 
         return self
 
-    def to_json(self):
+    def to_json(self, strip_none=True):
         data = {
             'container': self.container,
             'description': self.description,
@@ -111,7 +120,7 @@ class Domain(object):
             json_indices.append(index.to_json())
         data['indices'] = json_indices
 
-        return data
+        return strip_none_values(data, strip_none)
 
 
 # TODO: Determine if this can be used when initializing domain.create
@@ -137,13 +146,13 @@ class FieldIndex(object):
     def from_data(data):
         return FieldIndex(**data)
 
-    def to_json(self):
+    def to_json(self, strip_none=True):
         data = {
             'columnNames': self.column_names,
             'unique': self.unique
         }
 
-        return data
+        return strip_none_values(data, strip_none)
 
 
 # modeled on org.labkey.api.gwt.client.model.GWTPropertyDescriptor
@@ -210,7 +219,7 @@ class PropertyDescriptor(object):
     def from_data(data):
         return PropertyDescriptor(**data)
 
-    def to_json(self):
+    def to_json(self, strip_none=True):
         # TODO: Likely only want to include those that are not None
         data = {
             'conceptURI': self.concept_uri,
@@ -267,7 +276,7 @@ class PropertyDescriptor(object):
             json_validators.append(p.to_json())
         data['propertyValidators'] = json_validators
 
-        return data
+        return strip_none_values(data, strip_none)
 
 
 class PropertyValidator(object):
@@ -285,7 +294,7 @@ class PropertyValidator(object):
     def from_data(data):
         return PropertyValidator(**data)
 
-    def to_json(self):
+    def to_json(self, strip_none=True):
         data = {
             'description': self.description,
             'errorMessage': self.error_message,
@@ -297,7 +306,7 @@ class PropertyValidator(object):
             'type': self.type
         }
 
-        return data
+        return strip_none_values(data, strip_none)
 
 
 def create(server_context, domain_definition, container_path=None):
@@ -326,7 +335,7 @@ def create(server_context, domain_definition, container_path=None):
 
 
 def drop(server_context, schema_name, query_name, container_path=None):
-    # type: (ServerContext, str, str, str) -> None
+    # type: (ServerContext, str, str, str) -> dict
     """
     Delete a domain
     :param server_context: A LabKey server context. See utils.create_server_context.
