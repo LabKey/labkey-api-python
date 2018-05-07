@@ -16,9 +16,12 @@
 from __future__ import unicode_literals
 import json
 
+from labkey.utils import ServerContext
+
 
 # TODO Incorporate logging
 def load_batch(server_context, assay_id, batch_id):
+    # type: (ServerContext, int, int) -> Union[Batch, None]
     """
     Loads a batch from the server.
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -47,6 +50,7 @@ def load_batch(server_context, assay_id, batch_id):
 
 
 def save_batch(server_context, assay_id, batch):
+    # type: (ServerContext, int, Batch) -> Union[Batch, None]
     """
     Saves a modified batch.
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -62,6 +66,7 @@ def save_batch(server_context, assay_id, batch):
 
 
 def save_batches(server_context, assay_id, batches):
+    # type: (ServerContext, int, List[Batch]) -> Union[List[Batch], None]
     """
     Saves a modified batches.
     :param server_context: A LabKey server context. See utils.create_server_context.
