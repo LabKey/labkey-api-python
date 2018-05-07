@@ -22,7 +22,7 @@ user_controller = 'user'
 def activate_users(server_context, target_ids, container_path=None):
     """
     Activate user accounts
-    :param server_context: LabKey server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param target_ids:
     :param container_path:
     :return:
@@ -34,7 +34,7 @@ def activate_users(server_context, target_ids, container_path=None):
 def add_to_group(server_context, user_ids, group_id, container_path=None):
     """
     Add user to group
-    :param server_context: LabKey server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param user_ids: users to add
     :param group_id: to add to
     :param container_path:
@@ -46,7 +46,7 @@ def add_to_group(server_context, user_ids, group_id, container_path=None):
 def add_to_role(server_context, role, user_id=None, email=None, container_path=None):
     """
     Add user/group to security role
-    :param server_context: LabKey server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param role: (from get_roles) to add user to
     :param user_id: to add permissions role to (must supply this or email or both)
     :param email: to add permissions role to (must supply this or user_id or both)
@@ -60,7 +60,7 @@ def add_to_role(server_context, role, user_id=None, email=None, container_path=N
 def create_user(server_context, email, container_path=None, send_email=False):
     """
     Create new account
-    :param server_context: LabKey server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param email:
     :param container_path:
     :param send_email: true to send email notification to user
@@ -78,7 +78,7 @@ def create_user(server_context, email, container_path=None, send_email=False):
 def deactivate_users(server_context, target_ids, container_path=None):
     """
     Deactivate but do not delete user accounts
-    :param server_context: LabKey server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param target_ids:
     :param container_path:
     :return:
@@ -95,7 +95,7 @@ def deactivate_users(server_context, target_ids, container_path=None):
 def delete_users(server_context, target_ids, container_path=None):
     """
     Delete user accounts
-    :param server_context: LabKey server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param target_ids:
     :param container_path:
     :return:
@@ -112,7 +112,7 @@ def delete_users(server_context, target_ids, container_path=None):
 def get_roles(server_context, container_path=None):
     """
     Gets the set of permissions and roles available from the server
-    :param server_context:
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param container_path:
     :return:
     """
@@ -123,7 +123,7 @@ def get_roles(server_context, container_path=None):
 def get_user_by_email(server_context, email):
     """
     Get the user with the provided email. Throws a ValueError if not found.
-    :param server_context: LabKey server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param email:
     :return:
     """
@@ -152,7 +152,7 @@ def list_groups(server_context, include_site_groups=False, container_path=None):
 def remove_from_group(server_context, user_ids, group_id, container_path=None):
     """
     Remove user from group
-    :param server_context: LabKey server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param user_ids:
     :param group_id:
     :param container_path:
@@ -165,7 +165,7 @@ def remove_from_group(server_context, user_ids, group_id, container_path=None):
 def remove_from_role(server_context, role, user_id=None, email=None, container_path=None):
     """
     Remove user/group from security role
-    :param server_context: LabKey server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param role: (from get_roles) to remove user from
     :param user_id: to remove permissions from (must supply this or email or both)
     :param email: to remove permissions from (must supply this or user_id or both)
@@ -179,7 +179,7 @@ def remove_from_role(server_context, role, user_id=None, email=None, container_p
 def reset_password(server_context, email, container_path=None):
     """
     Change password for a user  (Requires Admin privileges on the LabKey server)
-    :param server_context:
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param email:
     :param container_path:
     :return:
@@ -194,7 +194,7 @@ def reset_password(server_context, email, container_path=None):
 def __make_security_group_api_request(server_context, api, user_ids, group_id, container_path):
     """
     Execute a request against the LabKey Security Controller Group Membership apis
-    :param server_context: LabKey Server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param api: Action to execute
     :param user_ids: user ids to apply action to
     :param group_id: group id to apply action to
@@ -216,7 +216,7 @@ def __make_security_group_api_request(server_context, api, user_ids, group_id, c
 def __make_security_role_api_request(server_context, api, role, email=None, user_id=None, container_path=None):
     """
     Execute a request against the LabKey Security Controller Group Membership apis
-    :param server_context: LabKey Server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param api: Action to execute
     :param user_id: user ids to apply action to
     :param role: (from get_roles) to remove user from
@@ -238,7 +238,7 @@ def __make_security_role_api_request(server_context, api, role, email=None, user
 def __make_user_api_request(server_context, target_ids, api, container_path=None):
     """
     Make a request to the LabKey User Controller
-    :param server_context: LabKey Server context
+    :param server_context: A LabKey server context. See utils.create_server_context.
     :param target_ids: Array of User ids to affect
     :param api: action to take
     :param container_path: container context
