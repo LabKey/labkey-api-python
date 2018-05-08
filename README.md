@@ -9,7 +9,7 @@ Lets you query, insert, and update data on a [LabKey Server](https://www.labkey.
 
 The following APIs can be used against a LabKey Server instance.
 
-Query API (labkey.query)
+Query API - [sample code](samples/query_examples.py)
 
 - **delete_rows()** - Delete records in a table.
 - **execute_sql()** - Execute SQL (LabKey SQL dialect) through the query module.
@@ -17,12 +17,22 @@ Query API (labkey.query)
 - **select_rows()** - Query and get results sets.
 - **update_rows()** - Update rows in a table.
 
-Experiment API (labkey.experiment)
+Domain API - [sample code](samples/domain_example.py)
+
+- **create()** - Create many types of domains (e.g. lists, datsets).
+- **drop()** - Delete a domain.
+- **get()** - Get a domain design.
+- **infer_fields()** - Infer fields for a domain design from a file.
+- **save()** - Save changes to a domain design.
+
+Experiment API - [sample code](samples/experiment_example.py)
 
 - **load_batch()** - Retrieve assay data (batch level).
 - **save_batch()** - Save assay data (batch level)
 
-Security API (labkey.security). Available for administrating and configuring user accounts and permissions.
+Security API - [sample code](samples/security_example.py). 
+
+- Available for administrating and configuring user accounts and permissions.
 
 ## Installation
 To install, simply use `pip`:
