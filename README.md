@@ -28,9 +28,9 @@ Domain API - [sample code](samples/domain_example.py)
 Experiment API - [sample code](samples/experiment_example.py)
 
 - **load_batch()** - Retrieve assay data (batch level).
-- **save_batch()** - Save assay data (batch level)
+- **save_batch()** - Save assay data (batch level).
 
-Security API - [sample code](samples/security_example.py). 
+Security API - [sample code](samples/security_example.py) 
 
 - Available for administrating and configuring user accounts and permissions.
 
