@@ -89,6 +89,13 @@ list_domain.add_field({
     'rangeURI': 'boolean'
 })
 
+# Use infer fields to define additional fields
+fields_file = open('data/infer.tsv', 'rb')
+inferred_fields = domain.infer_fields(server_context, fields_file)
+
+for field in inferred_fields:
+    list_domain.add_field(field)
+
 domain.save(server_context, 'lists', 'BloodTypes', list_domain)
 
 ###################
