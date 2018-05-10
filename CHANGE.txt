@@ -2,6 +2,14 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 0.7.0 package
+==============================
+
+*Release date: 05/10/2018*
+
+- Domain API, see labkey.domain
+- Fix for error response handling (#12). Thanks to @thusharaw for this contribution.
+
 What's New in the LabKey 0.6.1 package
 ==============================
 
