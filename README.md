@@ -9,7 +9,7 @@ Lets you query, insert, and update data on a [LabKey Server](https://www.labkey.
 
 The following APIs can be used against a LabKey Server instance.
 
-Query API (labkey.query)
+Query API - [sample code](samples/query_examples.py)
 
 - **delete_rows()** - Delete records in a table.
 - **execute_sql()** - Execute SQL (LabKey SQL dialect) through the query module.
@@ -17,12 +17,22 @@ Query API (labkey.query)
 - **select_rows()** - Query and get results sets.
 - **update_rows()** - Update rows in a table.
 
-Experiment API (labkey.experiment)
+Domain API - [sample code](samples/domain_example.py)
+
+- **create()** - Create many types of domains (e.g. lists, datsets).
+- **drop()** - Delete a domain.
+- **get()** - Get a domain design.
+- **infer_fields()** - Infer fields for a domain design from a file.
+- **save()** - Save changes to a domain design.
+
+Experiment API - [sample code](samples/experiment_example.py)
 
 - **load_batch()** - Retrieve assay data (batch level).
-- **save_batch()** - Save assay data (batch level)
+- **save_batch()** - Save assay data (batch level).
 
-Security API (labkey.security). Available for administrating and configuring user accounts and permissions.
+Security API - [sample code](samples/security_example.py) 
+
+- Available for administrating and configuring user accounts and permissions.
 
 ## Installation
 To install, simply use `pip`:
@@ -93,7 +103,7 @@ Python 2.6+ and 3.4+ are fully supported.
 LabKey Server v15.1 and later.
 
 ## Contributing
-This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the [LabKey Server support forum](https://www.labkey.org/wiki/home/page.view?name=support).
+This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the [LabKey Server developer support forum](https://www.labkey.org/home/Support/Developer%20Forum/project-begin.view?).
 
 ### Testing
 If you are looking to contribute please run the tests before issuing a PR. For now you need to manually get the dependencies:

@@ -20,9 +20,8 @@ Sample data from the New Study tutorial on labkey.org:
     https://www.labkey.org/wiki/home/Documentation/page.view?name=studySetupManual
 
 """
-
-
 from __future__ import unicode_literals
+
 from labkey.utils import create_server_context
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerContextError, ServerNotFoundError
 from labkey.query import select_rows, update_rows, Pagination, QueryFilter, \
@@ -34,8 +33,8 @@ import copy
 print("Create a server context")
 labkey_server = 'localhost:8080'
 project_name = 'ModuleAssayTest'  # Project folder name
-contextPath = 'labkey'
-server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=False)
+context_path = 'labkey'
+server_context = create_server_context(labkey_server, project_name, context_path, use_ssl=False)
 
 schema = 'lists'
 table = 'Demographics'
@@ -79,7 +78,7 @@ except QueryNotFoundError:
     print('Caught bad schema')
 
 # catch SSL error
-ssl_server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=True)
+ssl_server_context = create_server_context(labkey_server, project_name, context_path, use_ssl=True)
 try:
     result = select_rows(ssl_server_context, schema, table)
     print(result)
@@ -96,7 +95,7 @@ except ServerNotFoundError:
     print('Caught context path')
 
 # catch bad folder path error
-bad_server_context = create_server_context(labkey_server, 'bad_project_name', contextPath, use_ssl=False)
+bad_server_context = create_server_context(labkey_server, 'bad_project_name', context_path, use_ssl=False)
 try:
     result = select_rows(bad_server_context, schema, table)
     print(result)
@@ -229,7 +228,7 @@ else:
 
 # paging
 sql_result = execute_sql(server_context, schema, sql, max_rows=5, offset=10,
-                        sort=(column1 + ', -' + column2))
+                         sort=(column1 + ', -' + column2))
 if sql_result is not None:
     print('execute_sql: There are ' + str(len(sql_result['rows'])) + ' rows.')
     print('execute_sql: There are ' + str(sql_result['rowCount']) + ' total rows.')
@@ -251,4 +250,3 @@ try:
     print('execute_sql did not timeout')
 except Timeout:
     print('Caught Timeout')
-

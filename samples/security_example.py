@@ -16,14 +16,12 @@
 from __future__ import unicode_literals
 
 from labkey.exceptions import ServerNotFoundError
-from labkey.security import create_user, delete_user, deactivate_user, add_to_group, add_to_role, \
+from labkey.security import create_user, delete_users, deactivate_users, add_to_group, add_to_role, \
      reset_password, get_user_by_email, get_roles
 from labkey.utils import create_server_context
 
-print("Create a server context")
 labkey_server = 'localhost:8080'
-# project_name = 'Home'  # Project folder name
-project_name = None
+project_name = 'Home'  # Project folder name
 contextPath = 'labkey'
 server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=False)
 
@@ -37,7 +35,7 @@ result = create_user(server_context, new_user_email)
 if result is not None:
     print(result)
 else:
-    print("No results returned")
+    print("Add users: no results returned")
     exit()
 
 
@@ -52,7 +50,7 @@ except ValueError:
 if result is not None:
     print(result)
 else:
-    print("No results returned")
+    print("Show users: no results returned")
     exit()
 
 
@@ -64,7 +62,7 @@ result = reset_password(server_context, new_user_email)
 if result is not None:
     print(result)
 else:
-    print("No results returned")
+    print("Reset password: no results returned")
     exit()
 
 
@@ -72,10 +70,8 @@ else:
 # add permissions to User
 ###############
 
-    ###############
-    # List Security Roles
-    ###############
-result = get_roles(server_context, 'NciTestProject')
+# List Security Roles
+result = get_roles(server_context)
 if result is not None:
     print(result)
 else:
@@ -88,49 +84,53 @@ for role in result['roles']:
         author_role = role
 
 try:
-    result = add_to_role(server_context, role=author_role, user_id=new_user_id, container_path='home')
+    result = add_to_role(server_context, role=author_role, user_id=new_user_id)
 except ServerNotFoundError:
-    print("resource not found, check that 'Home' project is created")
+    print("resource not found, check that '" + project_name + "' project exists")
 
 if result is not None:
     print(result)
 else:
-    print("No results returned")
+    print("Add user permissions: no results returned")
     exit()
 
 
 ###############
 # add user to group
 ###############
-site_group_id = -1
+site_group_id = -1  # This needs to be the ID of a Project Group within the project specified above
+
+if site_group_id == -1:
+    print("NOTE: To successfully complete this sample code a 'site_group_id' must be set in the file.")
+    exit()
 
 result = add_to_group(server_context, new_user_id, site_group_id)
 if result is not None:
     print(result)
 else:
-    print("No results returned")
+    print("Add user to group: no results returned")
     exit()
 
 ###############
 # deactivate User
 ###############
 
-result = deactivate_user(server_context, new_user_id)
+result = deactivate_users(server_context, [new_user_id])
 if result is not None:
     print(result)
 else:
-    print("No results returned")
+    print("Deactivate user: no results returned")
     exit()
 
 
 ###############
 # delete User
 ###############
-result = delete_user(server_context, new_user_id)
+result = delete_users(server_context, [new_user_id])
 if result is not None:
     print(result)
 else:
-    print("No results returned")
+    print("Delete user: no results returned")
     exit()
 
 
