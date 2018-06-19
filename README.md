@@ -69,7 +69,7 @@ password mypassword
 Note that the netrc file only deals with connections at the machine level and should not include a port or protocol designation, meaning both "mymachine.labkey.org:8888" and "https://mymachine.labkey.org" are incorrect. 
 
 ### Old credentials
-As of v0.4.0 this API no longer supports using a ``.labkeycredentials.txt`` file, and now uses the .netrc files similar to the other labkey APIs. Additional .netrc [setup instructions](https://www.labkey.org/wiki/home/Documentation/page.view?name=netrc) can be found at the link.
+As of v0.4.0 this API no longer supports using a ``.labkeycredentials.txt`` file, and now uses the .netrc files similar to the other labkey APIs. Additional .netrc [setup instructions](https://www.labkey.org/Documentation/wiki-page.view?name=netrc) can be found at the link.
 
 ## Examples
 
@@ -103,7 +103,7 @@ Python 2.6+ and 3.4+ are fully supported.
 LabKey Server v15.1 and later.
 
 ## Contributing
-This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the [LabKey Server developer support forum](https://www.labkey.org/home/Support/Developer%20Forum/project-begin.view?).
+This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the [LabKey Server developer support forum](https://www.labkey.org/home/developer/forum/project-start.view).
 
 ### Testing
 If you are looking to contribute please run the tests before issuing a PR. For now you need to manually get the dependencies:

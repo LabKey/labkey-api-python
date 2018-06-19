@@ -35,7 +35,7 @@ Documentation for the LabKey Client APIs:
 https://www.labkey.org/Documentation/wiki-page.view?name=viewAPIs
 
 Support questions should be directed to the LabKey Developer forum:
-https://www.labkey.org/home/Support/Developer%20Forum/project-begin.view?
+https://www.labkey.org/home/developer/forum/project-start.view
 
 
 ############################################################################

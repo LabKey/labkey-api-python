@@ -17,7 +17,7 @@
 Examples using the Query.py API
 
 Sample data from the New Study tutorial on labkey.org:
-    https://www.labkey.org/wiki/home/Documentation/page.view?name=studySetupManual
+    https://www.labkey.org/Documentation/wiki-page.view?name=studySetupManual
 
 """
 from __future__ import unicode_literals
