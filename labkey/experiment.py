@@ -213,9 +213,9 @@ class Run(ExpObject):
         return data
 
 
-class ProtocolOutput(ExpObject):
+class RunItem(ExpObject):
     def __init__(self, **kwargs):
-        super(ProtocolOutput, self).__init__(**kwargs)
+        super(RunItem, self).__init__(**kwargs)
 
         self.source_protocol = kwargs.pop('source_protocol', kwargs.pop('sourceProtocol', None))
         self.run = kwargs.pop('run', None)  # TODO Check if this should be a Run instance
@@ -225,10 +225,10 @@ class ProtocolOutput(ExpObject):
 
     @staticmethod
     def from_data(data):
-        return ProtocolOutput(**data)
+        return RunItem(**data)
 
     def to_json(self):
-        data = super(ProtocolOutput, self).to_json()
+        data = super(RunItem, self).to_json()
 
         data['sourceProtocol'] = self.source_protocol
         data['run'] = self.run
@@ -239,7 +239,7 @@ class ProtocolOutput(ExpObject):
         return data
 
 
-class Data(ProtocolOutput):
+class Data(RunItem):
     def __init__(self, **kwargs):
         super(Data, self).__init__(**kwargs)
 
