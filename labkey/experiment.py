@@ -14,9 +14,8 @@
 # limitations under the License.
 #
 from __future__ import unicode_literals
-import json
 
-from labkey.utils import ServerContext
+from labkey.utils import json_dumps, ServerContext
 
 
 # TODO Incorporate logging
@@ -42,7 +41,7 @@ def load_batch(server_context, assay_id, batch_id):
         'Accept': 'text/plain'
     }
 
-    json_body = server_context.make_request(load_batch_url, json.dumps(payload, sort_keys=True), headers=headers)
+    json_body = server_context.make_request(load_batch_url, json_dumps(payload, sort_keys=True), headers=headers)
     if json_body is not None:
         loaded_batch = Batch.from_data(json_body['batch'])
 
@@ -95,7 +94,7 @@ def save_batches(server_context, assay_id, batches):
         'Accept': 'text/plain'
     }
 
-    json_body = server_context.make_request(save_batch_url, json.dumps(payload, sort_keys=True), headers=headers)
+    json_body = server_context.make_request(save_batch_url, json_dumps(payload, sort_keys=True), headers=headers)
     if json_body is not None:
         resp_batches = json_body['batches']
         return [Batch.from_data(resp_batch) for resp_batch in resp_batches]

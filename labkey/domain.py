@@ -16,7 +16,7 @@
 from __future__ import unicode_literals
 import json
 
-from labkey.utils import ServerContext
+from labkey.utils import json_dumps, ServerContext
 
 
 def strip_none_values(data, do_strip=True):
@@ -326,7 +326,7 @@ def create(server_context, domain_definition, container_path=None):
 
     domain = None
 
-    raw_domain = server_context.make_request(url, json.dumps(domain_definition), headers=headers)
+    raw_domain = server_context.make_request(url, json_dumps(domain_definition), headers=headers)
 
     if raw_domain is not None:
         domain = Domain.from_data(raw_domain)
@@ -355,7 +355,7 @@ def drop(server_context, schema_name, query_name, container_path=None):
         'queryName': query_name
     }
 
-    return server_context.make_request(url, json.dumps(payload), headers=headers)
+    return server_context.make_request(url, json_dumps(payload), headers=headers)
 
 
 def get(server_context, schema_name, query_name, container_path=None):
@@ -431,4 +431,4 @@ def save(server_context, schema_name, query_name, domain, container_path=None):
         'schemaName': schema_name
     }
 
-    return server_context.make_request(url, json.dumps(payload), headers=headers)
+    return server_context.make_request(url, json_dumps(payload), headers=headers)
