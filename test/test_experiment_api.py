@@ -25,7 +25,7 @@ from labkey import utils
 from labkey.experiment import load_batch, save_batch, Batch, Run
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
 
-from test_utils import MockLabKey, mock_server_context, success_test, throws_error_test
+from utilities import MockLabKey, mock_server_context, success_test, throws_error_test
 
 
 class MockLoadBatch(MockLabKey):
