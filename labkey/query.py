@@ -41,7 +41,8 @@ https://www.labkey.org/home/developer/forum/project-start.view
 ############################################################################
 """
 from __future__ import unicode_literals
-import json
+
+from labkey.utils import json_dumps
 
 _query_headers = {
     'Content-Type': 'application/json'
@@ -80,7 +81,7 @@ def delete_rows(server_context, schema_name, query_name, rows, container_path=No
         'rows': rows
     }
 
-    return server_context.make_request(url, json.dumps(payload, sort_keys=True), headers=_query_headers, timeout=timeout)
+    return server_context.make_request(url, json_dumps(payload, sort_keys=True), headers=_query_headers, timeout=timeout)
 
 
 def execute_sql(server_context, schema_name, sql, container_path=None,
@@ -161,7 +162,7 @@ def insert_rows(server_context, schema_name, query_name, rows, container_path=No
         'rows': rows
     }
 
-    return server_context.make_request(url, json.dumps(payload, sort_keys=True), headers=_query_headers,
+    return server_context.make_request(url, json_dumps(payload, sort_keys=True), headers=_query_headers,
                                        timeout=timeout)
 
 
@@ -281,7 +282,7 @@ def update_rows(server_context, schema_name, query_name, rows, container_path=No
         'rows': rows
     }
 
-    return server_context.make_request(url, json.dumps(payload, sort_keys=True), headers=_query_headers,
+    return server_context.make_request(url, json_dumps(payload, sort_keys=True), headers=_query_headers,
                                        timeout=timeout)
 
 

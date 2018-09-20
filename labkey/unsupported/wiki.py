@@ -23,8 +23,9 @@ LabKey Server.
 """
 from __future__ import unicode_literals
 
-import json
 from requests.exceptions import SSLError
+
+from labkey.utils import json_dumps
 
 
 def update_wiki(server_context, wiki_name, wiki_body, container_path=None):
@@ -100,7 +101,7 @@ def update_wiki(server_context, wiki_name, wiki_body, container_path=None):
     wiki_vars['body'] = wiki_body
 
     try:
-        data = server_context.make_request(update_wiki_url, payload=json.dumps(wiki_vars, sort_keys=True),
+        data = server_context.make_request(update_wiki_url, payload=json_dumps(wiki_vars, sort_keys=True),
                                            headers=headers, non_json_response=True)
     except SSLError as e:
         print("There was a problem while attempting to submit the read for the wiki page '" + str(wiki_name) + "' via the URL " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
