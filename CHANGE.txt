@@ -2,6 +2,14 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 1.0.0 package
+==============================
+
+*Release date: 09/20/2018*
+
+- BREAKING CHANGE: in labkey.experiment ProtocolOutput has been renamed to RunItem
+- Provide a default encoder for json.dumps to better handle datetime (#14).
+
 What's New in the LabKey 0.7.0 package
 ==============================
 
