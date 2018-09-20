@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 from __future__ import unicode_literals
-from datetime import datetime
+from datetime import date, datetime
 import unittest
 
 try:
@@ -28,8 +28,10 @@ from labkey import utils
 class TestJsonDumps(unittest.TestCase):
 
     def test_encoder(self):
+        # test date and datetime encoding
         payload = {
-            'testdate': datetime(2018, 9, 18, 5, 25)
+            'my_date': date(1985, 9, 11),
+            'my_date_time': datetime(2018, 9, 18, 5, 25)
         }
 
         utils.json_dumps(payload)

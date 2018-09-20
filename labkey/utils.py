@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 import requests
 import json
 from functools import wraps
-from datetime import datetime
+from datetime import date, datetime
 
 from requests.exceptions import RequestException
 from labkey.exceptions import RequestError, RequestAuthorizationError, QueryNotFoundError, ServerContextError, \
@@ -187,10 +187,10 @@ def handle_response(response, non_json_response=False):
 # Issue #14: json.dumps on datetime throws TypeError
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, datetime):
+        if isinstance(o, (datetime, date)):
             return o.isoformat()
 
-        return json.JSONEncoder.default(self, o)
+        return super(DateTimeEncoder, self).default(o)
 
 
 @wraps(json.dumps)
