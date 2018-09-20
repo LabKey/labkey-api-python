@@ -188,7 +188,6 @@ def handle_response(response, non_json_response=False):
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, datetime):
-            print("converting to", o.isoformat())
             return o.isoformat()
 
         return json.JSONEncoder.default(self, o)

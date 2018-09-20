@@ -22,6 +22,7 @@ from test_experiment_api import suite as exp_suite
 from test_query_api import suite as query_suite
 from test_security import suite as security_suite
 from test_unsupported import suite as unsupported_suite
+from test_utils import suite as utils_suite
 
 if __name__ == '__main__':
 
@@ -35,6 +36,7 @@ if __name__ == '__main__':
         exp_suite(),
         query_suite(),
         security_suite(),
-        unsupported_suite()
+        unsupported_suite(),
+        utils_suite()
     ])
     unittest.TextTestRunner().run(all_tests)
