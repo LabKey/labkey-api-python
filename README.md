@@ -19,7 +19,7 @@ Query API - [sample code](samples/query_examples.py)
 
 Domain API - [sample code](samples/domain_example.py)
 
-- **create()** - Create many types of domains (e.g. lists, datsets).
+- **create()** - Create many types of domains (e.g. lists, datasets).
 - **drop()** - Delete a domain.
 - **get()** - Get a domain design.
 - **infer_fields()** - Infer fields for a domain design from a file.
