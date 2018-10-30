@@ -364,3 +364,6 @@ class QueryFilter:
     def get_column_name(self):
         return self.column_name
 
+    def __repr__(self):
+        return '<QueryFilter [{} {} {}]>'.format(self.column_name, self.filter_type, self.value)
+
