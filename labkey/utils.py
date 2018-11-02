@@ -49,6 +49,11 @@ class ServerContext(object):
         else:
             self._scheme = 'http://'
 
+    def __repr__(self):
+        return '<ServerContext [ {} | {} | {} ]>'.format(self._domain,
+                                                         self._context_path,
+                                                         self._container_path)
+
     def build_url(self, controller, action, container_path=None):
         # type: (self, str, str, str) -> str
         sep = '/'
