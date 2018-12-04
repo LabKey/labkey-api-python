@@ -117,3 +117,6 @@ Then, to run the tests:
 ```bash
 $ python test/test_labkey.py
 ```
+
+### Maintainers
+Package maintainer's can reference the [Python Package Maintenance](https://docs.google.com/document/d/13nVxwyctH4YZ6gDhcrOu9Iz6qGFPAxicE1VHiVYpw9A/) document (requires permission) for updating releases.
