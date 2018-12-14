@@ -50,7 +50,7 @@ setup(
     packages=packages,
     package_data={},
     install_requires=['requests'],
-    tests_require=['requests', 'mock'],
+    extras_require={ 'testing': ['mock'] },
     keywords="labkey api client",
     classifiers=[
         'Development Status :: 4 - Beta',
