@@ -36,6 +36,8 @@ if not version:
 
 long_desc = "Python client API for LabKey Server. Supports query and experiment APIs."
 
+tests_require = ['pytest', 'requests', 'mock', 'pytest-cov']
+
 setup(
     name='labkey',
     version=version,
@@ -50,7 +52,11 @@ setup(
     packages=packages,
     package_data={},
     install_requires=['requests'],
-    tests_require=['requests', 'mock'],
+    tests_require=tests_require,
+    setup_requires=['pytest-runner'],
+    extras_require={
+        'test': tests_require
+    },
     keywords="labkey api client",
     classifiers=[
         'Development Status :: 4 - Beta',

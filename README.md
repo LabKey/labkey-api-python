@@ -106,16 +106,21 @@ LabKey Server v15.1 and later.
 This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the [LabKey Server developer support forum](https://www.labkey.org/home/developer/forum/project-start.view).
 
 ### Testing
-If you are looking to contribute please run the tests before issuing a PR. For now you need to manually get the dependencies:
+If you are looking to contribute please run the tests before issuing a PR. The tests can be initiated by running
 
 ```bash
-$ pip install mock
+$ python setup.py test
 ```
 
-Then, to run the tests:
+This runs the tests using [pytest](https://docs.pytest.org/en/latest/contents.html). If you'd like to run pytest directly you can install the testing dependencies in your virtual environment with:
 
 ```bash
-$ python test/test_labkey.py
+$ pip install -e .[test]
+```
+
+Then, the tests can be run with
+```bash
+$ pytest .
 ```
 
 ### Maintainers
