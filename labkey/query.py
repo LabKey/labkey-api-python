@@ -352,6 +352,9 @@ class QueryFilter:
         BETWEEN = 'between'
         NOT_BETWEEN = 'notbetween'
 
+        IS_BLANK = 'isblank'
+        IS_NOT_BLANK = 'isnonblank'
+
         MEMBER_OF = 'memberof'
 
     def __init__(self, column, value, filter_type=Types.EQUAL):
