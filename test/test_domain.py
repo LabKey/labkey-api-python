@@ -28,7 +28,7 @@ from labkey import utils
 from labkey.domain import create, Domain, drop, get, infer_fields, save
 from labkey.exceptions import RequestAuthorizationError
 
-from utilities import MockLabKey, mock_server_context, success_test, success_test_get, throws_error_test, throws_error_test_get
+from .utilities import MockLabKey, mock_server_context, success_test, success_test_get, throws_error_test, throws_error_test_get
 
 
 domain_controller = 'property'

@@ -25,7 +25,7 @@ from labkey import utils
 from labkey.query import delete_rows, update_rows, insert_rows, select_rows, execute_sql, QueryFilter
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
 
-from utilities import MockLabKey, mock_server_context, success_test, throws_error_test
+from .utilities import MockLabKey, mock_server_context, success_test, throws_error_test
 
 
 class MockSelectRows(MockLabKey):

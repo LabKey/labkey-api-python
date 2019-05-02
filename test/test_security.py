@@ -27,7 +27,7 @@ from labkey.security import create_user, reset_password, activate_users, deactiv
     remove_from_group, remove_from_role, add_to_role, get_roles, list_groups
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
 
-from utilities import MockLabKey, mock_server_context, success_test, throws_error_test
+from .utilities import MockLabKey, mock_server_context, success_test, throws_error_test
 
 
 class MockSecurityController(MockLabKey):

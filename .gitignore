@@ -2,7 +2,11 @@
 *.py[cod]
 build/
 dist/
+\.coverage
+labkey\.egg-info/
+\.eggs/
 
 # Project Artifacts
 .idea/
 *.iml
+*.swp

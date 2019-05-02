@@ -19,7 +19,7 @@ import unittest
 from labkey import utils
 from labkey.unsupported import messageboard
 
-from utilities import MockLabKey, mock_server_context, success_test
+from .utilities import MockLabKey, mock_server_context, success_test
 
 
 class MockPostMessage(MockLabKey):
