@@ -8,4 +8,5 @@ labkey\.egg-info/
 
 # Project Artifacts
 .idea/
+*.iml
 *.swp

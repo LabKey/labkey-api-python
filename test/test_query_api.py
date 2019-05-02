@@ -22,7 +22,7 @@ except ImportError:
     import unittest.mock as mock
 
 from labkey import utils
-from labkey.query import delete_rows, update_rows, insert_rows, select_rows, execute_sql
+from labkey.query import delete_rows, update_rows, insert_rows, select_rows, execute_sql, QueryFilter
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
 
 from .utilities import MockLabKey, mock_server_context, success_test, throws_error_test
@@ -244,6 +244,30 @@ class TestSelectRows(unittest.TestCase):
     def test_success(self):
         test = self
         success_test(test, self.service.get_successful_response(), select_rows, True, *self.args, **self.expected_kwargs)
+
+    def test_query_filter(self):
+        test = self
+        # Construct a set of arguments that
+        args = [
+            *self.args,
+            # view_name
+            None,
+            # filter_array
+            [
+                QueryFilter('Field1', 'value', 'eq'),
+                QueryFilter('Field2', 'value1', 'contains'),
+                QueryFilter('Field2', 'value2', 'contains'),
+            ]
+        ]
+        # Expected query field values in post request body
+        query_field = {
+            'query.Field1~eq': ['value'],
+            'query.Field2~contains': ['value1', 'value2'],
+        }
+        # Update post request body with expected query field values
+        self.expected_kwargs['data'].update(query_field)
+
+        success_test(test, self.service.get_successful_response(), select_rows, True, *args, **self.expected_kwargs)
 
     def test_unauthorized(self):
         test = self

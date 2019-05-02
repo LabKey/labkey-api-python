@@ -220,7 +220,11 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
     if filter_array is not None:
         for query_filter in filter_array:
             prefix = query_filter.get_url_parameter_name()
-            payload[prefix] = query_filter.get_url_parameter_value()
+            # Use a list for each prefix, as a prefix may have multiple different
+            # filter values associated for it.
+            filters = payload.get(prefix, [])
+            filters.append(query_filter.get_url_parameter_value())
+            payload[prefix] = filters
 
     if columns is not None:
         payload['query.columns'] = columns
@@ -347,6 +351,9 @@ class QueryFilter:
 
         BETWEEN = 'between'
         NOT_BETWEEN = 'notbetween'
+
+        IS_BLANK = 'isblank'
+        IS_NOT_BLANK = 'isnonblank'
 
         MEMBER_OF = 'memberof'
 
