@@ -247,18 +247,13 @@ class TestSelectRows(unittest.TestCase):
 
     def test_query_filter(self):
         test = self
-        # Construct a set of arguments that
-        args = [
-            *self.args,
-            # view_name
-            None,
-            # filter_array
-            [
-                QueryFilter('Field1', 'value', 'eq'),
-                QueryFilter('Field2', 'value1', 'contains'),
-                QueryFilter('Field2', 'value2', 'contains'),
-            ]
+        view_name = None
+        filter_array = [
+            QueryFilter('Field1', 'value', 'eq'),
+            QueryFilter('Field2', 'value1', 'contains'),
+            QueryFilter('Field2', 'value2', 'contains'),
         ]
+        args = list(self.args) + [view_name, filter_array]
         # Expected query field values in post request body
         query_field = {
             'query.Field1~eq': ['value'],
