@@ -2,6 +2,15 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 1.1.0 package
+==============================
+
+*Release date: 05/07/2019*
+
+- Add isblank and isnonblank filter types (#23)
+- Fix issue with Query API overwriting query filters with the same field/comparison (#20)
+- Use pytest as the default test runner (#24)
+
 What's New in the LabKey 1.0.1 package
 ==============================
 
