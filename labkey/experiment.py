@@ -106,7 +106,7 @@ class ExpObject(object):
     def __init__(self, **kwargs):
         self.lsid = kwargs.pop('lsid', None)  # Life Science identifier
         self.name = kwargs.pop('name', None)
-        self.id = kwargs.pop('id', 0)
+        self.id = kwargs.pop('id', None)
         self.row_id = self.id
         self.comment = kwargs.pop('comment', None)
         self.created = kwargs.pop('created', None)
@@ -126,6 +126,10 @@ class ExpObject(object):
             'modifiedBy': self.modified_by,
             'properties': self.properties
         }
+
+        if self.id is not None:
+            data.update({'id': self.id})
+
         if self.lsid is not None:
             data.update({'lsid': self.lsid})
             
