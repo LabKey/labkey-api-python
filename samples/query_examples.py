@@ -25,7 +25,7 @@ from __future__ import unicode_literals
 from labkey.utils import create_server_context
 from labkey.exceptions import RequestError, QueryNotFoundError, ServerContextError, ServerNotFoundError
 from labkey.query import select_rows, update_rows, Pagination, QueryFilter, \
-    insert_rows, delete_rows, execute_sql
+    insert_rows, delete_rows, truncate_table, execute_sql
 from requests.exceptions import Timeout
 
 import copy
@@ -212,6 +212,13 @@ print('Delete Rows: deleted rowId [ ' + str(deleteResult['rows'][0]['Key']) + ' 
 
 all_rows = select_rows(server_context, schema, table)
 print('Delete Rows: after row count [ ' + str(all_rows['rowCount']) + ' ]')
+
+
+###################
+# Test truncate_table
+###################
+truncate_info = truncate_table(server_context, schema, table)
+print('Delete all rows in table: [ ' + str(truncate_info['deletedRows']) + ' ] rows deleted')
 
 
 ###################

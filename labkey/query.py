@@ -84,7 +84,7 @@ def delete_rows(server_context, schema_name, query_name, rows, container_path=No
     return server_context.make_request(url, json_dumps(payload, sort_keys=True), headers=_query_headers, timeout=timeout)
 
 
-def truncate_tables(server_context, schema_name, query_name, container_path=None, timeout=_default_timeout):
+def truncate_table(server_context, schema_name, query_name, container_path=None, timeout=_default_timeout):
     """
     Delete all rows from the schema.query
     :param server_context: A LabKey server context. See utils.create_server_context.
