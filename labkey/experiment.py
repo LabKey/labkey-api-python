@@ -186,6 +186,7 @@ class Run(ExpObject):
         self.material_inputs = kwargs.pop('material_inputs', kwargs.pop('materialInputs', []))
         self.material_outputs = kwargs.pop('material_outputs', kwargs.pop('materialOutputs', []))
         self.object_properties = kwargs.pop('object_properties', kwargs.pop('objectProperties', []))
+        self.plate_metadata = kwargs.pop('plate_metadata', None)
 
         # TODO: initialize protocol
         # self._protocol = None
@@ -212,6 +213,7 @@ class Run(ExpObject):
         data['filePathRoot'] = self.file_path_root
         data['materialInputs'] = self.material_inputs
         data['materialOutputs'] = self.material_outputs
+        data['plateMetadata'] = self.plate_metadata
 
         return data
 
