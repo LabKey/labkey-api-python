@@ -27,6 +27,7 @@ except ImportError:
 from labkey import utils
 from labkey.domain import create, Domain, drop, get, infer_fields, save
 from labkey.exceptions import RequestAuthorizationError
+from labkey.query import QueryFilter
 
 from .utilities import MockLabKey, mock_server_context, success_test, success_test_get, throws_error_test, throws_error_test_get
 
@@ -44,7 +45,15 @@ class TestCreate(unittest.TestCase):
                 'name': 'TheTestList',
                 'fields': [{
                     'name': 'theKey',
-                    'rangeURI': 'int'
+                    'rangeURI': 'int',
+                    'conditionalFormats': [{
+                        'filter': QueryFilter('age', 500, QueryFilter.Types.GREATER_THAN).get_filter_format(), #maybe just hitchhike?
+                        'textcolor': 'f44e3b',
+                        'backgroundcolor': 'fcba03',
+                        'bold': True,
+                        'italic': True,
+                        'strikethrough': False
+                    }]
                 }]
             },
             'options': {
@@ -242,6 +251,57 @@ class TestSave(unittest.TestCase):
         test = self
         throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
                           save, *self.args, **self.expected_kwargs)
+
+class TestConditionalFormats(unittest.TestCase):
+
+    def setUp(self):
+
+        domain_definition = {
+            'kind': 'IntList',
+            'domainDesign': {
+                'name': 'TheTestList',
+                'fields': [{
+                    'name': 'theKey',
+                    'rangeURI': 'int',
+                    'conditionalFormats': [{
+                        'filter': QueryFilter('age', 500, QueryFilter.Types.GREATER_THAN).get_filter_format(),
+                        'textcolor': 'f44e3b',
+                        'backgroundcolor': 'fcba03',
+                        'bold': True,
+                        'italic': True,
+                        'strikethrough': False
+                    }]
+                }]
+            },
+        }
+
+        class MockCreate(MockLabKey):
+            api = 'createDomain.api'
+            default_action = domain_controller
+            default_success_body = domain_definition
+
+        self.service = MockCreate()
+
+        self.expected_kwargs = {
+            'expected_args': [self.service.get_server_url()],
+            'data': json.dumps(domain_definition),
+            'headers': {'Content-Type': 'application/json'},
+            'timeout': 300
+        }
+
+        self.args = [
+            mock_server_context(self.service), domain_definition
+        ]
+
+    def test_success(self):
+        test = self
+        success_test(test, self.service.get_successful_response(),
+                     create, False,  *self.args, **self.expected_kwargs)
+
+    # def test_unauthorized(self):
+    #     test = self
+    #     throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+    #                       create, *self.args, **self.expected_kwargs)
 
 
 def suite():

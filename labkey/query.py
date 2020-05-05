@@ -377,10 +377,12 @@ class QueryFilter:
 
         MEMBER_OF = 'memberof'
 
-    def __init__(self, column, value, filter_type=Types.EQUAL):
+    def __init__(self, column, value, filter_type=Types.EQUAL, second_value=None, second_filter_type=Types.EQUAL):
         self.column_name = column
         self.value = value
         self.filter_type = filter_type
+        self.second_value = second_value
+        self.second_filter_type = second_filter_type
 
     def get_url_parameter_name(self):
         return 'query.' + self.column_name + '~' + self.filter_type
@@ -390,6 +392,14 @@ class QueryFilter:
 
     def get_column_name(self):
         return self.column_name
+
+    def get_filter_format(self):
+        second_condition = None
+        if self.second_value or self.second_filter_type:
+            second_condition = '&format.column~{}={}'.format(self.second_filter_type, self.second_value)
+
+        return 'format.column~{}={}{}'.format(self.filter_type, self.value,
+                                               second_condition if second_condition else '')
 
     def __repr__(self):
         return '<QueryFilter [{} {} {}]>'.format(self.column_name, self.filter_type, self.value)

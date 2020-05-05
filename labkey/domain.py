@@ -17,6 +17,7 @@ from __future__ import unicode_literals
 import json
 
 from labkey.utils import json_dumps, ServerContext
+from labkey.query import QueryFilter
 
 
 def strip_none_values(data, do_strip=True):
@@ -308,6 +309,31 @@ class PropertyValidator(object):
 
         return strip_none_values(data, strip_none)
 
+# For every conditional format filter that is set as a QueryFilter, translates the given filter into LabKey
+# filter URL format
+def format_conditional_filters(field):
+    if 'conditionalFormats' in field:
+        formats = []
+        for cf in field['conditionalFormats']:
+            if 'filter' in cf and isinstance(cf['filter'], QueryFilter):
+                cf['filter'] = cf['filter'].get_filter_format()
+            formats.append(cf)
+        field['conditionalFormats'] = formats
+    return field
+
+# Used in updating conditional formats for existing domains. Supports filter URL format as well as QueryFilter
+# filter parameters
+def conditional_format(filter, bold=False, italic=False, strikethrough=False,
+                       text_color="", background_color=""):
+    if isinstance(filter, QueryFilter):
+        filter = filter.get_filter_format()
+
+    cf = ConditionalFormat.from_data({
+        'filter': filter, 'bold': bold, 'italic': italic, 'strikethrough': strikethrough,
+        'textColor': text_color, 'backgroundColor': background_color
+    })
+
+    return cf
 
 def create(server_context, domain_definition, container_path=None):
     # type: (ServerContext, dict, str) -> Domain
@@ -326,6 +352,8 @@ def create(server_context, domain_definition, container_path=None):
 
     domain = None
 
+    domain_fields = domain_definition['domainDesign']['fields']
+    domain_definition['domainDesign']['fields'] = list(map(format_conditional_filters, domain_fields))
     raw_domain = server_context.make_request(url, json_dumps(domain_definition), headers=headers)
 
     if raw_domain is not None:
