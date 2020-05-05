@@ -119,6 +119,9 @@ list_with_cf = {
         'name': 'ListWithConditionalFormats',
         'description': 'Test list',
         'fields': [{
+            'name': 'rowId',
+            'rangeURI': 'int'
+        }, {
             'name': 'date',
             'rangeURI': 'date',
             'conditionalFormats': [{
@@ -142,6 +145,10 @@ list_with_cf = {
                 'strikethrough': False
             }]
         }]
+    },
+    'options': {
+        'keyName': 'rowId',
+        'keyType': 'AutoIncrementInteger'
     }
 }
 
@@ -165,7 +172,7 @@ for field in domain_cf.fields:
 print('The filter on field "' + age_field.name + '" has been updated to: ' + age_field.conditional_formats[0].filter)
 
 ###################
-# Delete a domain's condtiional format
+# Delete a domain's conditional format
 ###################
 for field in domain_cf.fields:
     if field.name == 'age':
