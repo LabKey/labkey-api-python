@@ -169,6 +169,7 @@ for field in domain_cf.fields:
                                        text_color='f44e3b')
         field.conditional_formats = [cf]
 
+domain.save(server_context, 'lists', 'ListWithConditionalFormats', domain_cf)
 print('The filter on field "' + age_field.name + '" has been updated to: ' + age_field.conditional_formats[0].filter)
 
 ###################
