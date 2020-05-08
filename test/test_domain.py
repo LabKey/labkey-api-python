@@ -45,15 +45,7 @@ class TestCreate(unittest.TestCase):
                 'name': 'TheTestList',
                 'fields': [{
                     'name': 'theKey',
-                    'rangeURI': 'int',
-                    'conditionalFormats': [{
-                        'filter': QueryFilter('age', 500, QueryFilter.Types.GREATER_THAN).get_filter_format(), #maybe just hitchhike?
-                        'textcolor': 'f44e3b',
-                        'backgroundcolor': 'fcba03',
-                        'bold': True,
-                        'italic': True,
-                        'strikethrough': False
-                    }]
+                    'rangeURI': 'int'
                 }]
             },
             'options': {
@@ -252,19 +244,19 @@ class TestSave(unittest.TestCase):
         throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
                           save, *self.args, **self.expected_kwargs)
 
-class TestConditionalFormats(unittest.TestCase):
+class TestConditionalFormatCreate(unittest.TestCase):
 
     def setUp(self):
 
         domain_definition = {
             'kind': 'IntList',
             'domainDesign': {
-                'name': 'TheTestList',
+                'name': 'TheTestList_cf',
                 'fields': [{
                     'name': 'theKey',
                     'rangeURI': 'int',
                     'conditionalFormats': [{
-                        'filter': QueryFilter('age', 500, QueryFilter.Types.GREATER_THAN).get_filter_format(),
+                        'filter': QueryFilter('theKey', 500, QueryFilter.Types.GREATER_THAN).get_filter_format(),
                         'textcolor': 'f44e3b',
                         'backgroundcolor': 'fcba03',
                         'bold': True,
@@ -298,11 +290,68 @@ class TestConditionalFormats(unittest.TestCase):
         success_test(test, self.service.get_successful_response(),
                      create, False,  *self.args, **self.expected_kwargs)
 
-    # def test_unauthorized(self):
-    #     test = self
-    #     throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
-    #                       create, *self.args, **self.expected_kwargs)
+    def test_unauthorized(self):
+        test = self
+        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+                          create, *self.args, **self.expected_kwargs)
 
+
+class TestConditionalFormatSave(unittest.TestCase):
+    domain = Domain(**{
+        'container': 'TestContainer',
+        'description': 'A Test Domain',
+        'domain_id': 5314,
+        'fields': [{
+            'name': 'theKey',
+            'rangeURI': 'int',
+            'conditionalFormats': [{
+                'filter': QueryFilter('theKey', 200, QueryFilter.Types.LESS_THAN).get_filter_format(),
+                'textcolor': 'f44e3b',
+                'backgroundcolor': 'fcba03',
+                'bold': True,
+                'italic': True,
+                'strikethrough': True
+            }]
+        }]
+    })
+    schema_name = 'lists'
+    query_name = 'TheTestList_cf'
+
+    def setUp(self):
+
+        class MockSave(MockLabKey):
+            api = 'saveDomain.api'
+            default_action = domain_controller
+            default_success_body = {}
+
+        self.service = MockSave()
+
+        payload = {
+            'domainDesign': self.domain.to_json(),
+            'queryName': self.query_name,
+            'schemaName': self.schema_name
+        }
+
+        self.expected_kwargs = {
+            'expected_args': [self.service.get_server_url()],
+            'data': json.dumps(payload),
+            'headers': {'Content-Type': 'application/json'},
+            'timeout': 300
+        }
+
+        self.args = [
+            mock_server_context(self.service), self.schema_name, self.query_name, self.domain
+        ]
+
+    def test_success(self):
+        test = self
+        success_test(test, self.service.get_successful_response(),
+                     save, True,  *self.args, **self.expected_kwargs)
+
+    def test_unauthorized(self):
+        test = self
+        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+                          save, *self.args, **self.expected_kwargs)
 
 def suite():
     load_tests = unittest.TestLoader().loadTestsFromTestCase
