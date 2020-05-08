@@ -305,7 +305,7 @@ class TestConditionalFormatSave(unittest.TestCase):
             'name': 'theKey',
             'rangeURI': 'int',
             'conditionalFormats': [{
-                'filter': QueryFilter('theKey', 200, QueryFilter.Types.LESS_THAN).get_filter_format(),
+                'filter': Domain.get_filter_format(QueryFilter('theKey', 200, QueryFilter.Types.LESS_THAN)),
                 'textcolor': 'f44e3b',
                 'backgroundcolor': 'fcba03',
                 'bold': True,
