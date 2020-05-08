@@ -125,8 +125,8 @@ list_with_cf = {
             'name': 'date',
             'rangeURI': 'date',
             'conditionalFormats': [{
-                'filter': QueryFilter('date', '10/29/1995', QueryFilter.Types.DATE_GREATER_THAN,
-                                      '10/31/1995', QueryFilter.Types.DATE_LESS_THAN),
+                'filter': [QueryFilter('date', '10/29/1995', QueryFilter.Types.DATE_GREATER_THAN),
+                           QueryFilter('date', '10/31/1995', QueryFilter.Types.DATE_LESS_THAN)],
                 'textcolor': 'f44e3b',
                 'backgroundcolor': 'fcba03',
                 'bold': True,
