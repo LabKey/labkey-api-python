@@ -257,7 +257,7 @@ class TestConditionalFormatCreate(unittest.TestCase):
                     'name': 'theKey',
                     'rangeURI': 'int',
                     'conditionalFormats': [{
-                        'filter': QueryFilter('theKey', 500, QueryFilter.Types.GREATER_THAN).get_filter_format(),
+                        'filter': domain.get_filter_format(QueryFilter('theKey', 500, QueryFilter.Types.GREATER_THAN)),
                         'textcolor': 'f44e3b',
                         'backgroundcolor': 'fcba03',
                         'bold': True,
