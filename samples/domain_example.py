@@ -125,8 +125,10 @@ list_with_cf = {
             'name': 'date',
             'rangeURI': 'date',
             'conditionalFormats': [{
-                'filter': [QueryFilter('date', '10/29/1995', QueryFilter.Types.DATE_GREATER_THAN),
-                           QueryFilter('date', '10/31/1995', QueryFilter.Types.DATE_LESS_THAN)],
+                'filter': [
+                    QueryFilter('date', '10/29/1995', QueryFilter.Types.DATE_GREATER_THAN),
+                    QueryFilter('date', '10/31/1995', QueryFilter.Types.DATE_LESS_THAN)
+                ],
                 'textcolor': 'f44e3b',
                 'backgroundcolor': 'fcba03',
                 'bold': True,
@@ -162,10 +164,10 @@ print('The filter on field "' + age_field.name + '" was: ' + age_field.condition
 
 for field in domain_cf.fields:
     if field.name == 'age':
-        cf = domain.conditional_format(filter='format.column~eq=30', text_color='ff0000')
+        cf = domain.conditional_format(query_filter='format.column~eq=30', text_color='ff0000')
         field.conditional_formats = [cf]
     if field.name == 'date':
-        cf = domain.conditional_format(filter=QueryFilter('date', "10/30/1995", QueryFilter.Types.DATE_LESS_THAN),
+        cf = domain.conditional_format(query_filter=QueryFilter('date', '10/30/1995', QueryFilter.Types.DATE_LESS_THAN),
                                        text_color='f44e3b')
         field.conditional_formats = [cf]
 
@@ -179,5 +181,5 @@ for field in domain_cf.fields:
     if field.name == 'age':
         field.conditional_formats = []
 
-# CLeanup
+# Cleanup
 domain.drop(server_context, 'lists', 'ListWithConditionalFormats')

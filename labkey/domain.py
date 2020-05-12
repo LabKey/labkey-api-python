@@ -309,45 +309,60 @@ class PropertyValidator(object):
         return strip_none_values(data, strip_none)
 
 
-def get_filter_format(filter):
-    return 'format.column~{}={}'.format(filter.filter_type, filter.value)
+def conditional_format(query_filter, bold=False, italic=False, strike_through=False, text_color="",
+                       background_color=""):
+    # type: (any, bool, bool, bool, str, str) -> ConditionalFormat
+    """
+    Creates a conditional format for use with an existing domain.
+    Supports filter URL format as well as QueryFilter filter parameters.
+    """
+    filter_str = ''
+    if isinstance(query_filter, QueryFilter):
+        filter_str = encode_conditional_format_filter(query_filter)
+    elif isinstance(query_filter, list):
+        if len(query_filter) > 2:
+            raise Exception('Too many QueryFilters given for one conditional format.')
+        if (not isinstance(query_filter[0], QueryFilter)) or \
+           (len(query_filter) > 1 and not isinstance(query_filter[1], QueryFilter)):
+            raise Exception('Please pass QueryFilter objects when updating a conditional format using a list filter.')
 
-
-# Used in updating conditional formats for existing domains. Supports filter URL format as well as QueryFilter
-# filter parameters
-def conditional_format(filter=QueryFilter.Types.HAS_ANY_VALUE, bold=False, italic=False, strikethrough=False,
-                       text_color="", background_color=""):
-    if isinstance(filter, QueryFilter):
-        filter = get_filter_format(filter)  # Replaces QueryFilter obj with string form
-    if isinstance(filter, list):
-        if len(filter) > 2:
-            raise Exception("Too many QueryFilters given for one conditional format.")
-        if (not isinstance(filter[0], QueryFilter)) or (len(filter) > 1 and not isinstance(filter[1], QueryFilter)):
-            raise Exception("Please pass QueryFilter objects when updating a conditional format using a list filter.")
-
-        stringFilters = list(map(lambda filter: get_filter_format(filter), filter))
-        filter = stringFilters[0] + '&' + stringFilters[1] if len(filter) == 2 else stringFilters[0]
+        string_filters = list(map(lambda f: encode_conditional_format_filter(f), query_filter))
+        filter_str = string_filters[0] + '&' + string_filters[1] if len(query_filter) == 2 else string_filters[0]
+    else:
+        filter_str = query_filter
 
     cf = ConditionalFormat.from_data({
-        'filter': filter, 'bold': bold, 'italic': italic, 'strikethrough': strikethrough,
-        'textColor': text_color, 'backgroundColor': background_color
+        'background_color': background_color,
+        'bold': bold,
+        'filter': filter_str,
+        'italic': italic,
+        'strike_through': strike_through,
+        'text_color': text_color,
     })
 
     return cf
 
 
-# For every conditional format filter that is set as a QueryFilter, translates the given filter into LabKey
-# filter URL format
-def format_conditional_filters(field):
+def encode_conditional_format_filter(query_filter):
+    # type: (QueryFilter) -> str
+    return 'format.column~{}={}'.format(query_filter.filter_type, query_filter.value)
+
+
+def __format_conditional_filters(field):
+    # type: (dict) -> dict
+    """
+    For every conditional format filter that is set as a QueryFilter, translates the given filter into LabKey
+    filter URL format.
+    """
     if 'conditionalFormats' in field:
         for cf in field['conditionalFormats']:
             if 'filter' in cf and isinstance(cf['filter'], QueryFilter):  # Supports one QueryFilter without list form
-                cf['filter'] = get_filter_format(cf['filter'])
+                cf['filter'] = encode_conditional_format_filter(cf['filter'])
 
             elif 'filter' in cf and isinstance(cf['filter'], list):  # Supports list of QueryFilters
                 filters = []
                 for query_filter in cf['filter']:
-                    filters.append(get_filter_format(query_filter))
+                    filters.append(encode_conditional_format_filter(query_filter))
                 if len(filters) > 2:
                     raise Exception("Too many QueryFilters given for one conditional format.")
                 cf['filter'] = filters[0] + '&' + filters[1] if len(filters) == 2 else filters[0]
@@ -373,7 +388,7 @@ def create(server_context, domain_definition, container_path=None):
     domain = None
 
     domain_fields = domain_definition['domainDesign']['fields']
-    domain_definition['domainDesign']['fields'] = list(map(format_conditional_filters, domain_fields))
+    domain_definition['domainDesign']['fields'] = list(map(__format_conditional_filters, domain_fields))
     raw_domain = server_context.make_request(url, json_dumps(domain_definition), headers=headers)
 
     if raw_domain is not None:
