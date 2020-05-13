@@ -25,10 +25,13 @@ except ImportError:
     import unittest.mock as mock
 
 from labkey import utils
-from labkey.domain import create, Domain, drop, get, infer_fields, save
+from labkey.domain import create, conditional_format, Domain, drop, encode_conditional_format_filter, \
+    get, infer_fields, save
 from labkey.exceptions import RequestAuthorizationError
+from labkey.query import QueryFilter
 
-from .utilities import MockLabKey, mock_server_context, success_test, success_test_get, throws_error_test, throws_error_test_get
+from .utilities import MockLabKey, mock_server_context, success_test, success_test_get, throws_error_test, \
+    throws_error_test_get
 
 
 domain_controller = 'property'
@@ -244,6 +247,133 @@ class TestSave(unittest.TestCase):
                           save, *self.args, **self.expected_kwargs)
 
 
+class TestConditionalFormatCreate(unittest.TestCase):
+
+    def setUp(self):
+
+        self.domain_definition = {
+            'kind': 'IntList',
+            'domainDesign': {
+                'name': 'TheTestList_cf',
+                'fields': [{
+                    'name': 'theKey',
+                    'rangeURI': 'int',
+                    'conditionalFormats': [{
+                        'filter': encode_conditional_format_filter(QueryFilter('theKey', 500)),
+                        'textColor': 'f44e3b',
+                        'backgroundColor': 'fcba03',
+                        'bold': True,
+                        'italic': True,
+                        'strikethrough': False
+                    }]
+                }]
+            },
+        }
+
+        class MockCreate(MockLabKey):
+            api = 'createDomain.api'
+            default_action = domain_controller
+            default_success_body = self.domain_definition
+
+        self.service = MockCreate()
+
+        self.expected_kwargs = {
+            'expected_args': [self.service.get_server_url()],
+            'data': json.dumps(self.domain_definition),
+            'headers': {'Content-Type': 'application/json'},
+            'timeout': 300
+        }
+
+        self.args = [
+            mock_server_context(self.service), self.domain_definition
+        ]
+
+    def test_success(self):
+        test = self
+        success_test(test, self.service.get_successful_response(),
+                     create, False, *self.args, **self.expected_kwargs)
+
+    def test_unauthorized(self):
+        test = self
+        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+                          create, *self.args, **self.expected_kwargs)
+
+
+class TestConditionalFormatSave(unittest.TestCase):
+
+    schema_name = 'lists'
+    query_name = 'TheTestList_cf'
+
+    def setUp(self):
+        self.test_domain = Domain(**{
+            'container': 'TestContainer',
+            'description': 'A Test Domain',
+            'domain_id': 5314,
+            'fields': [{
+                'name': 'theKey',
+                'rangeURI': 'int'
+            }]
+        })
+
+        self.test_domain.fields[0].conditional_formats = [
+            # create conditional format using our utility for a QueryFilter
+            conditional_format(
+                background_color='fcba03',
+                bold=True,
+                italic=True,
+                query_filter=QueryFilter('theKey', 200),
+                strike_through=True,
+                text_color='f44e3b',
+            ),
+            # create conditional format using our utility for a QueryFilter list
+            conditional_format(
+                background_color='fcba03',
+                bold=True,
+                italic=True,
+                query_filter=[
+                    QueryFilter('theKey', 500, QueryFilter.Types.GREATER_THAN),
+                    QueryFilter('theKey', 1000, QueryFilter.Types.LESS_THAN)
+                ],
+                strike_through=True,
+                text_color='f44e3b',
+            )
+        ]
+
+        class MockSave(MockLabKey):
+            api = 'saveDomain.api'
+            default_action = domain_controller
+            default_success_body = {}
+
+        self.service = MockSave()
+
+        payload = {
+            'domainDesign': self.test_domain.to_json(),
+            'queryName': self.query_name,
+            'schemaName': self.schema_name
+        }
+
+        self.expected_kwargs = {
+            'expected_args': [self.service.get_server_url()],
+            'data': json.dumps(payload),
+            'headers': {'Content-Type': 'application/json'},
+            'timeout': 300
+        }
+
+        self.args = [
+            mock_server_context(self.service), self.schema_name, self.query_name, self.test_domain
+        ]
+
+    def test_success(self):
+        test = self
+        success_test(test, self.service.get_successful_response(),
+                     save, True, *self.args, **self.expected_kwargs)
+
+    def test_unauthorized(self):
+        test = self
+        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
+                          save, *self.args, **self.expected_kwargs)
+
+
 def suite():
     load_tests = unittest.TestLoader().loadTestsFromTestCase
     return unittest.TestSuite([
@@ -251,7 +381,9 @@ def suite():
         load_tests(TestDrop),
         load_tests(TestGet),
         load_tests(TestInferFields),
-        load_tests(TestSave)
+        load_tests(TestSave),
+        load_tests(TestConditionalFormatCreate),
+        load_tests(TestConditionalFormatSave)
     ])
 
 

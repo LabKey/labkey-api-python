@@ -16,6 +16,7 @@
 from __future__ import unicode_literals
 
 from labkey.utils import create_server_context
+from labkey.query import QueryFilter
 from labkey import domain
 
 labkey_server = 'localhost:8080'
@@ -108,3 +109,77 @@ if 'success' in drop_response:
 drop_response = domain.drop(server_context, 'lists', 'BloodTypes')
 if 'success' in drop_response:
     print('The list domain was deleted.')
+
+###################
+# Create a domain with a conditional format
+###################
+list_with_cf = {
+    'kind': 'IntList',
+    'domainDesign': {
+        'name': 'ListWithConditionalFormats',
+        'description': 'Test list',
+        'fields': [{
+            'name': 'rowId',
+            'rangeURI': 'int'
+        }, {
+            'name': 'date',
+            'rangeURI': 'date',
+            'conditionalFormats': [{
+                'filter': [
+                    QueryFilter('date', '10/29/1995', QueryFilter.Types.DATE_GREATER_THAN),
+                    QueryFilter('date', '10/31/1995', QueryFilter.Types.DATE_LESS_THAN)
+                ],
+                'textcolor': 'f44e3b',
+                'backgroundcolor': 'fcba03',
+                'bold': True,
+                'italic': False,
+                'strikethrough': False
+            }]
+        }, {
+            'name': 'age',
+            'rangeURI': 'int',
+            'conditionalFormats': [{
+                'filter': QueryFilter('age', 500, QueryFilter.Types.GREATER_THAN),
+                'textcolor': 'f44e3b',
+                'backgroundcolor': 'fcba03',
+                'bold': True,
+                'italic': True,
+                'strikethrough': False
+            }]
+        }]
+    },
+    'options': {
+        'keyName': 'rowId',
+        'keyType': 'AutoIncrementInteger'
+    }
+}
+
+domain_cf = domain.create(server_context, list_with_cf)
+
+###################
+# Edit an existing domain's conditional format
+###################
+age_field = list(filter(lambda domain_field: domain_field.name == 'age', domain_cf.fields))[0]
+print('The filter on field "' + age_field.name + '" was: ' + age_field.conditional_formats[0].filter)
+
+for field in domain_cf.fields:
+    if field.name == 'age':
+        cf = domain.conditional_format(query_filter='format.column~eq=30', text_color='ff0000')
+        field.conditional_formats = [cf]
+    if field.name == 'date':
+        cf = domain.conditional_format(query_filter=QueryFilter('date', '10/30/1995', QueryFilter.Types.DATE_LESS_THAN),
+                                       text_color='f44e3b')
+        field.conditional_formats = [cf]
+
+domain.save(server_context, 'lists', 'ListWithConditionalFormats', domain_cf)
+print('The filter on field "' + age_field.name + '" has been updated to: ' + age_field.conditional_formats[0].filter)
+
+###################
+# Delete a domain's conditional format
+###################
+for field in domain_cf.fields:
+    if field.name == 'age':
+        field.conditional_formats = []
+
+# Cleanup
+domain.drop(server_context, 'lists', 'ListWithConditionalFormats')
