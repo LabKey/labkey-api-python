@@ -295,3 +295,4 @@ for row in result['rows']:
         delete_rows(server_context, 'core', 'qcstate', [row])
     except ServerContextError as sce:
         print(sce)
+        
