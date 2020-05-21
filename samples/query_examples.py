@@ -257,3 +257,41 @@ try:
     print('execute_sql did not timeout')
 except Timeout:
     print('Caught Timeout')
+
+
+###################
+# Test QC State Definitions
+###################
+
+# Create new QC state definitions
+qcstates = [{
+       'label': 'needs verification',
+       'description': 'please look at this',
+       'publicData': False
+   }, {
+       'label': 'approved',
+       'publicData': True
+}]
+result = insert_rows(server_context, 'core', 'qcstate', qcstates)
+for row in result['rows']:
+    print('Created QC state: ' + row['label'])
+
+result = select_rows(server_context, "core", "qcstate")
+
+# Update a QC state definitions
+originalValue = result['rows'][1]
+testRow = {
+    'RowId': originalValue['RowId'],
+    'label': 'Updated Label'
+}
+updateResult = update_rows(server_context, "core", "qcstate", [testRow])
+print('Updated label: approved -> ' + updateResult['rows'][0]['label'])
+
+# Delete all unused QC state definitions
+result = select_rows(server_context, 'core', 'qcstate')
+for row in result['rows']:
+    print('Deleting QC state: ' + row['Label'])
+    try:
+        delete_rows(server_context, 'core', 'qcstate', [row])
+    except ServerContextError as sce:
+        print(sce)
