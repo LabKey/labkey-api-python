@@ -2,6 +2,15 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 1.3.0 package
+==============================
+
+*Release date: 05/27/2020*
+
+- domain.create() now iterates through its conditional formats and converts instances or lists of QueryFilter to their string format.
+- domain.conditional_format() provides a wrapper for creating a conditional format--typically to be used in updating
+- Added examples for domain.create, domain.conditional_format, and updating QC state.
+
 What's New in the LabKey 1.2.0 package
 ==============================
 
