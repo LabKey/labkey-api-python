@@ -201,7 +201,8 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
                 include_update_column=None,
                 selection_key=None,
                 required_version=None,
-                timeout=_default_timeout
+                timeout=_default_timeout,
+                ignore_filter=None,
                 ):
     """
     Query data from a LabKey server
@@ -225,6 +226,7 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
     :param selection_key:
     :param required_version: decimal value that indicates the response version of the api
     :param timeout: Request timeout in seconds (defaults to 30s)
+    :param ignore_filter: Boolean, if true, the command will ignore any filter that may be part of the chosen view.
     :return:
     """
     url = server_context.build_url('query', 'getQuery.api', container_path=container_path)
@@ -282,6 +284,9 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
 
     if required_version is not None:
         payload['apiVersion'] = required_version
+
+    if ignore_filter is not None and ignore_filter is True:
+        payload['query.ignoreFilter'] = 1
 
     return server_context.make_request(url, payload, timeout=timeout)
 
