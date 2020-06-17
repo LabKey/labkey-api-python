@@ -2,6 +2,13 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 1.4.0 package
+==============================
+
+*Release date: 06/17/2020*
+
+- Add ignore_filter option to select_rows
+
 What's New in the LabKey 1.3.0 package
 ==============================
 
