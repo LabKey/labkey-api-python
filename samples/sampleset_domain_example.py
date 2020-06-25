@@ -56,7 +56,6 @@ sampleset_domain_definition = {
 # domain.create returns the full Domain definition
 created_sampleset_domain = domain.create(server_context, sampleset_domain_definition)
 
-
 ###################
 # Get a domain
 ###################
@@ -87,6 +86,6 @@ domain.save(server_context, 'samples', 'BloodSamples', sampleset_domain)
 # Drop a domain
 ###################
 
-#drop_response = domain.drop(server_context, 'samples', 'BloodSamples')
-#if 'success' in drop_response:
-#    print('The SampleSet domain was deleted.')
+drop_response = domain.drop(server_context, 'samples', 'BloodSamples')
+if 'success' in drop_response:
+    print('The SampleSet domain was deleted.')
