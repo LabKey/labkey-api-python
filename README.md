@@ -123,5 +123,12 @@ Then, the tests can be run with
 $ pytest .
 ```
 
+The integration tests do not run by default. If you want to run the integration tests make sure you have a live server
+running, a netrc file, and run the following command:
+
+```bash
+$ pytest . -m "integration"
+```
+
 ### Maintainers
 Package maintainer's can reference the [Python Package Maintenance](https://docs.google.com/document/d/13nVxwyctH4YZ6gDhcrOu9Iz6qGFPAxicE1VHiVYpw9A/) document (requires permission) for updating releases.
