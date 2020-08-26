@@ -3,8 +3,10 @@ import pytest
 from labkey.exceptions import ServerContextError
 from labkey.utils import create_server_context
 from labkey.query import select_rows
-from labkey import domain
+from labkey import domain, container
 
+PROJECT_NAME = 'PythonIntegrationTests'
+STUDY_NAME = 'TestStudy'
 SCHEMA_NAME = 'study'
 QUERY_NAME = 'KrankenLevel'
 DATASET_DOMAIN = {
@@ -24,6 +26,14 @@ DATASET_DOMAIN = {
 }
 
 
+@pytest.fixture(autouse=True)
+def project():
+    context = create_server_context('localhost:8080', '', 'labkey', use_ssl=False)
+    project_ = container.create(context, PROJECT_NAME, folderType='study')
+    yield project_
+    container.delete(context, PROJECT_NAME)
+
+
 @pytest.fixture
 def server_context():
     """
@@ -33,11 +43,35 @@ def server_context():
 
     :return: ServerContext
     """
-    return create_server_context('localhost:8080', 'PythonIntegrationTest', 'labkey', use_ssl=False)
+    return create_server_context('localhost:8080', PROJECT_NAME, 'labkey', use_ssl=False)
+
+
+@pytest.fixture
+def study(server_context):
+    url = server_context.build_url('study', 'createStudy.view')
+    payload = {
+        'shareVisits': 'false',
+        'shareDatasets': 'false',
+        'simpleRepository': 'true',
+        'securityString': 'BASIC_READ',
+        'defaultTimepointDuration': '1',
+        'startDate': '2020-01-01',
+        'timepointType': 'VISIT',
+        'subjectColumnName': 'PeopleId',
+        'subjectNounPlural': 'Peoples',
+        'subjectNounSingular': 'People',
+        'label': 'Python Integration Tests Study'
+    }
+    created_study = server_context.make_request(url, payload, non_json_response=True)
+    yield created_study
+    url = server_context.build_url('study', 'deleteStudy.view')
+    server_context.make_request(url, None, non_json_response=True)
 
 
 @pytest.fixture(scope="function")
-def dataset(server_context):
+def dataset(server_context, study):
+    # study is not used in this function, but the fixture is required to run because we need a study in order to create
+    # a dataset
     domain.create(server_context, DATASET_DOMAIN)
     created_domain = domain.get(server_context, SCHEMA_NAME, QUERY_NAME)
     yield created_domain
