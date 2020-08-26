@@ -15,8 +15,8 @@
 #
 from __future__ import unicode_literals
 
-security_controller = 'security'
-user_controller = 'user'
+SECURITY_CONTROLLER = 'security'
+USER_CONTROLLER = 'user'
 
 
 def activate_users(server_context, target_ids, container_path=None):
@@ -66,7 +66,7 @@ def create_user(server_context, email, container_path=None, send_email=False):
     :param send_email: true to send email notification to user
     :return:
     """
-    url = server_context.build_url(security_controller, 'createNewUser.api', container_path)
+    url = server_context.build_url(SECURITY_CONTROLLER, 'createNewUser.api', container_path)
     payload = {
         'email': email,
         'sendEmail': send_email
@@ -116,7 +116,7 @@ def get_roles(server_context, container_path=None):
     :param container_path:
     :return:
     """
-    url = server_context.build_url(security_controller, 'getRoles.api', container_path=container_path)
+    url = server_context.build_url(SECURITY_CONTROLLER, 'getRoles.api', container_path=container_path)
     return server_context.make_request(url, None)
 
 
@@ -127,7 +127,7 @@ def get_user_by_email(server_context, email):
     :param email:
     :return:
     """
-    url = server_context.build_url(user_controller, 'getUsers.api')
+    url = server_context.build_url(USER_CONTROLLER, 'getUsers.api')
     payload = dict(includeDeactivatedAccounts=True)
     result = server_context.make_request(url, payload)
 
@@ -142,7 +142,7 @@ def get_user_by_email(server_context, email):
 
 
 def list_groups(server_context, include_site_groups=False, container_path=None):
-    url = server_context.build_url(security_controller, 'listProjectGroups.api', container_path)
+    url = server_context.build_url(SECURITY_CONTROLLER, 'listProjectGroups.api', container_path)
 
     return server_context.make_request(url, {
         'includeSiteGroups': include_site_groups
@@ -184,7 +184,7 @@ def reset_password(server_context, email, container_path=None):
     :param container_path:
     :return:
     """
-    url = server_context.build_url(security_controller, 'adminRotatePassword.api', container_path)
+    url = server_context.build_url(SECURITY_CONTROLLER, 'adminRotatePassword.api', container_path)
 
     return server_context.make_request(url, {
         'email': email
@@ -201,7 +201,7 @@ def __make_security_group_api_request(server_context, api, user_ids, group_id, c
     :param container_path: Additional container context path
     :return: Request json object
     """
-    url = server_context.build_url(security_controller, api, container_path)
+    url = server_context.build_url(SECURITY_CONTROLLER, api, container_path)
 
     # if user_ids is only a single scalar make it an array
     if not hasattr(user_ids, "__iter__"):
@@ -226,7 +226,7 @@ def __make_security_role_api_request(server_context, api, role, email=None, user
     if email is None and user_id is None:
         raise ValueError("Must supply either/both [email] or [user_id]")
 
-    url = server_context.build_url(security_controller, api, container_path)
+    url = server_context.build_url(SECURITY_CONTROLLER, api, container_path)
 
     return server_context.make_request(url, {
         'roleClassName': role['uniqueName'],
@@ -244,7 +244,7 @@ def __make_user_api_request(server_context, target_ids, api, container_path=None
     :param container_path: container context
     :return: response json
     """
-    url = server_context.build_url(user_controller, api, container_path)
+    url = server_context.build_url(USER_CONTROLLER, api, container_path)
 
     return server_context.make_request(url, {
         'userId': target_ids
