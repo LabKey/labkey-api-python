@@ -27,19 +27,18 @@ from labkey.exceptions import RequestError, RequestAuthorizationError, QueryNotF
 __default_timeout = 60 * 5  # 5 minutes
 API_KEY_TOKEN = 'apikey'
 CSRF_TOKEN = 'X-LABKEY-CSRF'
-DISABLE_CSRF_CHECK = False  # Used by tests to disable CSRF token check
 
 
 class ServerContext(object):
-
-    def __init__(self, **kwargs):
-        self._container_path = kwargs.pop('container_path', None)
-        self._context_path = kwargs.pop('context_path', None)
-        self._domain = kwargs.pop('domain', None)
-        self._use_ssl = kwargs.pop('use_ssl', True)
-        self._verify_ssl = kwargs.pop('verify_ssl', True)
-        self._api_key = kwargs.pop('api_key', None)
-
+    def __init__(self, domain, container_path, context_path=None, use_ssl=True, verify_ssl=True, api_key=None,
+                 disable_csrf=False):
+        self._container_path = container_path
+        self._context_path = context_path
+        self._domain = domain
+        self._use_ssl = use_ssl
+        self._verify_ssl = verify_ssl
+        self._api_key = api_key
+        self._disable_csrf = disable_csrf
         self._session = requests.Session()
 
         if self._use_ssl:
@@ -50,9 +49,7 @@ class ServerContext(object):
             self._scheme = 'http://'
 
     def __repr__(self):
-        return '<ServerContext [ {} | {} | {} ]>'.format(self._domain,
-                                                         self._context_path,
-                                                         self._container_path)
+        return '<ServerContext [ {} | {} | {} ]>'.format(self._domain, self._context_path, self._container_path)
 
     def build_url(self, controller, action, container_path=None):
         # type: (self, str, str, str) -> str
@@ -83,7 +80,7 @@ class ServerContext(object):
                     API_KEY_TOKEN: self._api_key
                 })
 
-        if not DISABLE_CSRF_CHECK:
+        if not self._disable_csrf:
             global CSRF_TOKEN
 
             # CSRF check
@@ -111,8 +108,9 @@ class ServerContext(object):
             handle_request_exception(e, server_context=self)
 
 
-def create_server_context(domain, container_path, context_path=None, use_ssl=True, verify_ssl=True, api_key=None):
-    # type: (str, str, str, bool, bool, str) -> ServerContext
+def create_server_context(domain, container_path, context_path=None, use_ssl=True, verify_ssl=True, api_key=None,
+                          disable_csrf=False):
+    # type: (str, str, str, bool, bool, str, bool) -> ServerContext
     """
     Create a LabKey server context. This context is used to encapsulate properties
     about the LabKey server that is being requested against. This includes, but is not limited to,
@@ -123,18 +121,18 @@ def create_server_context(domain, container_path, context_path=None, use_ssl=Tru
     :param use_ssl:
     :param verify_ssl:
     :param api_key:
+    :param disable_csrf:
     :return:
     """
-    config = dict(
+    return ServerContext(
         domain=domain,
         container_path=container_path,
         context_path=context_path,
         use_ssl=use_ssl,
         verify_ssl=verify_ssl,
-        api_key=api_key
+        api_key=api_key,
+        disable_csrf=disable_csrf,
     )
-
-    return ServerContext(**config)
 
 
 def build_url(server_context, controller, action, container_path=None):
