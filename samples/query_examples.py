@@ -172,42 +172,42 @@ else:
 # Test update_rows
 ###################
 rows = result['rows']
-testRowIdx = 1
-originalValue = rows[testRowIdx]
+test_row_idx = 1
+original_value = rows[test_row_idx]
 column3 = 'Country'
-testRow = {
-    'Key': originalValue['Key'],
+test_row = {
+    'Key': original_value['Key'],
     column3: 'Pangea'
 }
 
-print('update_rows: original value [ ' + originalValue[column3] + ' ]')
+print('update_rows: original value [ ' + original_value[column3] + ' ]')
 
-updateResult = update_rows(server_context, schema, table, [testRow])
-print('update_rows: updated value [ ' + updateResult['rows'][0][column3] + ' ]')
+update_result = update_rows(server_context, schema, table, [test_row])
+print('update_rows: updated value [ ' + update_result['rows'][0][column3] + ' ]')
 
-updateResult = update_rows(server_context, schema, table, [originalValue])
-print('update_rows: reset value [ ' + updateResult['rows'][0][column3] + ' ]')
+update_result = update_rows(server_context, schema, table, [original_value])
+print('update_rows: reset value [ ' + update_result['rows'][0][column3] + ' ]')
 
 
 ###################
 # Test insert_rows & delete_rows
 ###################
-testRow = copy.copy(originalValue)
+test_row = copy.copy(original_value)
 
-testRow['Key'] = None
-testRow['Country'] = 'Antarctica'
+test_row['Key'] = None
+test_row['Country'] = 'Antarctica'
 
 all_rows = select_rows(server_context, schema, table)
 print('Insert Rows: Initials row count [ ' + str(all_rows['rowCount']) + ' ]')
 
-insertResult = insert_rows(server_context, schema, table, [testRow])
-print('Insert Rows: New rowId [ ' + str(insertResult['rows'][0]['Key']) + ' ]')
+insert_result = insert_rows(server_context, schema, table, [test_row])
+print('Insert Rows: New rowId [ ' + str(insert_result['rows'][0]['Key']) + ' ]')
 
 all_rows = select_rows(server_context, schema, table)
 print('Insert Rows: after row count [ ' + str(all_rows['rowCount']) + ' ]')
 
-testRow = insertResult['rows'][0]
-deleteResult = delete_rows(server_context, schema, table, [testRow])
+test_row = insert_result['rows'][0]
+deleteResult = delete_rows(server_context, schema, table, [test_row])
 print('Delete Rows: deleted rowId [ ' + str(deleteResult['rows'][0]['Key']) + ' ]')
 
 all_rows = select_rows(server_context, schema, table)
@@ -264,7 +264,7 @@ except Timeout:
 ###################
 
 # Create new QC state definitions
-qcstates = [{
+qc_states = [{
        'label': 'needs verification',
        'description': 'please look at this',
        'publicData': False
@@ -272,26 +272,27 @@ qcstates = [{
        'label': 'approved',
        'publicData': True
 }]
-result = insert_rows(server_context, 'core', 'qcstate', qcstates)
+result = insert_rows(server_context, 'core', 'qcstate', qc_states)
 for row in result['rows']:
     print('Created QC state: ' + row['label'])
 
 result = select_rows(server_context, "core", "qcstate")
 
 # Update a QC state definitions
-originalValue = result['rows'][1]
-testRow = {
-    'RowId': originalValue['RowId'],
+original_value = result['rows'][1]
+test_row = {
+    'RowId': original_value['RowId'],
     'label': 'Updated Label'
 }
-updateResult = update_rows(server_context, "core", "qcstate", [testRow])
-print('Updated label: approved -> ' + updateResult['rows'][0]['label'])
+update_result = update_rows(server_context, "core", "qcstate", [test_row])
+print('Updated label: approved -> ' + update_result['rows'][0]['label'])
 
 # Delete all unused QC state definitions
 result = select_rows(server_context, 'core', 'qcstate')
+
 for row in result['rows']:
     print('Deleting QC state: ' + row['Label'])
     try:
         delete_rows(server_context, 'core', 'qcstate', [row])
-    except ServerContextError as sce:
-        print(sce)
+    except ServerContextError as e:
+        print(e.message)
