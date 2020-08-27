@@ -47,7 +47,7 @@ def server_context_vars():
             parser = ConfigParser()
             parser.read_string(contents)
             parsed_config = parser['config']
-            host = parsed_config.get('labkey.server', DEFAULT_PORT)
+            host = parsed_config.get('labkey.server', DEFAULT_HOST)
             port = parsed_config.get('tomcat.port', DEFAULT_PORT)
             context_path = parsed_config.get('labkey.contextpath', DEFAULT_CONTEXT_PATH)
 
