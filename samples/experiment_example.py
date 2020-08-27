@@ -30,9 +30,9 @@ assay_id = 3315  # provide one from your server
 ###################
 
 # Generate the Run object(s)
-runTest = Run()
-runTest.name = 'python upload'
-runTest.data_rows = [{
+run_test = Run()
+run_test.name = 'python upload'
+run_test.data_rows = [{
     # ColumnName: Value
     'SampleId': 'Monkey 1',
     'TimePoint': '2008/11/02 11:22:33',
@@ -49,11 +49,11 @@ runTest.data_rows = [{
     'DoubleData': 1.5,
     'HiddenData': 'jimbo'
 }]
-runTest.properties['RunFieldName'] = 'Run Field Value'
+run_test.properties['RunFieldName'] = 'Run Field Value'
 
 # Generate the Batch object(s)
 batch = Batch()
-batch.runs = [runTest]
+batch.runs = [run_test]
 batch.name = 'python batch'
 batch.properties['PropertyName'] = 'Property Value'
 
