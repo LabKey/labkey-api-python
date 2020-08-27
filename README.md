@@ -16,6 +16,7 @@ Query API - [sample code](samples/query_examples.py)
 - **insert_rows()** - Insert rows into a table.
 - **select_rows()** - Query and get results sets.
 - **update_rows()** - Update rows in a table.
+- **truncate_table()** - Delete all rows from a table.
 
 Domain API - [sample code](samples/domain_example.py)
 
@@ -24,6 +25,7 @@ Domain API - [sample code](samples/domain_example.py)
 - **get()** - Get a domain design.
 - **infer_fields()** - Infer fields for a domain design from a file.
 - **save()** - Save changes to a domain design.
+- **conditional_format()** - Create a conditional format on a field.
 
 Experiment API - [sample code](samples/experiment_example.py)
 
