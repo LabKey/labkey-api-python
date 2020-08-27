@@ -14,25 +14,16 @@ DATASET_DOMAIN = {
     'kind': 'StudyDatasetVisit',
     'domainDesign': {
         'name': QUERY_NAME,
-        'fields': [{
-            'name': 'kronk',
-            'label': 'krongggk',
-            'rangeURI': 'double'
-        }, {
-            'name': 'type',
-            'label': 'type',
-            'rangeURI': 'string'
-        }]
+        'fields': [
+            {'name': 'kronk', 'label': 'krongggk', 'rangeURI': 'double'},
+            {'name': 'type', 'label': 'type', 'rangeURI': 'string'},
+        ],
     }
 }
-TEST_QCSTATES = [{
-        'label': 'needs verification',
-        'description': 'that can not be right',
-        'publicData': False
-    }, {
-        'label': 'approved',
-        'publicData': True
-    }]
+TEST_QC_STATES = [
+    {'label': 'needs verification', 'description': 'that can not be right', 'publicData': False},
+    {'label': 'approved', 'publicData': True},
+]
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -89,16 +80,15 @@ def dataset(server_context, study):
 
 
 @pytest.fixture(scope="function")
-def qcstates(server_context, study):
-    insert_result = insert_rows(server_context, 'core', 'qcstate', TEST_QCSTATES)
+def qc_states(server_context, study):
+    insert_result = insert_rows(server_context, 'core', 'qcstate', TEST_QC_STATES)
     yield insert_result
     # clean up
-    cleanup_qcStates= [{
-        'rowId': insert_result['rows'][0]['rowid']
-    }, {
-        'rowId': insert_result['rows'][1]['rowid']
-    }]
-    delete_rows(server_context, 'core', 'qcstate', cleanup_qcStates)
+    cleanup_qc_states= [
+        {'rowId': insert_result['rows'][0]['rowid']},
+        {'rowId': insert_result['rows'][1]['rowid']},
+    ]
+    delete_rows(server_context, 'core', 'qcstate', cleanup_qc_states)
 
 
 def test_select_rows(server_context):
@@ -123,47 +113,47 @@ def test_create_duplicate_dataset(server_context, dataset):
     assert e.value.message == f'\'500: A Dataset or Query already exists with the name "{QUERY_NAME}".\''
 
 
-def test_create_qcstate_definition(server_context, qcstates):
-    assert qcstates['rowsAffected'] == 2
-    assert qcstates['rows'][0]['label'] == 'needs verification'
-    assert qcstates['rows'][1]['label'] == 'approved'
+def test_create_qc_state_definition(server_context, qc_states):
+    assert qc_states['rowsAffected'] == 2
+    assert qc_states['rows'][0]['label'] == 'needs verification'
+    assert qc_states['rows'][1]['label'] == 'approved'
 
 
-def test_update_qcstate_definition(server_context, qcstates, study):
+def test_update_qc_state_definition(server_context, qc_states, study):
     new_description = 'for sure that is not right'
-    edit_rowid = qcstates['rows'][0]['rowid']
-    assert qcstates['rows'][0]['description'] != new_description
-    to_edit_row = [{'rowid': edit_rowid,
-                    'description': new_description}]
+    edit_rowid = qc_states['rows'][0]['rowid']
+    assert qc_states['rows'][0]['description'] != new_description
+    to_edit_row = [{'rowid': edit_rowid, 'description': new_description}]
     update_response = update_rows(server_context, 'core', 'qcstate', to_edit_row)
     assert update_response['rowsAffected'] == 1
     assert update_response['rows'][0]['description'] == new_description
 
 
-def test_insert_duplicate_labeled_qcstate_produces_error(server_context, qcstates, study):
+def test_insert_duplicate_labeled_qc_state_produces_error(server_context, qc_states, study):
     with pytest.raises(ServerContextError) as e:
-        dupe_qcstate = [{
-            'label': 'needs verification',
-            'publicData': 'false'
-        }]
-        insert_rows(server_context, 'core', 'qcstate', dupe_qcstate)
+        dupe_qc_state = [{'label': 'needs verification', 'publicData': 'false'}]
+        insert_rows(server_context, 'core', 'qcstate', dupe_qc_state)
+    
     assert "500: ERROR: duplicate key value violates unique constraint" in e.value.message
 
 
-def test_cannot_delete_qcstate_in_use(server_context, qcstates, study, dataset):
-    qcstate_rowid = qcstates['rows'][0]['rowid']
-    new_row = [{'ParticipantId': '2',
-                'vitd': 4,
-                'SequenceNum': '345',
-                'QCState': qcstate_rowid}]
+def test_cannot_delete_qc_state_in_use(server_context, qc_states, study, dataset):
+    qc_state_rowid = qc_states['rows'][0]['rowid']
+    new_row = [{
+        'ParticipantId': '2',
+        'vitd': 4,
+        'SequenceNum': '345',
+        'QCState': qc_state_rowid
+    }]
     insert_result = insert_rows(server_context, SCHEMA_NAME, QUERY_NAME, new_row)
     inserted_lsid = insert_result['rows'][0]['lsid']
     assert insert_result['rowsAffected'] == 1
-    assert insert_result['rows'][0]['QCState'] == qcstate_rowid
+    assert insert_result['rows'][0]['QCState'] == qc_state_rowid
 
     with pytest.raises(ServerContextError) as e:
-        qcstate_to_delete = [{'rowid': qcstate_rowid}]
-        delete_rows(server_context, 'core', 'qcstate', qcstate_to_delete)
+        qc_state_to_delete = [{'rowid': qc_state_rowid}]
+        delete_rows(server_context, 'core', 'qcstate', qc_state_to_delete)
+
     assert  e.value.message == '"400: QC state \'needs verification\' cannot be deleted as it is currently in use."'
     # now clean up/stop using it
     dataset_row_to_remove = [{'lsid': inserted_lsid}]
