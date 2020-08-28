@@ -30,9 +30,9 @@ assay_id = 310  # provide one from your server
 ###################
 
 # Generate the Run object(s)
-runTest = Run()
-runTest.name = 'python upload'
-runTest.data_rows = [{
+run_test = Run()
+run_test.name = 'python upload'
+run_test.data_rows = [{
     # ColumnName: Value
     'ParticipantId' : '1234',
     'VisitId' : 111,
@@ -47,11 +47,12 @@ runTest.data_rows = [{
     'WellLocation' : 'F12'
 }]
 
-# Assays that are configured for plate support have a required run property for the plate template, this is the plate template lsid
-runTest.properties['PlateTemplate'] = 'urn:lsid:labkey.com:PlateTemplate.Folder-6:d8bbec7d-34cd-1038-bd67-b3bd777822f8'
+# Assays that are configured for plate support have a required run property for the plate template, this is the plate
+# template lsid
+run_test.properties['PlateTemplate'] = 'urn:lsid:labkey.com:PlateTemplate.Folder-6:d8bbec7d-34cd-1038-bd67-b3bd777822f8'
 
 # The assay plate metadata is a specially formatted JSON object to map properties to the well groups
-runTest.plate_metadata = {
+run_test.plate_metadata = {
     'control' : {
       'positive' : {'dilution':  0.005},
       'negative' : {'dilution':  1.0}
@@ -66,7 +67,7 @@ runTest.plate_metadata = {
 
 # Generate the Batch object(s)
 batch = Batch()
-batch.runs = [runTest]
+batch.runs = [run_test]
 batch.name = 'python batch'
 batch.properties['PropertyName'] = 'Property Value'
 

@@ -19,34 +19,34 @@ sampleset_domain_definition = {
         'fields': [{
           'name': "Name", 
           'rangeURI': "string"
-        },{
+        }, {
           'name': "volume_mL", 
           'rangeURI': "int"
-        },{
+        }, {
           'name': "Project",
           'rangeURI': "string"
-        },{
+        }, {
           'name': "DrawDate",
           'rangeURI': "dateTime"
-        },{
+        }, {
           'name': "ReceivedDate",
           'rangeURI': "dateTime"
-        },{
+        }, {
           'name': "ReceivedFrom",
           'rangeURI': "string"
-        },{
+        }, {
           'name': "ReceivingOperator",
           'rangeURI': "string"
-        },{
+        }, {
           'name': "TubeColor",
           'rangeURI': "string"
-        },{
+        }, {
           'name': "TubeType",
           'rangeURI': "string"
-        },{
+        }, {
           'name': "ProblemWithTube",
           'rangeURI': "boolean"
-        },{
+        }, {
           'name': "Comments",
           'rangeURI': "string"
         }]

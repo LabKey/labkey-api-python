@@ -1,2 +1,3 @@
 include *.txt
+include pytest.ini
 recursive-include docs *.txt

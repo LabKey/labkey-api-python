@@ -27,10 +27,9 @@ from labkey.utils import create_server_context
 def mock_server_context(mock_action):
     # mock the CSRF token
     with mock.patch('labkey.utils.requests.sessions.Session.get') as mock_get:
-
         mock_get.return_value = mock_action.get_csrf_response()
         return create_server_context(mock_action.server_name, mock_action.project_path, mock_action.context_path,
-                                     api_key=mock_action.api_key)
+                                     api_key=mock_action.api_key, disable_csrf=True)
 
 
 def success_test(test, expected_response, api_method, compare_response, *args, **expected_kwargs):
