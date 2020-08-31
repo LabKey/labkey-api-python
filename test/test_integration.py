@@ -3,6 +3,7 @@ from configparser import ConfigParser
 
 import pytest
 
+from labkey.domain import conditional_format
 from labkey.exceptions import ServerContextError
 from labkey.utils import create_server_context
 from labkey.query import delete_rows, insert_rows, select_rows, update_rows
@@ -30,6 +31,35 @@ TEST_QC_STATES = [
     {'label': 'needs verification', 'description': 'that can not be right', 'publicData': False},
     {'label': 'approved', 'publicData': True},
 ]
+
+LISTS_SCHEMA = 'lists'
+LIST_NAME = 'testlist'
+CONDITIONAL_FORMAT = [{
+               'filter': 'format.column~gte=25',
+               'textcolor': 'ff0000',
+               'backgroundcolor': 'ffffff',
+               'bold' : True,
+               'italic' : False,
+               'strikethrough' : False
+           }]
+LIST_DEFINITION ={
+   'kind': 'IntList',
+   'domainDesign': {
+       'name': LIST_NAME,
+       'fields': [{
+           'name': 'rowId',
+           'rangeURI': 'int'
+       }, {
+           'name': 'formatted',
+           'rangeURI': 'int',
+           'conditionalFormats': CONDITIONAL_FORMAT
+       }]
+   },
+   'options': {
+       'keyName': 'rowId',
+       'keyType': 'AutoIncrementInteger'
+   }
+}
 
 
 @pytest.fixture(scope='session')
@@ -64,6 +94,7 @@ def server_context_vars():
 def project(server_context_vars):
     server, context_path = server_context_vars
     context = create_server_context(server, '', context_path, use_ssl=False)
+    container.delete(context, PROJECT_NAME)
     project_ = container.create(context, PROJECT_NAME, folderType='study')
     yield project_
     container.delete(context, PROJECT_NAME)
@@ -125,6 +156,15 @@ def qc_states(server_context, study):
         {'rowId': insert_result['rows'][1]['rowid']},
     ]
     delete_rows(server_context, 'core', 'qcstate', cleanup_qc_states)
+
+
+@pytest.fixture(scope="function")
+def create_list(server_context, project):
+    domain.create(server_context, LIST_DEFINITION)
+    created_list = domain.get(server_context, LISTS_SCHEMA, LIST_NAME)
+    yield created_list
+    #clean up
+    domain.drop(server_context, LISTS_SCHEMA, LIST_NAME)
 
 
 def test_select_rows(server_context):
@@ -194,3 +234,23 @@ def test_cannot_delete_qc_state_in_use(server_context, qc_states, study, dataset
     # now clean up/stop using it
     dataset_row_to_remove = [{'lsid': inserted_lsid}]
     delete_rows(server_context, SCHEMA_NAME, QUERY_NAME, dataset_row_to_remove)
+
+
+def test_add_conditional_format(server_context, project, create_list):
+    new_conditional_format = conditional_format(
+               query_filter='format.column~lte=7',
+               text_color='ff0055',
+               background_color='ffffff',
+               bold=True,
+               italic=False,
+               strike_through=False
+           )
+    for field in create_list.fields:
+        if field.name == 'formatted':
+            field.conditional_formats.append(new_conditional_format)
+    domain.save(server_context, LISTS_SCHEMA, LIST_NAME, create_list)
+    saved_domain = domain.get(server_context, LISTS_SCHEMA, LIST_NAME)
+
+    for field in saved_domain.fields:
+        if field.name == "formatted":
+            assert field.conditional_formats.__len__() == 2
