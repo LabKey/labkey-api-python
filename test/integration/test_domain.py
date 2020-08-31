@@ -9,11 +9,11 @@ CONDITIONAL_FORMAT = [{
     'filter': 'format.column~gte=25',
     'textcolor': 'ff0000',
     'backgroundcolor': 'ffffff',
-    'bold' : True,
-    'italic' : False,
-    'strikethrough' : False
+    'bold': True,
+    'italic': False,
+    'strikethrough': False
 }]
-LIST_DEFINITION ={
+LIST_DEFINITION = {
     'kind': 'IntList',
     'domainDesign': {
         'name': LIST_NAME,
@@ -72,3 +72,18 @@ def test_remove_conditional_format(server_context, list_fixture):
     for field in saved_domain.fields:
         if field.name == "formatted":
             assert field.conditional_formats.__len__() == 0
+
+
+def test_update_conditional_format(server_context, list_fixture):
+    from labkey.query import QueryFilter
+    new_filter = QueryFilter('formatted', 15, QueryFilter.Types.GREATER_THAN_OR_EQUAL)
+    for field in list_fixture.fields:
+        if field.name == 'formatted':
+            field.conditional_formats[0].filter = new_filter
+
+    save(server_context, LISTS_SCHEMA, LIST_NAME, list_fixture)
+    saved_domain = get(server_context, LISTS_SCHEMA, LIST_NAME)
+
+    for field in list_fixture.fields:
+        if field.name == 'formatted':
+            assert field.conditional_formats[0].filter == new_filter
