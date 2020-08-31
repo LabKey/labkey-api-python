@@ -94,7 +94,7 @@ def server_context_vars():
 def project(server_context_vars):
     server, context_path = server_context_vars
     context = create_server_context(server, '', context_path, use_ssl=False)
-    container.delete(context, PROJECT_NAME)
+    #container.delete(context, PROJECT_NAME)
     project_ = container.create(context, PROJECT_NAME, folderType='study')
     yield project_
     container.delete(context, PROJECT_NAME)
@@ -254,3 +254,15 @@ def test_add_conditional_format(server_context, project, create_list):
     for field in saved_domain.fields:
         if field.name == "formatted":
             assert field.conditional_formats.__len__() == 2
+
+
+def test_remove_conditional_format(server_context, project, create_list):
+    for field in create_list.fields:
+        if field.name == 'formatted':
+            field.conditional_formats = []
+    domain.save(server_context, LISTS_SCHEMA, LIST_NAME, create_list)
+    saved_domain = domain.get(server_context, LISTS_SCHEMA, LIST_NAME)
+
+    for field in saved_domain.fields:
+        if field.name == "formatted":
+            assert field.conditional_formats.__len__() == 0
