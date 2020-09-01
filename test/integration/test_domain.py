@@ -1,4 +1,5 @@
 import pytest
+from labkey.query import QueryFilter
 
 from labkey.domain import conditional_format, create, drop, get, save
 
@@ -13,6 +14,11 @@ CONDITIONAL_FORMAT = [{
     'italic': False,
     'strikethrough': False
 }]
+SERIALIZED_QUERY_FILTER = QueryFilter('formatted', 35, QueryFilter.Types.LESS_THAN)
+SERIALIZED_CONDITIONAL_FORMAT = conditional_format(
+    query_filter=SERIALIZED_QUERY_FILTER,
+    bold=False, text_color="ffff00"
+)
 LIST_DEFINITION = {
     'kind': 'IntList',
     'domainDesign': {
@@ -74,6 +80,7 @@ def test_remove_conditional_format(server_context, list_fixture):
             assert field.conditional_formats.__len__() == 0
 
 
+@pytest.mark.xfail
 def test_update_conditional_format_serialize_filter(server_context, list_fixture):
     from labkey.query import QueryFilter
     new_filter = QueryFilter('formatted', 15, QueryFilter.Types.GREATER_THAN_OR_EQUAL)
@@ -101,3 +108,38 @@ def test_update_conditional_format_plain_text(server_context, list_fixture):
     for field in saved_domain.fields:
         if field.name == 'formatted':
             assert field.conditional_formats[0].filter == new_filter
+
+
+def test_create_list_with_conditionalFormattedField(server_context):
+    composed_list_definition = {
+        'kind': 'IntList',
+        'domainDesign': {
+            'name': 'composed_list_name',
+            'fields': [{
+                'name': 'rowId',
+                'rangeURI': 'int'
+            }, {
+                'name': 'formatted',
+                'rangeURI': 'int',
+                'conditionalFormats': [SERIALIZED_CONDITIONAL_FORMAT,
+                    {'filter': 'format.column~gte=25',
+                    'textcolor': 'ff0000',
+                    'backgroundcolor': 'ffffff',
+                    'bold': True,
+                    'italic': False,
+                    'strikethrough': False
+                    }]
+                }]
+            },
+            'options': {
+                'keyName': 'rowId',
+                'keyType': 'AutoIncrementInteger'
+            }
+        }
+    create(server_context, composed_list_definition)
+    created_list = get(server_context, LISTS_SCHEMA, 'composed_list_name')
+    for field in created_list.fields:
+        if field.name == 'formatted':
+            assert field.conditional_formats.__len__() == 2
+
+    drop(server_context, LISTS_SCHEMA, 'composed_list_name')
