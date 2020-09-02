@@ -1,5 +1,4 @@
 import pytest
-from labkey.exceptions import ServerContextError
 
 from labkey.query import QueryFilter
 
@@ -113,18 +112,18 @@ def test_add_malformed_query_filter(server_context, list_fixture):
 
     for field in saved_domain.fields:
         if field.name == "formatted":
-            assert field.conditional_formats[0].filter != 'this-is-a-badly-formed-filter', "api should discard meaningless filters"
+            assert field.conditional_formats[0].filter != 'this-is-a-badly-formed-filter', \
+                "api should discard meaningless filters"
 
 
 def test_add_conditional_format_with_missing_filter(server_context, list_fixture):
     missing_filter_type_filter = QueryFilter('formatted', 13)
     new_conditional_format = conditional_format(query_filter=missing_filter_type_filter,
-        text_color='ff0055',
-        background_color='ffffff',
-        bold=True,
-        italic=False,
-        strike_through=False
-    )
+                                                text_color='ff0055',
+                                                background_color='ffffff',
+                                                bold=True,
+                                                italic=False,
+                                                strike_through=False)
     for field in list_fixture.fields:
         if field.name == 'formatted':
             field.conditional_formats = []
@@ -180,7 +179,7 @@ def test_update_conditional_format_plain_text(server_context, list_fixture):
             assert field.conditional_formats[0].filter == new_filter
 
 
-def test_create_list_with_conditionalFormattedField(server_context):
+def test_create_list_with_conditional_formatted_field(server_context):
     composed_list_definition = {
         'kind': 'IntList',
         'domainDesign': {
@@ -192,20 +191,20 @@ def test_create_list_with_conditionalFormattedField(server_context):
                 'name': 'formatted',
                 'rangeURI': 'int',
                 'conditionalFormats': [SERIALIZED_CONDITIONAL_FORMAT,
-                    {'filter': 'format.column~gte=25',
-                    'textcolor': 'ff0000',
-                    'backgroundcolor': 'ffffff',
-                    'bold': True,
-                    'italic': False,
-                    'strikethrough': False
-                    }]
-                }]
-            },
-            'options': {
-                'keyName': 'rowId',
-                'keyType': 'AutoIncrementInteger'
-            }
+                                       {'filter': 'format.column~gte=25',
+                                        'textcolor': 'ff0000',
+                                        'backgroundcolor': 'ffffff',
+                                        'bold': True,
+                                        'italic': False,
+                                        'strikethrough': False
+                                        }]
+            }]
+        },
+        'options': {
+            'keyName': 'rowId',
+            'keyType': 'AutoIncrementInteger'
         }
+    }
     create(server_context, composed_list_definition)
     created_list = get(server_context, LISTS_SCHEMA, 'composed_list_name')
     for field in created_list.fields:
