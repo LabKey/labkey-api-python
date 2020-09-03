@@ -85,7 +85,6 @@ def test_create_dataset(dataset):
 def test_create_duplicate_dataset(server_context, dataset):
     # Dataset fixture is not used directly here, but it is an argument so it gets created and cleaned up when this test
     # runs
-
     with pytest.raises(ServerContextError) as e:
         domain.create(server_context, DATASET_DOMAIN)
 

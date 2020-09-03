@@ -60,7 +60,6 @@ def project(server_context_vars):
     context = create_server_context(server, '', context_path, use_ssl=False)
 
     try:
-
         container.delete(context, PROJECT_NAME)
     except QueryNotFoundError:
         # The project may not exist, and that is ok.
