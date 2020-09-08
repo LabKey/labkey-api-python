@@ -1,18 +1,11 @@
-import os
-from configparser import ConfigParser
-
 import pytest
 
 from labkey.exceptions import ServerContextError
-from labkey.utils import create_server_context
 from labkey.query import delete_rows, insert_rows, select_rows, update_rows
-from labkey import domain, container
+from labkey import domain
+
 
 pytestmark = pytest.mark.integration  # Mark all tests in this module as integration tests
-DEFAULT_HOST = 'localhost'
-DEFAULT_PORT = '8080'
-DEFAULT_CONTEXT_PATH = 'labkey'
-PROJECT_NAME = 'PythonIntegrationTests'
 STUDY_NAME = 'TestStudy'
 SCHEMA_NAME = 'study'
 QUERY_NAME = 'KrankenLevel'
@@ -30,56 +23,6 @@ TEST_QC_STATES = [
     {'label': 'needs verification', 'description': 'that can not be right', 'publicData': False},
     {'label': 'approved', 'publicData': True},
 ]
-
-
-@pytest.fixture(scope='session')
-def server_context_vars():
-    properties_file_path = os.getenv('TEAMCITY_BUILD_PROPERTIES_FILE')
-    host = DEFAULT_HOST
-    port = DEFAULT_PORT
-    context_path = DEFAULT_CONTEXT_PATH
-
-    if properties_file_path is not None:
-        with open(properties_file_path) as f:
-            contents = f.read()
-            # .properties files are ini files without any sections, so we need to inject one
-            contents = '[config]\n' + contents
-            parser = ConfigParser()
-            parser.read_string(contents)
-            parsed_config = parser['config']
-            host = parsed_config.get('labkey.server', DEFAULT_HOST)
-            port = parsed_config.get('tomcat.port', DEFAULT_PORT)
-            context_path = parsed_config.get('labkey.contextpath', DEFAULT_CONTEXT_PATH)
-
-            if host.startswith('http://'):
-                host = host.replace('http://', '')
-
-            if context_path.startswith('/'):
-                context_path = context_path[1:]
-
-    return f'{host}:{port}', context_path
-
-
-@pytest.fixture(autouse=True, scope="session")
-def project(server_context_vars):
-    server, context_path = server_context_vars
-    context = create_server_context(server, '', context_path, use_ssl=False)
-    project_ = container.create(context, PROJECT_NAME, folderType='study')
-    yield project_
-    container.delete(context, PROJECT_NAME)
-
-
-@pytest.fixture(scope="session")
-def server_context(server_context_vars):
-    """
-    Use this fixture by adding an argument called "server_context" to your test function. It assumes you have a server
-    running at localhost:8080, a project name "PythonIntegrationTest", and a context path of "labkey". You will need
-    a netrc file configured with a valid username and password in order for API requests to work.
-
-    :return: ServerContext
-    """
-    server, context_path = server_context_vars
-    return create_server_context(server, PROJECT_NAME, context_path, use_ssl=False)
 
 
 @pytest.fixture(scope="session")
@@ -142,7 +85,6 @@ def test_create_dataset(dataset):
 def test_create_duplicate_dataset(server_context, dataset):
     # Dataset fixture is not used directly here, but it is an argument so it gets created and cleaned up when this test
     # runs
-
     with pytest.raises(ServerContextError) as e:
         domain.create(server_context, DATASET_DOMAIN)
 
@@ -169,7 +111,7 @@ def test_insert_duplicate_labeled_qc_state_produces_error(server_context, qc_sta
     with pytest.raises(ServerContextError) as e:
         dupe_qc_state = [{'label': 'needs verification', 'publicData': 'false'}]
         insert_rows(server_context, 'core', 'qcstate', dupe_qc_state)
-    
+
     assert "500: ERROR: duplicate key value violates unique constraint" in e.value.message
 
 

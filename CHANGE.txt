@@ -2,6 +2,16 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 1.4.1 package
+==============================
+
+*Release date: 09/08/2020*
+
+- Add integration tests
+- NOTE: The next planned release will be 2.0.0 and is expected to drop support for Python 2.x, we plan to introduce
+code that will only be compatible with Python 3.6 and beyond. Python 2.x is no longer supported by the PSF as of
+January 1st, 2020.
+
 What's New in the LabKey 1.4.0 package
 ==============================
 
