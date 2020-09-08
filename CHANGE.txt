@@ -5,7 +5,7 @@ LabKey Python Client API News
 What's New in the LabKey 1.4.1 package
 ==============================
 
-*Release date: 09/03/2020*
+*Release date: 09/08/2020*
 
 - Add integration tests
 - NOTE: The next planned release will be 2.0.0 and is expected to drop support for Python 2.x, we plan to introduce
