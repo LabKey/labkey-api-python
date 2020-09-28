@@ -20,26 +20,37 @@ Sample data from the New Study tutorial on labkey.org:
     https://www.labkey.org/Documentation/wiki-page.view?name=studySetupManual
 
 """
-from __future__ import unicode_literals
-
 from labkey.utils import create_server_context
-from labkey.exceptions import RequestError, QueryNotFoundError, ServerContextError, ServerNotFoundError
-from labkey.query import select_rows, update_rows, Pagination, QueryFilter, \
-    insert_rows, delete_rows, truncate_table, execute_sql
+from labkey.exceptions import (
+    RequestError,
+    QueryNotFoundError,
+    ServerContextError,
+    ServerNotFoundError,
+)
+from labkey.query import (
+    select_rows,
+    update_rows,
+    Pagination,
+    QueryFilter,
+    insert_rows,
+    delete_rows,
+    truncate_table,
+    execute_sql,
+)
 from requests.exceptions import Timeout
 
 import copy
 
 print("Create a server context")
-labkey_server = 'localhost:8080'
-project_name = 'ModuleAssayTest'  # Project folder name
-context_path = 'labkey'
+labkey_server = "localhost:8080"
+project_name = "ModuleAssayTest"  # Project folder name
+context_path = "labkey"
 server_context = create_server_context(labkey_server, project_name, context_path, use_ssl=False)
 
-schema = 'lists'
-table = 'Demographics'
-column1 = 'Group Assignment'
-column2 = 'Participant ID'
+schema = "lists"
+table = "Demographics"
+column1 = "Group Assignment"
+column2 = "Participant ID"
 
 
 ###################
@@ -47,10 +58,10 @@ column2 = 'Participant ID'
 ###################
 result = select_rows(server_context, schema, table)
 if result is not None:
-    print(result['rows'][0])
-    print("select_rows: There are " + str(result['rowCount']) + " rows.")
+    print(result["rows"][0])
+    print("select_rows: There are " + str(result["rowCount"]) + " rows.")
 else:
-    print('select_rows: Failed to load results from ' + schema + '.' + table)
+    print("select_rows: Failed to load results from " + schema + "." + table)
 
 
 ###################
@@ -58,24 +69,24 @@ else:
 ###################
 # catch base error
 try:
-    result = select_rows(server_context, schema, 'badtable')
+    result = select_rows(server_context, schema, "badtable")
     print(result)
 except RequestError:
-    print('Caught base error')
+    print("Caught base error")
 
 # catch table not found error
 try:
-    result = select_rows(server_context, schema, 'badtable')
+    result = select_rows(server_context, schema, "badtable")
     print(result)
 except QueryNotFoundError:
-    print('Caught bad table')
+    print("Caught bad table")
 
 # catch schema error
 try:
-    result = select_rows(server_context, 'badSchema', table)
+    result = select_rows(server_context, "badSchema", table)
     print(result)
 except QueryNotFoundError:
-    print('Caught bad schema')
+    print("Caught bad schema")
 
 # catch SSL error
 ssl_server_context = create_server_context(labkey_server, project_name, context_path, use_ssl=True)
@@ -83,110 +94,125 @@ try:
     result = select_rows(ssl_server_context, schema, table)
     print(result)
 except ServerContextError:
-    print('Caught SSL Error')
+    print("Caught SSL Error")
 
 
 # catch bad context path
-bad_server_context = create_server_context(labkey_server, project_name, '', use_ssl=False)
+bad_server_context = create_server_context(labkey_server, project_name, "", use_ssl=False)
 try:
     result = select_rows(bad_server_context, schema, table)
     print(result)
 except ServerNotFoundError:
-    print('Caught context path')
+    print("Caught context path")
 
 # catch bad folder path error
-bad_server_context = create_server_context(labkey_server, 'bad_project_name', context_path, use_ssl=False)
+bad_server_context = create_server_context(
+    labkey_server, "bad_project_name", context_path, use_ssl=False
+)
 try:
     result = select_rows(bad_server_context, schema, table)
     print(result)
 except ServerNotFoundError:
-    print('Caught bad folder name')
+    print("Caught bad folder name")
 
 
 ###################
 # Test some parameters of select_rows
 ###################
-result = select_rows(server_context, schema, table,
-                     max_rows=5, offset=10, include_total_count=True, include_details_column=True,
-                     include_update_column=True)  # , required_version=12.2)
+result = select_rows(
+    server_context,
+    schema,
+    table,
+    max_rows=5,
+    offset=10,
+    include_total_count=True,
+    include_details_column=True,
+    include_update_column=True,
+)  # , required_version=12.2)
 if result is not None:
-    print('select_rows: There are ' + str(len(result['rows'])) + ' rows.')
-    print('select_rows: There are ' + str(result['rowCount']) + ' total rows.')
-    print('select_rows: Response API version [' + str(result['formatVersion']) + '].')
+    print("select_rows: There are " + str(len(result["rows"])) + " rows.")
+    print("select_rows: There are " + str(result["rowCount"]) + " total rows.")
+    print("select_rows: Response API version [" + str(result["formatVersion"]) + "].")
 
-    column_statement = 'select_rows: Included columns: '
-    for column in result['columnModel']:
-        column_statement = column_statement + ' ' + column['header'] + ', '
+    column_statement = "select_rows: Included columns: "
+    for column in result["columnModel"]:
+        column_statement = column_statement + " " + column["header"] + ", "
     print(column_statement)
 
-    row = result['rows'][0]
-    dataIndex = result['metaData']['id']
+    row = result["rows"][0]
+    dataIndex = result["metaData"]["id"]
     print("select_rows: The first row Key is: " + str(row[dataIndex]))
 else:
-    print('select_rows: Failed to load results from ' + schema + '.' + table)
+    print("select_rows: Failed to load results from " + schema + "." + table)
 
 
 ###################
 # Test get all results
 ###################
-result = select_rows(server_context, schema, table, show_rows=Pagination.ALL, include_total_count=True)
+result = select_rows(
+    server_context, schema, table, show_rows=Pagination.ALL, include_total_count=True
+)
 if result is not None:
-    print("select_rows: There are " + str(len(result['rows'])) + " rows.")
-    print('select_rows: There are ' + str(result['rowCount']) + ' total rows.')
+    print("select_rows: There are " + str(len(result["rows"])) + " rows.")
+    print("select_rows: There are " + str(result["rowCount"]) + " total rows.")
 else:
-    print('select_rows: Failed to load results from ' + schema + '.' + table)
+    print("select_rows: Failed to load results from " + schema + "." + table)
 
 
 ###################
 # Test sort and select columns
 ###################
-result = select_rows(server_context, schema, table, max_rows=5, offset=10, include_total_count=False,
-                     columns=",".join([column1, column2]),
-                     sort=column1 + ', -' + column2)  # use '-' to sort descending
+result = select_rows(
+    server_context,
+    schema,
+    table,
+    max_rows=5,
+    offset=10,
+    include_total_count=False,
+    columns=",".join([column1, column2]),
+    sort=column1 + ", -" + column2,
+)  # use '-' to sort descending
 if result is not None:
-    print('select_rows: There are ' + str(result['rowCount']) + ' rows.')
-    print('select_rows: ' + table)
-    for row in result['rows']:
-        print('\t' + str(row[column1]) + ', ' + str(row[column2]))
+    print("select_rows: There are " + str(result["rowCount"]) + " rows.")
+    print("select_rows: " + table)
+    for row in result["rows"]:
+        print("\t" + str(row[column1]) + ", " + str(row[column2]))
 else:
-    print('select_rows: Failed to load results from ' + schema + '.' + table)
+    print("select_rows: Failed to load results from " + schema + "." + table)
 
 
 ###################
 # Test basic filters
 ###################
 filters = [
-    QueryFilter(column1, 'Group 2: HIV-1 Negative'),
-    QueryFilter('Height (inches)', '50, 70', QueryFilter.Types.BETWEEN),
-    QueryFilter('Country', 'Germany;Uganda', QueryFilter.Types.IN),
-    ]
+    QueryFilter(column1, "Group 2: HIV-1 Negative"),
+    QueryFilter("Height (inches)", "50, 70", QueryFilter.Types.BETWEEN),
+    QueryFilter("Country", "Germany;Uganda", QueryFilter.Types.IN),
+]
 
 result = select_rows(server_context, schema, table, filter_array=filters)
 if result is not None:
-    print("select_rows: There are " + str(result['rowCount']) + " rows.")
+    print("select_rows: There are " + str(result["rowCount"]) + " rows.")
 else:
-    print('select_rows: Failed to load results from ' + schema + '.' + table)
+    print("select_rows: Failed to load results from " + schema + "." + table)
 
 
 ###################
 # Test update_rows
 ###################
-rows = result['rows']
+rows = result["rows"]
 test_row_idx = 1
 original_value = rows[test_row_idx]
-column3 = 'Country'
-test_row = {
-    'Key': original_value['Key'],
-    column3: 'Pangea'
-}
+column3 = "Country"
+test_row = {"Key": original_value["Key"], column3: "Pangea"}
 
-print('update_rows: original value [ ' + original_value[column3] + ' ]')
+print("update_rows: original value [ " + original_value[column3] + " ]")
 
 update_result = update_rows(server_context, schema, table, [test_row])
-print('update_rows: updated value [ ' + update_result['rows'][0][column3] + ' ]')
+print("update_rows: updated value [ " + update_result["rows"][0][column3] + " ]")
 
 update_result = update_rows(server_context, schema, table, [original_value])
-print('update_rows: reset value [ ' + update_result['rows'][0][column3] + ' ]')
+print("update_rows: reset value [ " + update_result["rows"][0][column3] + " ]")
 
 
 ###################
@@ -194,69 +220,69 @@ print('update_rows: reset value [ ' + update_result['rows'][0][column3] + ' ]')
 ###################
 test_row = copy.copy(original_value)
 
-test_row['Key'] = None
-test_row['Country'] = 'Antarctica'
+test_row["Key"] = None
+test_row["Country"] = "Antarctica"
 
 all_rows = select_rows(server_context, schema, table)
-print('Insert Rows: Initials row count [ ' + str(all_rows['rowCount']) + ' ]')
+print("Insert Rows: Initials row count [ " + str(all_rows["rowCount"]) + " ]")
 
 insert_result = insert_rows(server_context, schema, table, [test_row])
-print('Insert Rows: New rowId [ ' + str(insert_result['rows'][0]['Key']) + ' ]')
+print("Insert Rows: New rowId [ " + str(insert_result["rows"][0]["Key"]) + " ]")
 
 all_rows = select_rows(server_context, schema, table)
-print('Insert Rows: after row count [ ' + str(all_rows['rowCount']) + ' ]')
+print("Insert Rows: after row count [ " + str(all_rows["rowCount"]) + " ]")
 
-test_row = insert_result['rows'][0]
+test_row = insert_result["rows"][0]
 deleteResult = delete_rows(server_context, schema, table, [test_row])
-print('Delete Rows: deleted rowId [ ' + str(deleteResult['rows'][0]['Key']) + ' ]')
+print("Delete Rows: deleted rowId [ " + str(deleteResult["rows"][0]["Key"]) + " ]")
 
 all_rows = select_rows(server_context, schema, table)
-print('Delete Rows: after row count [ ' + str(all_rows['rowCount']) + ' ]')
+print("Delete Rows: after row count [ " + str(all_rows["rowCount"]) + " ]")
 
 
 ###################
 # Test truncate_table
 ###################
 truncate_info = truncate_table(server_context, schema, table)
-print('Delete all rows in table: [ ' + str(truncate_info['deletedRows']) + ' ] rows deleted')
+print("Delete all rows in table: [ " + str(truncate_info["deletedRows"]) + " ] rows deleted")
 
 
 ###################
 # Test execute_sql
 ###################
-sql = 'select * from lists.demographics'
+sql = "select * from lists.demographics"
 
 # base execute_sql
 sql_result = execute_sql(server_context, schema, sql)
 if sql_result is not None:
-    print("execute_sql: There are " + str(sql_result['rowCount']) + " rows.")
+    print("execute_sql: There are " + str(sql_result["rowCount"]) + " rows.")
 else:
-    print('execute_sql: Failed to load results from ' + schema + '.' + table)
+    print("execute_sql: Failed to load results from " + schema + "." + table)
 
 # paging
-sql_result = execute_sql(server_context, schema, sql, max_rows=5, offset=10,
-                         sort=(column1 + ', -' + column2))
+sql_result = execute_sql(
+    server_context, schema, sql, max_rows=5, offset=10, sort=(column1 + ", -" + column2)
+)
 if sql_result is not None:
-    print('execute_sql: There are ' + str(len(sql_result['rows'])) + ' rows.')
-    print('execute_sql: There are ' + str(sql_result['rowCount']) + ' total rows.')
-    print('execute_sql: ' + table)
-    for row in sql_result['rows']:
-        print('\t' + str(row[column1]) + ', ' + str(row[column2]))
+    print("execute_sql: There are " + str(len(sql_result["rows"])) + " rows.")
+    print("execute_sql: There are " + str(sql_result["rowCount"]) + " total rows.")
+    print("execute_sql: " + table)
+    for row in sql_result["rows"]:
+        print("\t" + str(row[column1]) + ", " + str(row[column2]))
 else:
-    print('execute_sql: Failed to load results from ' + schema + '.' + table)
+    print("execute_sql: Failed to load results from " + schema + "." + table)
 
 # Save query within the session
-sql_result = execute_sql(server_context, schema, sql, max_rows=5, offset=10,
-                         save_in_session=True)
-print('execute_sql: query saved as [ ' + sql_result['queryName'] + ' ]')
+sql_result = execute_sql(server_context, schema, sql, max_rows=5, offset=10, save_in_session=True)
+print("execute_sql: query saved as [ " + sql_result["queryName"] + " ]")
 
 
 # set timeout
 try:
     sql_result = execute_sql(server_context, schema, sql, timeout=0.001)
-    print('execute_sql did not timeout')
+    print("execute_sql did not timeout")
 except Timeout:
-    print('Caught Timeout')
+    print("Caught Timeout")
 
 
 ###################
@@ -264,35 +290,32 @@ except Timeout:
 ###################
 
 # Create new QC state definitions
-qc_states = [{
-       'label': 'needs verification',
-       'description': 'please look at this',
-       'publicData': False
-   }, {
-       'label': 'approved',
-       'publicData': True
-}]
-result = insert_rows(server_context, 'core', 'qcstate', qc_states)
-for row in result['rows']:
-    print('Created QC state: ' + row['label'])
+qc_states = [
+    {
+        "label": "needs verification",
+        "description": "please look at this",
+        "publicData": False,
+    },
+    {"label": "approved", "publicData": True},
+]
+result = insert_rows(server_context, "core", "qcstate", qc_states)
+for row in result["rows"]:
+    print("Created QC state: " + row["label"])
 
 result = select_rows(server_context, "core", "qcstate")
 
 # Update a QC state definitions
-original_value = result['rows'][1]
-test_row = {
-    'RowId': original_value['RowId'],
-    'label': 'Updated Label'
-}
+original_value = result["rows"][1]
+test_row = {"RowId": original_value["RowId"], "label": "Updated Label"}
 update_result = update_rows(server_context, "core", "qcstate", [test_row])
-print('Updated label: approved -> ' + update_result['rows'][0]['label'])
+print("Updated label: approved -> " + update_result["rows"][0]["label"])
 
 # Delete all unused QC state definitions
-result = select_rows(server_context, 'core', 'qcstate')
+result = select_rows(server_context, "core", "qcstate")
 
-for row in result['rows']:
-    print('Deleting QC state: ' + row['Label'])
+for row in result["rows"]:
+    print("Deleting QC state: " + row["Label"])
     try:
-        delete_rows(server_context, 'core', 'qcstate', [row])
+        delete_rows(server_context, "core", "qcstate", [row])
     except ServerContextError as e:
         print(e.message)

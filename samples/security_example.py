@@ -13,23 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from __future__ import unicode_literals
-
 from labkey.exceptions import ServerNotFoundError
-from labkey.security import create_user, delete_users, deactivate_users, add_to_group, add_to_role, \
-     reset_password, get_user_by_email, get_roles
+from labkey.security import (
+    create_user,
+    delete_users,
+    deactivate_users,
+    add_to_group,
+    add_to_role,
+    reset_password,
+    get_user_by_email,
+    get_roles,
+)
 from labkey.utils import create_server_context
 
-labkey_server = 'localhost:8080'
-project_name = 'Home'  # Project folder name
-contextPath = 'labkey'
+labkey_server = "localhost:8080"
+project_name = "Home"  # Project folder name
+contextPath = "labkey"
 server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=False)
 
 
 ###############
 # add User
 ###############
-new_user_email = 'demo@labkey.com'
+new_user_email = "demo@labkey.com"
 
 result = create_user(server_context, new_user_email)
 if result is not None:
@@ -57,7 +63,7 @@ else:
 ###############
 # reset User's password
 ###############
-new_user_id = result['userId']
+new_user_id = result["userId"]
 result = reset_password(server_context, new_user_email)
 if result is not None:
     print(result)
@@ -79,8 +85,8 @@ else:
     exit()
 
 author_role = None
-for role in result['roles']:
-    if role['name'] == 'Author':
+for role in result["roles"]:
+    if role["name"] == "Author":
         author_role = role
 
 try:
@@ -101,7 +107,9 @@ else:
 site_group_id = -1  # This needs to be the ID of a Project Group within the project specified above
 
 if site_group_id == -1:
-    print("NOTE: To successfully complete this sample code a 'site_group_id' must be set in the file.")
+    print(
+        "NOTE: To successfully complete this sample code a 'site_group_id' must be set in the file."
+    )
     exit()
 
 result = add_to_group(server_context, new_user_id, site_group_id)
@@ -132,5 +140,3 @@ if result is not None:
 else:
     print("Delete user: no results returned")
     exit()
-
-

@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from __future__ import unicode_literals
 import unittest
 
 from labkey import utils
@@ -23,67 +22,71 @@ from .utilities import MockLabKey, mock_server_context, success_test
 
 
 class MockPostMessage(MockLabKey):
-    api = 'insert.api'
-    default_action = 'announcements'
+    api = "insert.api"
+    default_action = "announcements"
 
 
 class MockUpdateWiki(MockLabKey):
-    api = 'editWiki.api'
-    default_action = 'wiki'
-    default_success_body = '<h1>Some wiki content</h1>'
+    api = "editWiki.api"
+    default_action = "wiki"
+    default_success_body = "<h1>Some wiki content</h1>"
 
 
 class TestPostMessage(unittest.TestCase):
-
     def setUp(self):
 
-        message_title = 'Test Insert Message'
-        message_body = 'The body of the message'
-        render_as = 'HTML'
+        message_title = "Test Insert Message"
+        message_body = "The body of the message"
+        render_as = "HTML"
 
         expected_content = {
-            'body': message_body,
-            'title': message_title,
-            'rendererType': render_as
+            "body": message_body,
+            "title": message_title,
+            "rendererType": render_as,
         }
 
         self.service = MockPostMessage()
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()],
-            'data': expected_content,
-            'headers': None,
-            'timeout': 300
+            "expected_args": [self.service.get_server_url()],
+            "data": expected_content,
+            "headers": None,
+            "timeout": 300,
         }
 
         self.args = [
-            mock_server_context(self.service), message_title, message_body, render_as
+            mock_server_context(self.service),
+            message_title,
+            message_body,
+            render_as,
         ]
 
     def test_success(self):
-        success_test(self, self.service.get_successful_response(), messageboard.post_message, False,
-                     *self.args, **self.expected_kwargs)
+        success_test(
+            self,
+            self.service.get_successful_response(),
+            messageboard.post_message,
+            False,
+            *self.args,
+            **self.expected_kwargs
+        )
 
 
 class TestUpdateWiki(unittest.TestCase):
     def setUp(self):
 
-        wiki_name = 'WikiToUpdate'
-        wiki_body = 'Updated wiki body'
+        wiki_name = "WikiToUpdate"
+        wiki_body = "Updated wiki body"
 
         self.service = MockUpdateWiki()
         self.expected_kwargs = {
-            'expected_args': [
+            "expected_args": [
                 self.service.get_server_url(),
             ],
-            'headers': {'Content-type': 'application/json'},
-            'params': {
-                'name': wiki_name
-            }
+            "headers": {"Content-type": "application/json"},
+            "params": {"name": wiki_name},
         }
 
-        self.args = [
-            mock_server_context(self.service), wiki_name, wiki_body
-        ]
+        self.args = [mock_server_context(self.service), wiki_name, wiki_body]
 
     # TODO: Enable this test after update wiki is modified to only issue one request
     # def test_success(self):
@@ -93,12 +96,9 @@ class TestUpdateWiki(unittest.TestCase):
 
 def suite():
     load_tests = unittest.TestLoader().loadTestsFromTestCase
-    return unittest.TestSuite([
-        load_tests(TestPostMessage),
-        load_tests(TestUpdateWiki)
-    ])
+    return unittest.TestSuite([load_tests(TestPostMessage), load_tests(TestUpdateWiki)])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     utils.DISABLE_CSRF_CHECK = True
     unittest.main()

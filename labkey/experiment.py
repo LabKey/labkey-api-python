@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from __future__ import unicode_literals
-
 from labkey.utils import json_dumps, ServerContext
 
 
@@ -28,22 +26,18 @@ def load_batch(server_context, assay_id, batch_id):
     :param batch_id:
     :return:
     """
-    load_batch_url = server_context.build_url('assay', 'getAssayBatch.api')
+    load_batch_url = server_context.build_url("assay", "getAssayBatch.api")
     loaded_batch = None
 
-    payload = {
-        'assayId': assay_id,
-        'batchId': batch_id
-    }
+    payload = {"assayId": assay_id, "batchId": batch_id}
 
-    headers = {
-        'Content-type': 'application/json',
-        'Accept': 'text/plain'
-    }
+    headers = {"Content-type": "application/json", "Accept": "text/plain"}
 
-    json_body = server_context.make_request(load_batch_url, json_dumps(payload, sort_keys=True), headers=headers)
+    json_body = server_context.make_request(
+        load_batch_url, json_dumps(payload, sort_keys=True), headers=headers
+    )
     if json_body is not None:
-        loaded_batch = Batch.from_data(json_body['batch'])
+        loaded_batch = Batch.from_data(json_body["batch"])
 
     return loaded_batch
 
@@ -73,7 +67,7 @@ def save_batches(server_context, assay_id, batches):
     :param batches: The Batch(es) to save.
     :return:
     """
-    save_batch_url = server_context.build_url('assay', 'saveAssayBatch.api')
+    save_batch_url = server_context.build_url("assay", "saveAssayBatch.api")
     json_batches = []
 
     if batches is None:
@@ -85,18 +79,14 @@ def save_batches(server_context, assay_id, batches):
         else:
             raise Exception('save_batch() "batches" expected to be a set Batch instances')
 
-    payload = {
-        'assayId': assay_id,
-        'batches': json_batches
-    }
-    headers = {
-        'Content-type': 'application/json',
-        'Accept': 'text/plain'
-    }
+    payload = {"assayId": assay_id, "batches": json_batches}
+    headers = {"Content-type": "application/json", "Accept": "text/plain"}
 
-    json_body = server_context.make_request(save_batch_url, json_dumps(payload, sort_keys=True), headers=headers)
+    json_body = server_context.make_request(
+        save_batch_url, json_dumps(payload, sort_keys=True), headers=headers
+    )
     if json_body is not None:
-        resp_batches = json_body['batches']
+        resp_batches = json_body["batches"]
         return [Batch.from_data(resp_batch) for resp_batch in resp_batches]
 
     return None
@@ -104,35 +94,35 @@ def save_batches(server_context, assay_id, batches):
 
 class ExpObject(object):
     def __init__(self, **kwargs):
-        self.lsid = kwargs.pop('lsid', None)  # Life Science identifier
-        self.name = kwargs.pop('name', None)
-        self.id = kwargs.pop('id', None)
+        self.lsid = kwargs.pop("lsid", None)  # Life Science identifier
+        self.name = kwargs.pop("name", None)
+        self.id = kwargs.pop("id", None)
         self.row_id = self.id
-        self.comment = kwargs.pop('comment', None)
-        self.created = kwargs.pop('created', None)
-        self.modified = kwargs.pop('modified', None)
-        self.created_by = kwargs.pop('created_by', kwargs.pop('createdBy', None))
-        self.modified_by = kwargs.pop('modified_by', kwargs.pop('modifiedBy', None))
-        self.properties = kwargs.pop('properties', {})
+        self.comment = kwargs.pop("comment", None)
+        self.created = kwargs.pop("created", None)
+        self.modified = kwargs.pop("modified", None)
+        self.created_by = kwargs.pop("created_by", kwargs.pop("createdBy", None))
+        self.modified_by = kwargs.pop("modified_by", kwargs.pop("modifiedBy", None))
+        self.properties = kwargs.pop("properties", {})
 
     def to_json(self):
         data = {
             # 'id': self.id,
-            'comment': self.comment,
-            'name': self.name,
-            'created': self.created,
-            'createdBy': self.created_by,
-            'modified': self.modified,
-            'modifiedBy': self.modified_by,
-            'properties': self.properties
+            "comment": self.comment,
+            "name": self.name,
+            "created": self.created,
+            "createdBy": self.created_by,
+            "modified": self.modified,
+            "modifiedBy": self.modified_by,
+            "properties": self.properties,
         }
 
         if self.id is not None:
-            data.update({'id': self.id})
+            data.update({"id": self.id})
 
         if self.lsid is not None:
-            data.update({'lsid': self.lsid})
-            
+            data.update({"lsid": self.lsid})
+
         return data
 
 
@@ -141,10 +131,10 @@ class Batch(ExpObject):
     def __init__(self, **kwargs):
         super(Batch, self).__init__(**kwargs)
 
-        self.batch_protocol_id = kwargs.pop('batch_protocol_id', self.id)
-        self.hidden = kwargs.pop('hidden', False)
+        self.batch_protocol_id = kwargs.pop("batch_protocol_id", self.id)
+        self.hidden = kwargs.pop("hidden", False)
 
-        runs = kwargs.pop('runs', [])
+        runs = kwargs.pop("runs", [])
         run_instances = []
 
         for run in runs:
@@ -160,7 +150,7 @@ class Batch(ExpObject):
 
         data = super(Batch, self).to_json()
 
-        data['batchProtocolId'] = self.batch_protocol_id
+        data["batchProtocolId"] = self.batch_protocol_id
 
         json_runs = []
         for run in self.runs:
@@ -169,7 +159,7 @@ class Batch(ExpObject):
         # The JavaScript API doesn't appear to send these?
         # data['batchProtocolId'] = self.batch_protocol_id
         # data['hidden'] = self.hidden
-        data['runs'] = json_runs
+        data["runs"] = json_runs
 
         return data
 
@@ -178,25 +168,25 @@ class Run(ExpObject):
     def __init__(self, **kwargs):
         super(Run, self).__init__(**kwargs)
 
-        self.experiments = kwargs.pop('experiments', [])
-        self.file_path_root = kwargs.pop('file_path_root', kwargs.pop('filePathRoot', None))
-        self.protocol = kwargs.pop('protocol', None)
-        self.data_outputs = kwargs.pop('data_outputs', kwargs.pop('dataOutputs', []))
-        self.data_rows = kwargs.pop('data_rows', kwargs.pop('dataRows', []))
-        self.material_inputs = kwargs.pop('material_inputs', kwargs.pop('materialInputs', []))
-        self.material_outputs = kwargs.pop('material_outputs', kwargs.pop('materialOutputs', []))
-        self.object_properties = kwargs.pop('object_properties', kwargs.pop('objectProperties', []))
-        self.plate_metadata = kwargs.pop('plate_metadata', None)
+        self.experiments = kwargs.pop("experiments", [])
+        self.file_path_root = kwargs.pop("file_path_root", kwargs.pop("filePathRoot", None))
+        self.protocol = kwargs.pop("protocol", None)
+        self.data_outputs = kwargs.pop("data_outputs", kwargs.pop("dataOutputs", []))
+        self.data_rows = kwargs.pop("data_rows", kwargs.pop("dataRows", []))
+        self.material_inputs = kwargs.pop("material_inputs", kwargs.pop("materialInputs", []))
+        self.material_outputs = kwargs.pop("material_outputs", kwargs.pop("materialOutputs", []))
+        self.object_properties = kwargs.pop("object_properties", kwargs.pop("objectProperties", []))
+        self.plate_metadata = kwargs.pop("plate_metadata", None)
 
         # TODO: initialize protocol
         # self._protocol = None
 
         # initialize data_inputs
-        data_inputs = kwargs.pop('data_inputs', kwargs.pop('dataInputs', []))
+        data_inputs = kwargs.pop("data_inputs", kwargs.pop("dataInputs", []))
         data_inputs_instances = []
 
-        for input in data_inputs:
-            data_inputs_instances.append(Data.from_data(input))
+        for input_ in data_inputs:
+            data_inputs_instances.append(Data.from_data(input_))
 
         self.data_inputs = data_inputs_instances
 
@@ -207,13 +197,13 @@ class Run(ExpObject):
     def to_json(self):
         data = super(Run, self).to_json()
 
-        data['dataInputs'] = [data_input.to_json() for data_input in self.data_inputs]
-        data['dataRows'] = self.data_rows
-        data['experiments'] = self.experiments
-        data['filePathRoot'] = self.file_path_root
-        data['materialInputs'] = self.material_inputs
-        data['materialOutputs'] = self.material_outputs
-        data['plateMetadata'] = self.plate_metadata
+        data["dataInputs"] = [data_input.to_json() for data_input in self.data_inputs]
+        data["dataRows"] = self.data_rows
+        data["experiments"] = self.experiments
+        data["filePathRoot"] = self.file_path_root
+        data["materialInputs"] = self.material_inputs
+        data["materialOutputs"] = self.material_outputs
+        data["plateMetadata"] = self.plate_metadata
 
         return data
 
@@ -222,11 +212,16 @@ class RunItem(ExpObject):
     def __init__(self, **kwargs):
         super(RunItem, self).__init__(**kwargs)
 
-        self.source_protocol = kwargs.pop('source_protocol', kwargs.pop('sourceProtocol', None))
-        self.run = kwargs.pop('run', None)  # TODO Check if this should be a Run instance
-        self.target_applications = kwargs.pop('target_applications', kwargs.pop('targetApplications', None))
-        self.successor_runs = kwargs.pop('successor_runs', kwargs.pop('successorRuns', kwargs.pop('sucessorRuns', None)))  # sic
-        self.cpas_type = kwargs.pop('cpas_type', kwargs.pop('cpasType', None))
+        self.source_protocol = kwargs.pop("source_protocol", kwargs.pop("sourceProtocol", None))
+        self.run = kwargs.pop("run", None)  # TODO Check if this should be a Run instance
+        self.target_applications = kwargs.pop(
+            "target_applications", kwargs.pop("targetApplications", None)
+        )
+        self.successor_runs = kwargs.pop(
+            "successor_runs",
+            kwargs.pop("successorRuns", kwargs.pop("sucessorRuns", None)),
+        )  # sic
+        self.cpas_type = kwargs.pop("cpas_type", kwargs.pop("cpasType", None))
 
     @staticmethod
     def from_data(data):
@@ -235,11 +230,11 @@ class RunItem(ExpObject):
     def to_json(self):
         data = super(RunItem, self).to_json()
 
-        data['sourceProtocol'] = self.source_protocol
-        data['run'] = self.run
-        data['targetApplications'] = self.target_applications
-        data['sucessorRuns'] = self.successor_runs
-        data['cpasType'] = self.cpas_type
+        data["sourceProtocol"] = self.source_protocol
+        data["run"] = self.run
+        data["targetApplications"] = self.target_applications
+        data["sucessorRuns"] = self.successor_runs
+        data["cpasType"] = self.cpas_type
 
         return data
 
@@ -248,10 +243,10 @@ class Data(RunItem):
     def __init__(self, **kwargs):
         super(Data, self).__init__(**kwargs)
 
-        self.data_type = kwargs.pop('data_type', kwargs.pop('dataType', None))
-        self.data_file_url = kwargs.pop('data_file_url', kwargs.pop('dataFileURL', None))
-        self.pipeline_path = kwargs.pop('pipeline_path', kwargs.pop('pipelinePath', None))
-        self.role = kwargs.pop('role', None)
+        self.data_type = kwargs.pop("data_type", kwargs.pop("dataType", None))
+        self.data_file_url = kwargs.pop("data_file_url", kwargs.pop("dataFileURL", None))
+        self.pipeline_path = kwargs.pop("pipeline_path", kwargs.pop("pipelinePath", None))
+        self.role = kwargs.pop("role", None)
 
     @staticmethod
     def from_data(data):
@@ -260,9 +255,9 @@ class Data(RunItem):
     def to_json(self):
         data = super(Data, self).to_json()
 
-        data['dataFileURL'] = self.data_file_url
-        data['dataType'] = self.data_type
-        data['pipelinePath'] = self.pipeline_path
-        data['role'] = self.role
+        data["dataFileURL"] = self.data_file_url
+        data["dataType"] = self.data_type
+        data["pipelinePath"] = self.pipeline_path
+        data["role"] = self.role
 
         return data

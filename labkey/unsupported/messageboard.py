@@ -21,7 +21,6 @@ WARNING: This module is not officially supported! Use at your own risk.
 This module provides functions for interacting with Message Boards on the
 LabKey Server.
 """
-from __future__ import unicode_literals
 from requests.exceptions import SSLError
 
 
@@ -35,19 +34,26 @@ def post_message(server_context, message_title, message_body, render_as, contain
     :param container_path: Optional container path that can be used to override the server_context container path
     :return: Returns 1 if successful, 0 is post failed.
     """
-    message_url = server_context.build_url('announcements', 'insert.api', container_path=container_path)
+    message_url = server_context.build_url(
+        "announcements", "insert.api", container_path=container_path
+    )
 
     message_data = {
-        'title': message_title,
-        'body': message_body,
-        'rendererType': render_as
+        "title": message_title,
+        "body": message_body,
+        "rendererType": render_as,
     }
 
     try:
         server_context.make_request(message_url, message_data)
     except SSLError as e:
-        print("There was problem while attempting to submit the message to " + str(e.geturl()) + ". The HTTP response code was " + str(e.getcode()))
+        print(
+            "There was problem while attempting to submit the message to "
+            + str(e.geturl())
+            + ". The HTTP response code was "
+            + str(e.getcode())
+        )
         print("The HTTP client error was: " + format(e))
         return 0
-        
+
     return 1

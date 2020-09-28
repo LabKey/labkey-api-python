@@ -105,7 +105,13 @@ Python 2.6+ and 3.4+ are fully supported.
 LabKey Server v15.1 and later.
 
 ## Contributing
-This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the [LabKey Server developer support forum](https://www.labkey.org/home/developer/forum/project-start.view).
+This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use
+the [LabKey Server developer support forum](https://www.labkey.org/home/developer/forum/project-start.view).
+
+When contributing changes please use `Black` to format your code. To run Black follow these instructions:
+1. Install black: `pip install black`
+2. Run black: `black .`
+3. Commit the newly formatted code.
 
 ### Testing
 If you are looking to contribute please run the tests before issuing a PR. The tests can be initiated by running

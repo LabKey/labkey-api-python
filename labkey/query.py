@@ -40,13 +40,9 @@ https://www.labkey.org/home/developer/forum/project-start.view
 
 ############################################################################
 """
-from __future__ import unicode_literals
-
 from labkey.utils import json_dumps
 
-_query_headers = {
-    'Content-Type': 'application/json'
-}
+_query_headers = {"Content-Type": "application/json"}
 
 _default_timeout = 60 * 5  # 5 minutes
 
@@ -55,14 +51,22 @@ class Pagination:
     """
     Enum of paging styles
     """
-    PAGINATED = 'paginated'
-    SELECTED = 'selected'
-    UNSELECTED = 'unselected'
-    ALL = 'all'
-    NONE = 'none'
+
+    PAGINATED = "paginated"
+    SELECTED = "selected"
+    UNSELECTED = "unselected"
+    ALL = "all"
+    NONE = "none"
 
 
-def delete_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
+def delete_rows(
+    server_context,
+    schema_name,
+    query_name,
+    rows,
+    container_path=None,
+    timeout=_default_timeout,
+):
     """
     Delete a set of rows from the schema.query
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -73,18 +77,25 @@ def delete_rows(server_context, schema_name, query_name, rows, container_path=No
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
-    url = server_context.build_url('query', 'deleteRows.api', container_path=container_path)
+    url = server_context.build_url("query", "deleteRows.api", container_path=container_path)
 
-    payload = {
-        'schemaName': schema_name,
-        'queryName': query_name,
-        'rows': rows
-    }
+    payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
 
-    return server_context.make_request(url, json_dumps(payload, sort_keys=True), headers=_query_headers, timeout=timeout)
+    return server_context.make_request(
+        url,
+        json_dumps(payload, sort_keys=True),
+        headers=_query_headers,
+        timeout=timeout,
+    )
 
 
-def truncate_table(server_context, schema_name, query_name, container_path=None, timeout=_default_timeout):
+def truncate_table(
+    server_context,
+    schema_name,
+    query_name,
+    container_path=None,
+    timeout=_default_timeout,
+):
     """
     Delete all rows from the schema.query
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -94,25 +105,32 @@ def truncate_table(server_context, schema_name, query_name, container_path=None,
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
-    url = server_context.build_url('query', 'truncateTable.api', container_path=container_path)
+    url = server_context.build_url("query", "truncateTable.api", container_path=container_path)
 
-    payload = {
-        'schemaName': schema_name,
-        'queryName': query_name
-    }
+    payload = {"schemaName": schema_name, "queryName": query_name}
 
-    return server_context.make_request(url, json_dumps(payload, sort_keys=True), headers=_query_headers, timeout=timeout)
+    return server_context.make_request(
+        url,
+        json_dumps(payload, sort_keys=True),
+        headers=_query_headers,
+        timeout=timeout,
+    )
 
 
-def execute_sql(server_context, schema_name, sql, container_path=None,
-                max_rows=None,
-                sort=None,
-                offset=None,
-                container_filter=None,
-                save_in_session=None,
-                parameters=None,
-                required_version=None,
-                timeout=_default_timeout):
+def execute_sql(
+    server_context,
+    schema_name,
+    sql,
+    container_path=None,
+    max_rows=None,
+    sort=None,
+    offset=None,
+    container_filter=None,
+    save_in_session=None,
+    parameters=None,
+    required_version=None,
+    timeout=_default_timeout,
+):
     """
     Execute sql query against a LabKey server.
 
@@ -131,39 +149,43 @@ def execute_sql(server_context, schema_name, sql, container_path=None,
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
-    url = server_context.build_url('query', 'executeSql.api', container_path=container_path)
+    url = server_context.build_url("query", "executeSql.api", container_path=container_path)
 
-    payload = {
-        'schemaName': schema_name,
-        'sql': sql
-    }
+    payload = {"schemaName": schema_name, "sql": sql}
 
     if container_filter is not None:
-        payload['containerFilter'] = container_filter
+        payload["containerFilter"] = container_filter
 
     if max_rows is not None:
-        payload['maxRows'] = max_rows
+        payload["maxRows"] = max_rows
 
     if offset is not None:
-        payload['offset'] = offset
+        payload["offset"] = offset
 
     if sort is not None:
-        payload['query.sort'] = sort
+        payload["query.sort"] = sort
 
     if save_in_session is not None:
-        payload['saveInSession'] = save_in_session
+        payload["saveInSession"] = save_in_session
 
     if parameters is not None:
         for key, value in parameters.items():
-            payload['query.param.' + key] = value
+            payload["query.param." + key] = value
 
     if required_version is not None:
-        payload['apiVersion'] = required_version
+        payload["apiVersion"] = required_version
 
     return server_context.make_request(url, payload, timeout=timeout)
 
 
-def insert_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
+def insert_rows(
+    server_context,
+    schema_name,
+    query_name,
+    rows,
+    container_path=None,
+    timeout=_default_timeout,
+):
     """
     Insert row(s) into table
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -174,36 +196,40 @@ def insert_rows(server_context, schema_name, query_name, rows, container_path=No
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
-    url = server_context.build_url('query', 'insertRows.api', container_path=container_path)
+    url = server_context.build_url("query", "insertRows.api", container_path=container_path)
 
-    payload = {
-        'schemaName': schema_name,
-        'queryName': query_name,
-        'rows': rows
-    }
+    payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
 
-    return server_context.make_request(url, json_dumps(payload, sort_keys=True), headers=_query_headers,
-                                       timeout=timeout)
+    return server_context.make_request(
+        url,
+        json_dumps(payload, sort_keys=True),
+        headers=_query_headers,
+        timeout=timeout,
+    )
 
 
-def select_rows(server_context, schema_name, query_name, view_name=None,
-                filter_array=None,
-                container_path=None,
-                columns=None,
-                max_rows=None,
-                sort=None,
-                offset=None,
-                container_filter=None,
-                parameters=None,
-                show_rows=None,
-                include_total_count=None,
-                include_details_column=None,
-                include_update_column=None,
-                selection_key=None,
-                required_version=None,
-                timeout=_default_timeout,
-                ignore_filter=None,
-                ):
+def select_rows(
+    server_context,
+    schema_name,
+    query_name,
+    view_name=None,
+    filter_array=None,
+    container_path=None,
+    columns=None,
+    max_rows=None,
+    sort=None,
+    offset=None,
+    container_filter=None,
+    parameters=None,
+    show_rows=None,
+    include_total_count=None,
+    include_details_column=None,
+    include_update_column=None,
+    selection_key=None,
+    required_version=None,
+    timeout=_default_timeout,
+    ignore_filter=None,
+):
     """
     Query data from a LabKey server
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -229,15 +255,12 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
     :param ignore_filter: Boolean, if true, the command will ignore any filter that may be part of the chosen view.
     :return:
     """
-    url = server_context.build_url('query', 'getQuery.api', container_path=container_path)
+    url = server_context.build_url("query", "getQuery.api", container_path=container_path)
 
-    payload = {
-        'schemaName': schema_name,
-        'query.queryName': query_name
-    }
+    payload = {"schemaName": schema_name, "query.queryName": query_name}
 
     if view_name is not None:
-        payload['query.viewName'] = view_name
+        payload["query.viewName"] = view_name
 
     if filter_array is not None:
         for query_filter in filter_array:
@@ -249,49 +272,56 @@ def select_rows(server_context, schema_name, query_name, view_name=None,
             payload[prefix] = filters
 
     if columns is not None:
-        payload['query.columns'] = columns
+        payload["query.columns"] = columns
 
     if max_rows is not None:
-        payload['query.maxRows'] = max_rows
+        payload["query.maxRows"] = max_rows
 
     if sort is not None:
-        payload['query.sort'] = sort
+        payload["query.sort"] = sort
 
     if offset is not None:
-        payload['query.offset'] = offset
+        payload["query.offset"] = offset
 
     if container_filter is not None:
-        payload['containerFilter'] = container_filter
+        payload["containerFilter"] = container_filter
 
     if parameters is not None:
         for key, value in parameters.items():
-            payload['query.param.' + key] = value
+            payload["query.param." + key] = value
 
     if show_rows is not None:
-        payload['query.showRows'] = show_rows
+        payload["query.showRows"] = show_rows
 
     if include_total_count is not None:
-        payload['includeTotalCount'] = include_total_count
+        payload["includeTotalCount"] = include_total_count
 
     if include_details_column is not None:
-        payload['includeDetailsColumn'] = include_details_column
+        payload["includeDetailsColumn"] = include_details_column
 
     if include_update_column is not None:
-        payload['includeUpdateColumn'] = include_update_column
+        payload["includeUpdateColumn"] = include_update_column
 
     if selection_key is not None:
-        payload['query.selectionKey'] = selection_key
+        payload["query.selectionKey"] = selection_key
 
     if required_version is not None:
-        payload['apiVersion'] = required_version
+        payload["apiVersion"] = required_version
 
     if ignore_filter is not None and ignore_filter is True:
-        payload['query.ignoreFilter'] = 1
+        payload["query.ignoreFilter"] = 1
 
     return server_context.make_request(url, payload, timeout=timeout)
 
 
-def update_rows(server_context, schema_name, query_name, rows, container_path=None, timeout=_default_timeout):
+def update_rows(
+    server_context,
+    schema_name,
+    query_name,
+    rows,
+    container_path=None,
+    timeout=_default_timeout,
+):
     """
     Update a set of rows
 
@@ -303,16 +333,16 @@ def update_rows(server_context, schema_name, query_name, rows, container_path=No
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
-    url = server_context.build_url('query', 'updateRows.api', container_path=container_path)
+    url = server_context.build_url("query", "updateRows.api", container_path=container_path)
 
-    payload = {
-        'schemaName': schema_name,
-        'queryName': query_name,
-        'rows': rows
-    }
+    payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
 
-    return server_context.make_request(url, json_dumps(payload, sort_keys=True), headers=_query_headers,
-                                       timeout=timeout)
+    return server_context.make_request(
+        url,
+        json_dumps(payload, sort_keys=True),
+        headers=_query_headers,
+        timeout=timeout,
+    )
 
 
 # TODO: Provide filter generators.
@@ -326,61 +356,63 @@ class QueryFilter:
     """
     Filter object to simplify generation of query filters
     """
+
     class Types:
         """
         Enumeration of acceptable filter types
         """
-        HAS_ANY_VALUE = ''
 
-        EQUAL = 'eq'
-        DATE_EQUAL = 'dateeq'
+        HAS_ANY_VALUE = ""
 
-        NEQ = 'neq'
-        NOT_EQUAL = 'neq'
-        DATE_NOT_EQUAL = 'dateneq'
+        EQUAL = "eq"
+        DATE_EQUAL = "dateeq"
 
-        NEQ_OR_NULL = 'neqornull'
-        NOT_EQUAL_OR_MISSING = 'neqornull'
+        NEQ = "neq"
+        NOT_EQUAL = "neq"
+        DATE_NOT_EQUAL = "dateneq"
 
-        GT = 'gt'
-        GREATER_THAN = 'gt'
-        DATE_GREATER_THAN = 'dategt'
+        NEQ_OR_NULL = "neqornull"
+        NOT_EQUAL_OR_MISSING = "neqornull"
 
-        LT = 'lt'
-        LESS_THAN = 'lt'
-        DATE_LESS_THAN = 'datelt'
+        GT = "gt"
+        GREATER_THAN = "gt"
+        DATE_GREATER_THAN = "dategt"
 
-        GTE = 'gte'
-        GREATER_THAN_OR_EQUAL = 'gte'
-        DATE_GREATER_THAN_OR_EQUAL = 'dategte'
+        LT = "lt"
+        LESS_THAN = "lt"
+        DATE_LESS_THAN = "datelt"
 
-        LTE = 'lte'
-        LESS_THAN_OR_EQUAL = 'lte'
-        DATE_LESS_THAN_OR_EQUAL = 'datelte'
+        GTE = "gte"
+        GREATER_THAN_OR_EQUAL = "gte"
+        DATE_GREATER_THAN_OR_EQUAL = "dategte"
 
-        STARTS_WITH = 'startswith'
-        DOES_NOT_START_WITH = 'doesnotstartwith'
+        LTE = "lte"
+        LESS_THAN_OR_EQUAL = "lte"
+        DATE_LESS_THAN_OR_EQUAL = "datelte"
 
-        CONTAINS = 'contains'
-        DOES_NOT_CONTAIN = 'doesnotcontain'
+        STARTS_WITH = "startswith"
+        DOES_NOT_START_WITH = "doesnotstartwith"
 
-        CONTAINS_ONE_OF = 'containsoneof'
-        CONTAINS_NONE_OF = 'containsnoneof'
+        CONTAINS = "contains"
+        DOES_NOT_CONTAIN = "doesnotcontain"
 
-        IN = 'in'
+        CONTAINS_ONE_OF = "containsoneof"
+        CONTAINS_NONE_OF = "containsnoneof"
 
-        EQUALS_ONE_OF = 'in'
+        IN = "in"
 
-        NOT_IN = 'notin'
-        EQUALS_NONE_OF = 'notin'
+        EQUALS_ONE_OF = "in"
 
-        BETWEEN = 'between'
-        NOT_BETWEEN = 'notbetween'
+        NOT_IN = "notin"
+        EQUALS_NONE_OF = "notin"
 
-        IS_BLANK = 'isblank'
-        IS_NOT_BLANK = 'isnonblank'
+        BETWEEN = "between"
+        NOT_BETWEEN = "notbetween"
 
-        MEMBER_OF = 'memberof'
+        IS_BLANK = "isblank"
+        IS_NOT_BLANK = "isnonblank"
+
+        MEMBER_OF = "memberof"
 
     def __init__(self, column, value, filter_type=Types.EQUAL):
         self.column_name = column
@@ -388,7 +420,7 @@ class QueryFilter:
         self.filter_type = filter_type
 
     def get_url_parameter_name(self):
-        return 'query.' + self.column_name + '~' + self.filter_type
+        return "query." + self.column_name + "~" + self.filter_type
 
     def get_url_parameter_value(self):
         return self.value
@@ -397,5 +429,4 @@ class QueryFilter:
         return self.column_name
 
     def __repr__(self):
-        return '<QueryFilter [{} {} {}]>'.format(self.column_name, self.filter_type, self.value)
-
+        return "<QueryFilter [{} {} {}]>".format(self.column_name, self.filter_type, self.value)

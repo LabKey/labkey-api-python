@@ -13,10 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from __future__ import unicode_literals
-
-SECURITY_CONTROLLER = 'security'
-USER_CONTROLLER = 'user'
+SECURITY_CONTROLLER = "security"
+USER_CONTROLLER = "user"
 
 
 def activate_users(server_context, target_ids, container_path=None):
@@ -27,8 +25,12 @@ def activate_users(server_context, target_ids, container_path=None):
     :param container_path:
     :return:
     """
-    return __make_user_api_request(server_context, target_ids=target_ids, api='activateUsers.api',
-                                   container_path=container_path)
+    return __make_user_api_request(
+        server_context,
+        target_ids=target_ids,
+        api="activateUsers.api",
+        container_path=container_path,
+    )
 
 
 def add_to_group(server_context, user_ids, group_id, container_path=None):
@@ -40,7 +42,9 @@ def add_to_group(server_context, user_ids, group_id, container_path=None):
     :param container_path:
     :return:
     """
-    return __make_security_group_api_request(server_context, 'addGroupMember.api', user_ids, group_id, container_path)
+    return __make_security_group_api_request(
+        server_context, "addGroupMember.api", user_ids, group_id, container_path
+    )
 
 
 def add_to_role(server_context, role, user_id=None, email=None, container_path=None):
@@ -53,8 +57,14 @@ def add_to_role(server_context, role, user_id=None, email=None, container_path=N
     :param container_path: additional project path context
     :return:
     """
-    return __make_security_role_api_request(server_context, 'addAssignment.api', role, user_id=user_id, email=email,
-                                            container_path=container_path)
+    return __make_security_role_api_request(
+        server_context,
+        "addAssignment.api",
+        role,
+        user_id=user_id,
+        email=email,
+        container_path=container_path,
+    )
 
 
 def create_user(server_context, email, container_path=None, send_email=False):
@@ -66,11 +76,8 @@ def create_user(server_context, email, container_path=None, send_email=False):
     :param send_email: true to send email notification to user
     :return:
     """
-    url = server_context.build_url(SECURITY_CONTROLLER, 'createNewUser.api', container_path)
-    payload = {
-        'email': email,
-        'sendEmail': send_email
-    }
+    url = server_context.build_url(SECURITY_CONTROLLER, "createNewUser.api", container_path)
+    payload = {"email": email, "sendEmail": send_email}
 
     return server_context.make_request(url, payload)
 
@@ -84,9 +91,13 @@ def deactivate_users(server_context, target_ids, container_path=None):
     :return:
     """
     # This action responds with HTML so we just check if it responds OK
-    response = __make_user_api_request(server_context, target_ids=target_ids, api='deactivateUsers.view',
-                                       container_path=container_path)
-    if response is not None and response['status_code'] == 200:
+    response = __make_user_api_request(
+        server_context,
+        target_ids=target_ids,
+        api="deactivateUsers.view",
+        container_path=container_path,
+    )
+    if response is not None and response["status_code"] == 200:
         return dict(success=True)
     else:
         raise ValueError("Unable to deactivate users {0}".format(target_ids))
@@ -101,9 +112,13 @@ def delete_users(server_context, target_ids, container_path=None):
     :return:
     """
     # This action responds with HTML so we just check if it responds OK
-    response = __make_user_api_request(server_context, target_ids=target_ids, api='deleteUsers.view',
-                                       container_path=container_path)
-    if response is not None and response['status_code'] == 200:
+    response = __make_user_api_request(
+        server_context,
+        target_ids=target_ids,
+        api="deleteUsers.view",
+        container_path=container_path,
+    )
+    if response is not None and response["status_code"] == 200:
         return dict(success=True)
     else:
         raise ValueError("Unable to delete users {0}".format(target_ids))
@@ -116,7 +131,9 @@ def get_roles(server_context, container_path=None):
     :param container_path:
     :return:
     """
-    url = server_context.build_url(SECURITY_CONTROLLER, 'getRoles.api', container_path=container_path)
+    url = server_context.build_url(
+        SECURITY_CONTROLLER, "getRoles.api", container_path=container_path
+    )
     return server_context.make_request(url, None)
 
 
@@ -127,26 +144,24 @@ def get_user_by_email(server_context, email):
     :param email:
     :return:
     """
-    url = server_context.build_url(USER_CONTROLLER, 'getUsers.api')
+    url = server_context.build_url(USER_CONTROLLER, "getUsers.api")
     payload = dict(includeDeactivatedAccounts=True)
     result = server_context.make_request(url, payload)
 
-    if result is None or result['users'] is None:
+    if result is None or result["users"] is None:
         raise ValueError("No Users in container" + email)
 
-    for user in result['users']:
-        if user['email'] == email:
+    for user in result["users"]:
+        if user["email"] == email:
             return user
     else:
         raise ValueError("User not found: " + email)
 
 
 def list_groups(server_context, include_site_groups=False, container_path=None):
-    url = server_context.build_url(SECURITY_CONTROLLER, 'listProjectGroups.api', container_path)
+    url = server_context.build_url(SECURITY_CONTROLLER, "listProjectGroups.api", container_path)
 
-    return server_context.make_request(url, {
-        'includeSiteGroups': include_site_groups
-    })
+    return server_context.make_request(url, {"includeSiteGroups": include_site_groups})
 
 
 def remove_from_group(server_context, user_ids, group_id, container_path=None):
@@ -158,8 +173,9 @@ def remove_from_group(server_context, user_ids, group_id, container_path=None):
     :param container_path:
     :return:
     """
-    return __make_security_group_api_request(server_context, 'removeGroupMember.api', user_ids,
-                                             group_id, container_path)
+    return __make_security_group_api_request(
+        server_context, "removeGroupMember.api", user_ids, group_id, container_path
+    )
 
 
 def remove_from_role(server_context, role, user_id=None, email=None, container_path=None):
@@ -172,8 +188,14 @@ def remove_from_role(server_context, role, user_id=None, email=None, container_p
     :param container_path: additional project path context
     :return:
     """
-    return __make_security_role_api_request(server_context, 'removeAssignment.api', role, user_id=user_id, email=email,
-                                            container_path=container_path)
+    return __make_security_role_api_request(
+        server_context,
+        "removeAssignment.api",
+        role,
+        user_id=user_id,
+        email=email,
+        container_path=container_path,
+    )
 
 
 def reset_password(server_context, email, container_path=None):
@@ -184,11 +206,9 @@ def reset_password(server_context, email, container_path=None):
     :param container_path:
     :return:
     """
-    url = server_context.build_url(SECURITY_CONTROLLER, 'adminRotatePassword.api', container_path)
+    url = server_context.build_url(SECURITY_CONTROLLER, "adminRotatePassword.api", container_path)
 
-    return server_context.make_request(url, {
-        'email': email
-    })
+    return server_context.make_request(url, {"email": email})
 
 
 def __make_security_group_api_request(server_context, api, user_ids, group_id, container_path):
@@ -207,13 +227,12 @@ def __make_security_group_api_request(server_context, api, user_ids, group_id, c
     if not hasattr(user_ids, "__iter__"):
         user_ids = [user_ids]
 
-    return server_context.make_request(url, {
-        'groupId': group_id,
-        'principalIds': user_ids
-    })
+    return server_context.make_request(url, {"groupId": group_id, "principalIds": user_ids})
 
 
-def __make_security_role_api_request(server_context, api, role, email=None, user_id=None, container_path=None):
+def __make_security_role_api_request(
+    server_context, api, role, email=None, user_id=None, container_path=None
+):
     """
     Execute a request against the LabKey Security Controller Group Membership apis
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -228,11 +247,10 @@ def __make_security_role_api_request(server_context, api, role, email=None, user
 
     url = server_context.build_url(SECURITY_CONTROLLER, api, container_path)
 
-    return server_context.make_request(url, {
-        'roleClassName': role['uniqueName'],
-        'principalId': user_id,
-        'email': email
-    })
+    return server_context.make_request(
+        url,
+        {"roleClassName": role["uniqueName"], "principalId": user_id, "email": email},
+    )
 
 
 def __make_user_api_request(server_context, target_ids, api, container_path=None):
@@ -246,6 +264,4 @@ def __make_user_api_request(server_context, target_ids, api, container_path=None
     """
     url = server_context.build_url(USER_CONTROLLER, api, container_path)
 
-    return server_context.make_request(url, {
-        'userId': target_ids
-    })
+    return server_context.make_request(url, {"userId": target_ids})

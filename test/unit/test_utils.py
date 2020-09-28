@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from __future__ import unicode_literals
 from datetime import date, datetime
 import unittest
 
@@ -26,20 +25,17 @@ from labkey import utils
 
 
 class TestJsonDumps(unittest.TestCase):
-
     def test_encoder(self):
         # test date and datetime encoding
         payload = {
-            'my_date': date(1985, 9, 11),
-            'my_date_time': datetime(2018, 9, 18, 5, 25)
+            "my_date": date(1985, 9, 11),
+            "my_date_time": datetime(2018, 9, 18, 5, 25),
         }
 
         utils.json_dumps(payload)
 
     def test_encoder_override(self):
-        payload = {
-            'testdate': datetime(2018, 9, 11, 6, 45)
-        }
+        payload = {"testdate": datetime(2018, 9, 11, 6, 45)}
 
         try:
             # disable the "cls" override by passing None
@@ -52,11 +48,9 @@ class TestJsonDumps(unittest.TestCase):
 
 def suite():
     load_tests = unittest.TestLoader().loadTestsFromTestCase
-    return unittest.TestSuite([
-        load_tests(TestJsonDumps)
-    ])
+    return unittest.TestSuite([load_tests(TestJsonDumps)])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     utils.DISABLE_CSRF_CHECK = True
     unittest.main()
