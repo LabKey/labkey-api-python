@@ -13,83 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from typing import Union, List
+
 from labkey.utils import json_dumps, ServerContext
-
-
-# TODO Incorporate logging
-def load_batch(server_context, assay_id, batch_id):
-    # type: (ServerContext, int, int) -> Union[Batch, None]
-    """
-    Loads a batch from the server.
-    :param server_context: A LabKey server context. See utils.create_server_context.
-    :param assay_id: The protocol id of the assay from which to load a batch.
-    :param batch_id:
-    :return:
-    """
-    load_batch_url = server_context.build_url("assay", "getAssayBatch.api")
-    loaded_batch = None
-
-    payload = {"assayId": assay_id, "batchId": batch_id}
-
-    headers = {"Content-type": "application/json", "Accept": "text/plain"}
-
-    json_body = server_context.make_request(
-        load_batch_url, json_dumps(payload, sort_keys=True), headers=headers
-    )
-    if json_body is not None:
-        loaded_batch = Batch.from_data(json_body["batch"])
-
-    return loaded_batch
-
-
-def save_batch(server_context, assay_id, batch):
-    # type: (ServerContext, int, Batch) -> Union[Batch, None]
-    """
-    Saves a modified batch.
-    :param server_context: A LabKey server context. See utils.create_server_context.
-    :param assay_id: The assay protocol id.
-    :param batch: The Batch to save.
-    :return:
-    """
-    result = save_batches(server_context, assay_id, [batch])
-
-    if result is not None:
-        return result[0]
-    return None
-
-
-def save_batches(server_context, assay_id, batches):
-    # type: (ServerContext, int, List[Batch]) -> Union[List[Batch], None]
-    """
-    Saves a modified batches.
-    :param server_context: A LabKey server context. See utils.create_server_context.
-    :param assay_id: The assay protocol id.
-    :param batches: The Batch(es) to save.
-    :return:
-    """
-    save_batch_url = server_context.build_url("assay", "saveAssayBatch.api")
-    json_batches = []
-
-    if batches is None:
-        return None  # Nothing to save
-
-    for batch in batches:
-        if isinstance(batch, Batch):
-            json_batches.append(batch.to_json())
-        else:
-            raise Exception('save_batch() "batches" expected to be a set Batch instances')
-
-    payload = {"assayId": assay_id, "batches": json_batches}
-    headers = {"Content-type": "application/json", "Accept": "text/plain"}
-
-    json_body = server_context.make_request(
-        save_batch_url, json_dumps(payload, sort_keys=True), headers=headers
-    )
-    if json_body is not None:
-        resp_batches = json_body["batches"]
-        return [Batch.from_data(resp_batch) for resp_batch in resp_batches]
-
-    return None
 
 
 class ExpObject(object):
@@ -261,3 +187,76 @@ class Data(RunItem):
         data["role"] = self.role
 
         return data
+
+
+# TODO Incorporate logging
+def load_batch(server_context: ServerContext, assay_id: int, batch_id: int) -> Union[Batch, None]:
+    """
+    Loads a batch from the server.
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param assay_id: The protocol id of the assay from which to load a batch.
+    :param batch_id:
+    :return:
+    """
+    load_batch_url = server_context.build_url("assay", "getAssayBatch.api")
+    loaded_batch = None
+
+    payload = {"assayId": assay_id, "batchId": batch_id}
+
+    headers = {"Content-type": "application/json", "Accept": "text/plain"}
+
+    json_body = server_context.make_request(
+        load_batch_url, json_dumps(payload, sort_keys=True), headers=headers
+    )
+    if json_body is not None:
+        loaded_batch = Batch.from_data(json_body["batch"])
+
+    return loaded_batch
+
+
+def save_batch(server_context: ServerContext, assay_id: int, batch: Batch) -> Union[Batch, None]:
+    """
+    Saves a modified batch.
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param assay_id: The assay protocol id.
+    :param batch: The Batch to save.
+    :return:
+    """
+    result = save_batches(server_context, assay_id, [batch])
+
+    if result is not None:
+        return result[0]
+    return None
+
+
+def save_batches(server_context: ServerContext, assay_id: int, batches: List[Batch]) -> Union[List[Batch], None]:
+    """
+    Saves a modified batches.
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param assay_id: The assay protocol id.
+    :param batches: The Batch(es) to save.
+    :return:
+    """
+    save_batch_url = server_context.build_url("assay", "saveAssayBatch.api")
+    json_batches = []
+
+    if batches is None:
+        return None  # Nothing to save
+
+    for batch in batches:
+        if isinstance(batch, Batch):
+            json_batches.append(batch.to_json())
+        else:
+            raise Exception('save_batch() "batches" expected to be a set Batch instances')
+
+    payload = {"assayId": assay_id, "batches": json_batches}
+    headers = {"Content-type": "application/json", "Accept": "text/plain"}
+
+    json_body = server_context.make_request(
+        save_batch_url, json_dumps(payload, sort_keys=True), headers=headers
+    )
+    if json_body is not None:
+        resp_batches = json_body["batches"]
+        return [Batch.from_data(resp_batch) for resp_batch in resp_batches]
+
+    return None

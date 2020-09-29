@@ -66,8 +66,7 @@ class ServerContext(object):
             self._domain, self._context_path, self._container_path
         )
 
-    def build_url(self, controller, action, container_path=None):
-        # type: (any, str, str, str) -> str
+    def build_url(self, controller: str, action: str, container_path: str = None) -> str:
         sep = "/"
 
         url = self._scheme + self._domain
@@ -86,15 +85,14 @@ class ServerContext(object):
 
     def make_request(
         self,
-        url,
-        payload,
-        headers=None,
-        timeout=300,
-        method="POST",
-        non_json_response=False,
-        file_payload=None,
-    ):
-        # type: (any, str, any, dict, int, str, bool, any) -> any
+        url: str,
+        payload: any,
+        headers: dict = None,
+        timeout: int = 300,
+        method: str = "POST",
+        non_json_response: bool = False,
+        file_payload: any = None,
+    ) -> any:
         if self._api_key is not None:
             global API_KEY_TOKEN
 
@@ -137,15 +135,14 @@ class ServerContext(object):
 
 
 def create_server_context(
-    domain,
-    container_path,
-    context_path=None,
-    use_ssl=True,
-    verify_ssl=True,
-    api_key=None,
-    disable_csrf=False,
-):
-    # type: (str, str, str, bool, bool, str, bool) -> ServerContext
+    domain: str,
+    container_path: str,
+    context_path: str = None,
+    use_ssl: bool = True,
+    verify_ssl: bool = True,
+    api_key: str = None,
+    disable_csrf: bool = False,
+) -> ServerContext:
     """
     Create a LabKey server context. This context is used to encapsulate properties
     about the LabKey server that is being requested against. This includes, but is not limited to,
@@ -168,20 +165,6 @@ def create_server_context(
         api_key=api_key,
         disable_csrf=disable_csrf,
     )
-
-
-def build_url(server_context, controller, action, container_path=None):
-    # type: (ServerContext, str, str, str) -> str
-    """
-    Builds a URL from a controller and an action. Users the server context to determine domain,
-    context path, container, etc.
-    :param server_context: A LabKey server context. See utils.create_server_context.
-    :param controller: The controller to use in building the URL
-    :param action: The action to use in building the URL
-    :param container_path:
-    :return:
-    """
-    return server_context.build_url(controller, action, container_path=container_path)
 
 
 def handle_request_exception(e, server_context=None):

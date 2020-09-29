@@ -19,8 +19,7 @@ from labkey.utils import json_dumps, ServerContext
 from labkey.query import QueryFilter
 
 
-def strip_none_values(data, do_strip=True):
-    # type: (dict, bool) -> dict
+def strip_none_values(data: dict, do_strip: bool = True):
     if do_strip:
         for k in list(data.keys()):
             if data[k] is None:

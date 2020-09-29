@@ -2,15 +2,14 @@ from labkey.utils import json_dumps, ServerContext
 
 
 def create(
-    server_context,
-    name,
-    container_path=None,
-    description=None,
-    folder_type=None,
-    is_workbook=None,
-    title=None,
-):
-    # type: (ServerContext, str, str, str, str, bool, str) -> dict
+    server_context: ServerContext,
+    name: str,
+    container_path: str = None,
+    description: str = None,
+    folder_type: str = None,
+    is_workbook: bool = None,
+    title: str = None,
+) -> dict:
     """
     Create a container in LabKey.
 
@@ -35,8 +34,7 @@ def create(
     return server_context.make_request(url, json_dumps(payload), headers=headers)
 
 
-def delete(server_context, container_path=None):
-    # type: (ServerContext, str) -> any
+def delete(server_context: ServerContext, container_path: str = None) -> any:
     """
     Deletes a container at the given container_path, or at the server_context's container path
     :param server_context: A LabKey server context. See utils.create_server_context.
