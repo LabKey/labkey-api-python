@@ -15,7 +15,8 @@
 #
 from typing import Union, List
 
-from labkey.utils import json_dumps, ServerContext
+from .server_context import ServerContext
+from labkey.utils import json_dumps
 
 
 class ExpObject(object):
@@ -229,7 +230,9 @@ def save_batch(server_context: ServerContext, assay_id: int, batch: Batch) -> Un
     return None
 
 
-def save_batches(server_context: ServerContext, assay_id: int, batches: List[Batch]) -> Union[List[Batch], None]:
+def save_batches(
+    server_context: ServerContext, assay_id: int, batches: List[Batch]
+) -> Union[List[Batch], None]:
     """
     Saves a modified batches.
     :param server_context: A LabKey server context. See utils.create_server_context.
