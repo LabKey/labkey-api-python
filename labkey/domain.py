@@ -349,7 +349,7 @@ def conditional_format(
         filter=filter_str,
         italic=italic,
         strike_through=strike_through,
-        text_color=text_color
+        text_color=text_color,
     )
 
     return cf

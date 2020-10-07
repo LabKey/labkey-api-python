@@ -106,9 +106,7 @@ except ServerNotFoundError:
     print("Caught context path")
 
 # catch bad folder path error
-bad_server_context = ServerContext(
-    labkey_server, "bad_project_name", context_path, use_ssl=False
-)
+bad_server_context = ServerContext(labkey_server, "bad_project_name", context_path, use_ssl=False)
 try:
     result = select_rows(bad_server_context, schema, table)
     print(result)
