@@ -15,19 +15,19 @@
 #
 import requests
 
+from labkey.server_context import ServerContext
+
 try:
     import mock
 except ImportError:
     import unittest.mock as mock
-
-from labkey.utils import create_server_context
 
 
 def mock_server_context(mock_action):
     # mock the CSRF token
     with mock.patch("labkey.utils.requests.sessions.Session.get") as mock_get:
         mock_get.return_value = mock_action.get_csrf_response()
-        return create_server_context(
+        return ServerContext(
             mock_action.server_name,
             mock_action.project_path,
             mock_action.context_path,

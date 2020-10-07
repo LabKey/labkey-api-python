@@ -24,12 +24,12 @@ from labkey.security import (
     get_user_by_email,
     get_roles,
 )
-from labkey.utils import create_server_context
+from labkey.server_context import ServerContext
 
 labkey_server = "localhost:8080"
 project_name = "Home"  # Project folder name
 contextPath = "labkey"
-server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=False)
+server_context = ServerContext(labkey_server, project_name, contextPath, use_ssl=False)
 
 
 ###############

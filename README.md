@@ -80,7 +80,7 @@ Sample code is available in the [samples](https://github.com/LabKey/labkey-api-p
 The following gets data from the Users table on your local machine:
 
 ```python
-from labkey.utils import create_server_context
+from labkey.server_context import ServerContext
 from labkey.query import select_rows
 
 print("Create a server context")
@@ -90,7 +90,7 @@ contextPath = 'labkey'
 schema = 'core'
 table = 'Users'
 
-server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=False)
+server_context = ServerContext(labkey_server, project_name, contextPath, use_ssl=False)
 
 result = select_rows(server_context, schema, table)
 if result is not None:
@@ -101,7 +101,7 @@ else:
 ```
 
 ## Supported Versions
-Python 2.6+ and 3.4+ are fully supported.
+Python 3.6+ is fully supported.
 LabKey Server v15.1 and later.
 
 ## Contributing

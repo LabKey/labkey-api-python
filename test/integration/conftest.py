@@ -3,7 +3,7 @@ from configparser import ConfigParser
 
 import pytest
 
-from labkey.utils import create_server_context
+from labkey.server_context import ServerContext
 from labkey import container
 from labkey.exceptions import QueryNotFoundError
 
@@ -51,13 +51,13 @@ def server_context(server_context_vars):
     :return: ServerContext
     """
     server, context_path = server_context_vars
-    return create_server_context(server, PROJECT_NAME, context_path, use_ssl=False)
+    return ServerContext(server, PROJECT_NAME, context_path, use_ssl=False)
 
 
 @pytest.fixture(autouse=True, scope="session")
 def project(server_context_vars):
     server, context_path = server_context_vars
-    context = create_server_context(server, "", context_path, use_ssl=False)
+    context = ServerContext(server, "", context_path, use_ssl=False)
 
     try:
         container.delete(context, PROJECT_NAME)

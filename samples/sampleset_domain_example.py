@@ -1,10 +1,10 @@
-from labkey.utils import create_server_context
 from labkey import domain
+from labkey.server_context import ServerContext
 
 labkey_server = "localhost:8080"
 project_name = "MySamples"  # Project folder name
 context_path = "labkey"
-server_context = create_server_context(labkey_server, project_name, context_path, use_ssl=False)
+server_context = ServerContext(labkey_server, project_name, context_path, use_ssl=False)
 
 ###################
 # Create a SampleSet domain

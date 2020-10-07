@@ -17,41 +17,6 @@ import json
 from functools import wraps
 from datetime import date, datetime
 
-from .server_context import ServerContext
-
-
-def create_server_context(
-    domain: str,
-    container_path: str,
-    context_path: str = None,
-    use_ssl: bool = True,
-    verify_ssl: bool = True,
-    api_key: str = None,
-    disable_csrf: bool = False,
-) -> ServerContext:
-    """
-    Create a LabKey server context. This context is used to encapsulate properties
-    about the LabKey server that is being requested against. This includes, but is not limited to,
-    the domain, container_path, if the server is using SSL, and CSRF token request.
-    :param domain:
-    :param container_path:
-    :param context_path:
-    :param use_ssl:
-    :param verify_ssl:
-    :param api_key:
-    :param disable_csrf:
-    :return:
-    """
-    return ServerContext(
-        domain=domain,
-        container_path=container_path,
-        context_path=context_path,
-        use_ssl=use_ssl,
-        verify_ssl=verify_ssl,
-        api_key=api_key,
-        disable_csrf=disable_csrf,
-    )
-
 
 # Issue #14: json.dumps on datetime throws TypeError
 class DateTimeEncoder(json.JSONEncoder):
@@ -59,7 +24,7 @@ class DateTimeEncoder(json.JSONEncoder):
         if isinstance(o, (datetime, date)):
             return o.isoformat()
 
-        return super(DateTimeEncoder, self).default(o)
+        return super().default(o)
 
 
 @wraps(json.dumps)

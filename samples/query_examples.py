@@ -20,7 +20,7 @@ Sample data from the New Study tutorial on labkey.org:
     https://www.labkey.org/Documentation/wiki-page.view?name=studySetupManual
 
 """
-from labkey.utils import create_server_context
+from labkey.server_context import ServerContext
 from labkey.exceptions import (
     RequestError,
     QueryNotFoundError,
@@ -45,7 +45,7 @@ print("Create a server context")
 labkey_server = "localhost:8080"
 project_name = "ModuleAssayTest"  # Project folder name
 context_path = "labkey"
-server_context = create_server_context(labkey_server, project_name, context_path, use_ssl=False)
+server_context = ServerContext(labkey_server, project_name, context_path, use_ssl=False)
 
 schema = "lists"
 table = "Demographics"
@@ -89,7 +89,7 @@ except QueryNotFoundError:
     print("Caught bad schema")
 
 # catch SSL error
-ssl_server_context = create_server_context(labkey_server, project_name, context_path, use_ssl=True)
+ssl_server_context = ServerContext(labkey_server, project_name, context_path, use_ssl=True)
 try:
     result = select_rows(ssl_server_context, schema, table)
     print(result)
@@ -98,7 +98,7 @@ except ServerContextError:
 
 
 # catch bad context path
-bad_server_context = create_server_context(labkey_server, project_name, "", use_ssl=False)
+bad_server_context = ServerContext(labkey_server, project_name, "", use_ssl=False)
 try:
     result = select_rows(bad_server_context, schema, table)
     print(result)
@@ -106,7 +106,7 @@ except ServerNotFoundError:
     print("Caught context path")
 
 # catch bad folder path error
-bad_server_context = create_server_context(
+bad_server_context = ServerContext(
     labkey_server, "bad_project_name", context_path, use_ssl=False
 )
 try:
