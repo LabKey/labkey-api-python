@@ -20,6 +20,7 @@ What's New in the LabKey 2.0.0 package
 - Removed various "from_data" methods
     - They were all simple one line wrappers around Class constructors that were not needed if you were using any you
     may update your code e.g. "SomeClass.from_data(data)" can be changed to "SomeClass(**data)"
+- Remove unsupported modules
 
 What's New in the LabKey 1.4.1 package
 ==============================

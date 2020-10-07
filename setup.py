@@ -22,7 +22,7 @@ are not already installed.
 import re
 from setuptools import setup
 
-packages = ["labkey", "labkey.unsupported"]
+packages = ["labkey"]
 
 with open("labkey/__init__.py", "r") as fd:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE).group(1)
