@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from labkey.experiment import Batch, Run, load_batch, save_batch
-from labkey.server_context import ServerContext
+from labkey.api_wrapper import APIWrapper
+from labkey.experiment import Batch, Run
 
 labkey_server = "localhost:8080"
 project_name = "ModulesAssayTest"  # Project folder name
 context_path = "labkey"
-server_context = ServerContext(labkey_server, project_name, context_path, use_ssl=False)
+api = APIWrapper(labkey_server, project_name, context_path, use_ssl=False)
 
 assay_id = 3315  # provide one from your server
 
@@ -60,13 +60,13 @@ batch.name = "python batch"
 batch.properties["PropertyName"] = "Property Value"
 
 # Execute save api
-saved_batch = save_batch(server_context, assay_id, batch)
+saved_batch = api.experiment.save_batch(assay_id, batch)
 
 ###################
 # Load an Assay batch
 ###################
 batch_id = saved_batch.row_id  # provide one from your server
-run_group = load_batch(server_context, assay_id, batch_id)
+run_group = api.experiment.load_batch(assay_id, batch_id)
 
 if run_group is not None:
     print("Batch Id: " + str(run_group.id))

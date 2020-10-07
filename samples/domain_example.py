@@ -13,14 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from labkey.api_wrapper import APIWrapper
+from labkey.domain import conditional_format
 from labkey.query import QueryFilter
-from labkey import domain
-from labkey.server_context import ServerContext
 
 labkey_server = "localhost:8080"
 project_name = "Study"  # Project folder name
 context_path = "labkey"
-server_context = ServerContext(labkey_server, project_name, context_path, use_ssl=False)
+api = APIWrapper(labkey_server, project_name, context_path, use_ssl=False)
 
 ###################
 # Create a list domain
@@ -39,8 +39,8 @@ list_domain_definition = {
     "options": {"keyName": "rowId", "keyType": "AutoIncrementInteger"},
 }
 
-# domain.create returns the full Domain definition
-created_list_domain = domain.create(server_context, list_domain_definition)
+# api.domain.create returns the full Domain definition
+created_list_domain = api.domain.create(list_domain_definition)
 
 ###################
 # Create a study dataset domain
@@ -62,12 +62,12 @@ dataset_domain_definition = {
     },
 }
 
-dataset_domain = domain.create(server_context, dataset_domain_definition)
+dataset_domain = api.domain.create(dataset_domain_definition)
 
 ###################
 # Get a domain
 ###################
-list_domain = domain.get(server_context, "lists", "BloodTypes")
+list_domain = api.domain.get("lists", "BloodTypes")
 
 # examine different from the domain
 print(list_domain.name)
@@ -80,21 +80,21 @@ list_domain.add_field({"name": "canTransfuse", "rangeURI": "boolean"})
 
 # Use infer fields to define additional fields
 fields_file = open("data/infer.tsv", "rb")
-inferred_fields = domain.infer_fields(server_context, fields_file)
+inferred_fields = api.domain.infer_fields(fields_file)
 
 for field in inferred_fields:
     list_domain.add_field(field)
 
-domain.save(server_context, "lists", "BloodTypes", list_domain)
+api.domain.save("lists", "BloodTypes", list_domain)
 
 ###################
 # Drop a domain
 ###################
-drop_response = domain.drop(server_context, "study", "Blood Levels")
+drop_response = api.domain.drop("study", "Blood Levels")
 if "success" in drop_response:
     print("The dataset domain was deleted.")
 
-drop_response = domain.drop(server_context, "lists", "BloodTypes")
+drop_response = api.domain.drop("lists", "BloodTypes")
 if "success" in drop_response:
     print("The list domain was deleted.")
 
@@ -148,7 +148,7 @@ list_with_cf = {
     "options": {"keyName": "rowId", "keyType": "AutoIncrementInteger"},
 }
 
-domain_cf = domain.create(server_context, list_with_cf)
+domain_cf = api.domain.create(list_with_cf)
 
 ###################
 # Edit an existing domain's conditional format
@@ -160,16 +160,16 @@ print(
 
 for field in domain_cf.fields:
     if field.name == "age":
-        cf = domain.conditional_format(query_filter="format.column~eq=30", text_color="ff0000")
+        cf = conditional_format(query_filter="format.column~eq=30", text_color="ff0000")
         field.conditional_formats = [cf]
     if field.name == "date":
-        cf = domain.conditional_format(
+        cf = conditional_format(
             query_filter=QueryFilter("date", "10/30/1995", QueryFilter.Types.DATE_LESS_THAN),
             text_color="f44e3b",
         )
         field.conditional_formats = [cf]
 
-domain.save(server_context, "lists", "ListWithConditionalFormats", domain_cf)
+api.domain.save("lists", "ListWithConditionalFormats", domain_cf)
 print(
     'The filter on field "'
     + age_field.name
@@ -185,4 +185,4 @@ for field in domain_cf.fields:
         field.conditional_formats = []
 
 # Cleanup
-domain.drop(server_context, "lists", "ListWithConditionalFormats")
+api.domain.drop("lists", "ListWithConditionalFormats")
