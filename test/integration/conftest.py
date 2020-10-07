@@ -3,6 +3,7 @@ from configparser import ConfigParser
 
 import pytest
 
+from labkey.api_wrapper import APIWrapper
 from labkey.server_context import ServerContext
 from labkey import container
 from labkey.exceptions import QueryNotFoundError
@@ -42,16 +43,9 @@ def server_context_vars():
 
 
 @pytest.fixture(scope="session")
-def server_context(server_context_vars):
-    """
-    Use this fixture by adding an argument called "server_context" to your test function. It assumes you have a server
-    running at localhost:8080, a project name "PythonIntegrationTest", and a context path of "labkey". You will need
-    a netrc file configured with a valid username and password in order for API requests to work.
-
-    :return: ServerContext
-    """
+def api(server_context_vars):
     server, context_path = server_context_vars
-    return ServerContext(server, PROJECT_NAME, context_path, use_ssl=False)
+    return APIWrapper(server, PROJECT_NAME, context_path, use_ssl=False)
 
 
 @pytest.fixture(autouse=True, scope="session")

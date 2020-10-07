@@ -1,8 +1,8 @@
 import pytest
 
+from labkey.api_wrapper import APIWrapper
 from labkey.query import QueryFilter
-
-from labkey.domain import conditional_format, create, drop, get, save
+from labkey.domain import conditional_format
 
 pytestmark = pytest.mark.integration  # Mark all tests in this module as integration tests
 LISTS_SCHEMA = "lists"
@@ -39,15 +39,15 @@ LIST_DEFINITION = {
 
 
 @pytest.fixture(scope="function")
-def list_fixture(server_context):
-    create(server_context, LIST_DEFINITION)
-    created_list = get(server_context, LISTS_SCHEMA, LIST_NAME)
+def list_fixture(api: APIWrapper):
+    api.domain.create(LIST_DEFINITION)
+    created_list = api.domain.get(LISTS_SCHEMA, LIST_NAME)
     yield created_list
     # clean up
-    drop(server_context, LISTS_SCHEMA, LIST_NAME)
+    api.domain.drop(LISTS_SCHEMA, LIST_NAME)
 
 
-def test_add_conditional_format(server_context, list_fixture):
+def test_add_conditional_format(api: APIWrapper, list_fixture):
     new_conditional_format = conditional_format(
         query_filter="format.column~lte=7",
         text_color="ff0055",
@@ -61,15 +61,15 @@ def test_add_conditional_format(server_context, list_fixture):
         if field.name == "formatted":
             field.conditional_formats.append(new_conditional_format)
 
-    save(server_context, LISTS_SCHEMA, LIST_NAME, list_fixture)
-    saved_domain = get(server_context, LISTS_SCHEMA, LIST_NAME)
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, list_fixture)
+    saved_domain = api.domain.get(LISTS_SCHEMA, LIST_NAME)
 
     for field in saved_domain.fields:
         if field.name == "formatted":
             assert len(field.conditional_formats) == 2
 
 
-def test_add_conditional_format_with_multiple_filters(server_context, list_fixture):
+def test_add_conditional_format_with_multiple_filters(api: APIWrapper, list_fixture):
     new_conditional_formats = [
         conditional_format(
             query_filter=[
@@ -93,8 +93,8 @@ def test_add_conditional_format_with_multiple_filters(server_context, list_fixtu
             field.conditional_formats = []
             field.conditional_formats = new_conditional_formats
 
-    save(server_context, LISTS_SCHEMA, LIST_NAME, list_fixture)
-    saved_domain = get(server_context, LISTS_SCHEMA, LIST_NAME)
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, list_fixture)
+    saved_domain = api.domain.get(LISTS_SCHEMA, LIST_NAME)
 
     for field in saved_domain.fields:
         if field.name == "formatted":
@@ -103,7 +103,7 @@ def test_add_conditional_format_with_multiple_filters(server_context, list_fixtu
 
 
 @pytest.mark.xfail  # this reproduces https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=41318
-def test_add_malformed_query_filter(server_context, list_fixture):
+def test_add_malformed_query_filter(api: APIWrapper, list_fixture):
     new_conditional_format = conditional_format(
         query_filter="this-is-a-badly-formed-filter",
         text_color="ff0055",
@@ -118,8 +118,8 @@ def test_add_malformed_query_filter(server_context, list_fixture):
             field.conditional_formats = []
             field.conditional_formats = [new_conditional_format]
 
-    save(server_context, LISTS_SCHEMA, LIST_NAME, list_fixture)
-    saved_domain = get(server_context, LISTS_SCHEMA, LIST_NAME)
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, list_fixture)
+    saved_domain = api.domain.get(LISTS_SCHEMA, LIST_NAME)
 
     for field in saved_domain.fields:
         if field.name == "formatted":
@@ -128,7 +128,7 @@ def test_add_malformed_query_filter(server_context, list_fixture):
             ), "api should discard meaningless filters"
 
 
-def test_add_conditional_format_with_missing_filter(server_context, list_fixture):
+def test_add_conditional_format_with_missing_filter(api: APIWrapper, list_fixture):
     missing_filter_type_filter = QueryFilter("formatted", 13)
     new_conditional_format = conditional_format(
         query_filter=missing_filter_type_filter,
@@ -144,28 +144,28 @@ def test_add_conditional_format_with_missing_filter(server_context, list_fixture
             field.conditional_formats = []
             field.conditional_formats = [new_conditional_format]
 
-    save(server_context, LISTS_SCHEMA, LIST_NAME, list_fixture)
-    saved_domain = get(server_context, LISTS_SCHEMA, LIST_NAME)
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, list_fixture)
+    saved_domain = api.domain.get(LISTS_SCHEMA, LIST_NAME)
 
     for field in saved_domain.fields:
         if field.name == "formatted":
             assert field.conditional_formats[0].filter == "format.column~eq=13"
 
 
-def test_remove_conditional_format(server_context, list_fixture):
+def test_remove_conditional_format(api: APIWrapper, list_fixture):
     for field in list_fixture.fields:
         if field.name == "formatted":
             field.conditional_formats = []
 
-    save(server_context, LISTS_SCHEMA, LIST_NAME, list_fixture)
-    saved_domain = get(server_context, LISTS_SCHEMA, LIST_NAME)
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, list_fixture)
+    saved_domain = api.domain.get(LISTS_SCHEMA, LIST_NAME)
 
     for field in saved_domain.fields:
         if field.name == "formatted":
             assert len(field.conditional_formats) == 0
 
 
-def test_update_conditional_format_serialize_filter(server_context, list_fixture):
+def test_update_conditional_format_serialize_filter(api: APIWrapper, list_fixture):
     from labkey.query import QueryFilter
 
     new_filter = QueryFilter("formatted", 15, QueryFilter.Types.GREATER_THAN_OR_EQUAL)
@@ -175,30 +175,30 @@ def test_update_conditional_format_serialize_filter(server_context, list_fixture
         if field.name == "formatted":
             field.conditional_formats[0] = cf
 
-    save(server_context, LISTS_SCHEMA, LIST_NAME, list_fixture)
-    saved_domain = get(server_context, LISTS_SCHEMA, LIST_NAME)
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, list_fixture)
+    saved_domain = api.domain.get(LISTS_SCHEMA, LIST_NAME)
 
     for field in saved_domain.fields:
         if field.name == "formatted":
             assert field.conditional_formats[0].filter == "format.column~gte=15"
 
 
-def test_update_conditional_format_plain_text(server_context, list_fixture):
+def test_update_conditional_format_plain_text(api: APIWrapper, list_fixture):
     new_filter = "formatted~gte=15"
 
     for field in list_fixture.fields:
         if field.name == "formatted":
             field.conditional_formats[0].filter = new_filter
 
-    save(server_context, LISTS_SCHEMA, LIST_NAME, list_fixture)
-    saved_domain = get(server_context, LISTS_SCHEMA, LIST_NAME)
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, list_fixture)
+    saved_domain = api.domain.get(LISTS_SCHEMA, LIST_NAME)
 
     for field in saved_domain.fields:
         if field.name == "formatted":
             assert field.conditional_formats[0].filter == new_filter
 
 
-def test_create_list_with_conditional_formatted_field(server_context):
+def test_create_list_with_conditional_formatted_field(api: APIWrapper):
     composed_list_definition = {
         "kind": "IntList",
         "domainDesign": {
@@ -224,10 +224,11 @@ def test_create_list_with_conditional_formatted_field(server_context):
         },
         "options": {"keyName": "rowId", "keyType": "AutoIncrementInteger"},
     }
-    create(server_context, composed_list_definition)
-    created_list = get(server_context, LISTS_SCHEMA, "composed_list_name")
+    api.domain.create(composed_list_definition)
+    created_list = api.domain.get(LISTS_SCHEMA, "composed_list_name")
+
     for field in created_list.fields:
         if field.name == "formatted":
             assert len(field.conditional_formats) == 2
 
-    drop(server_context, LISTS_SCHEMA, "composed_list_name")
+    api.domain.drop(LISTS_SCHEMA, "composed_list_name")
