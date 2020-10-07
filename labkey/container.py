@@ -45,3 +45,28 @@ def delete(server_context: ServerContext, container_path: str = None) -> any:
     headers = {"Content-Type": "application/json"}
     url = server_context.build_url("core", "deleteContainer.api", container_path)
     return server_context.make_request(url, None, headers=headers)
+
+
+class ContainerWrapper:
+    """
+    Wrapper for all of the API methods exposed in the container module. Used by the APIWrapper class.
+    """
+
+    def __init__(self, server_context: ServerContext):
+        self.server_context = server_context
+
+    def create(
+        self,
+        name: str,
+        container_path: str = None,
+        description: str = None,
+        folder_type: str = None,
+        is_workbook: bool = None,
+        title: str = None,
+    ):
+        return create(
+            self.server_context, name, container_path, description, folder_type, is_workbook, title
+        )
+
+    def delete(self, container_path: str = None):
+        return delete(self.server_context, container_path)

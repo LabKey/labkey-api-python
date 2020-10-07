@@ -13,13 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from typing import Union, List
+import functools
+from typing import List, Optional
 
 from .server_context import ServerContext
 from labkey.utils import json_dumps
 
 
-class ExpObject(object):
+class ExpObject:
     def __init__(self, **kwargs):
         self.lsid = kwargs.pop("lsid", None)  # Life Science identifier
         self.name = kwargs.pop("name", None)
@@ -191,7 +192,7 @@ class Data(RunItem):
 
 
 # TODO Incorporate logging
-def load_batch(server_context: ServerContext, assay_id: int, batch_id: int) -> Union[Batch, None]:
+def load_batch(server_context: ServerContext, assay_id: int, batch_id: int) -> Optional[Batch]:
     """
     Loads a batch from the server.
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -215,7 +216,7 @@ def load_batch(server_context: ServerContext, assay_id: int, batch_id: int) -> U
     return loaded_batch
 
 
-def save_batch(server_context: ServerContext, assay_id: int, batch: Batch) -> Union[Batch, None]:
+def save_batch(server_context: ServerContext, assay_id: int, batch: Batch) -> Optional[Batch]:
     """
     Saves a modified batch.
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -232,7 +233,7 @@ def save_batch(server_context: ServerContext, assay_id: int, batch: Batch) -> Un
 
 def save_batches(
     server_context: ServerContext, assay_id: int, batches: List[Batch]
-) -> Union[List[Batch], None]:
+) -> Optional[List[Batch]]:
     """
     Saves a modified batches.
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -263,3 +264,24 @@ def save_batches(
         return [Batch.from_data(resp_batch) for resp_batch in resp_batches]
 
     return None
+
+
+class ExperimentWrapper:
+    """
+    Wrapper for all of the API methods exposed in the experiment module. Used by the APIWrapper class.
+    """
+
+    def __init__(self, server_context: ServerContext):
+        self.server_context = server_context
+
+    @functools.wraps(load_batch)
+    def load_batch(self, assay_id: int, batch_id: int) -> Optional[Batch]:
+        return load_batch(self.server_context, assay_id, batch_id)
+
+    @functools.wraps(save_batch)
+    def save_batch(self, assay_id: int, batch: Batch) -> Optional[Batch]:
+        return save_batch(self.server_context, assay_id, batch)
+
+    @functools.wraps(save_batches)
+    def save_batches(self, assay_id: int, batches: List[Batch]) -> Optional[List[Batch]]:
+        return save_batches(self.server_context, assay_id, batches)

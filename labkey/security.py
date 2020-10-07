@@ -13,11 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import functools
+from typing import Union, List
+
+from labkey.server_context import ServerContext
+
 SECURITY_CONTROLLER = "security"
 USER_CONTROLLER = "user"
 
 
-def activate_users(server_context, target_ids, container_path=None):
+def activate_users(
+    server_context: ServerContext, target_ids: List[int], container_path: str = None
+):
     """
     Activate user accounts
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -33,7 +40,12 @@ def activate_users(server_context, target_ids, container_path=None):
     )
 
 
-def add_to_group(server_context, user_ids, group_id, container_path=None):
+def add_to_group(
+    server_context: ServerContext,
+    user_ids: Union[int, List[int]],
+    group_id: int,
+    container_path: str = None,
+):
     """
     Add user to group
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -47,7 +59,13 @@ def add_to_group(server_context, user_ids, group_id, container_path=None):
     )
 
 
-def add_to_role(server_context, role, user_id=None, email=None, container_path=None):
+def add_to_role(
+    server_context: ServerContext,
+    role: dict,
+    user_id: int = None,
+    email: str = None,
+    container_path: str = None,
+):
     """
     Add user/group to security role
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -67,7 +85,9 @@ def add_to_role(server_context, role, user_id=None, email=None, container_path=N
     )
 
 
-def create_user(server_context, email, container_path=None, send_email=False):
+def create_user(
+    server_context: ServerContext, email: str, container_path: str = None, send_email=False
+):
     """
     Create new account
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -82,7 +102,9 @@ def create_user(server_context, email, container_path=None, send_email=False):
     return server_context.make_request(url, payload)
 
 
-def deactivate_users(server_context, target_ids, container_path=None):
+def deactivate_users(
+    server_context: ServerContext, target_ids: List[int], container_path: str = None
+) -> dict:
     """
     Deactivate but do not delete user accounts
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -103,7 +125,7 @@ def deactivate_users(server_context, target_ids, container_path=None):
         raise ValueError("Unable to deactivate users {0}".format(target_ids))
 
 
-def delete_users(server_context, target_ids, container_path=None):
+def delete_users(server_context: ServerContext, target_ids: List[int], container_path: str = None):
     """
     Delete user accounts
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -124,7 +146,7 @@ def delete_users(server_context, target_ids, container_path=None):
         raise ValueError("Unable to delete users {0}".format(target_ids))
 
 
-def get_roles(server_context, container_path=None):
+def get_roles(server_context: ServerContext, container_path: str = None):
     """
     Gets the set of permissions and roles available from the server
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -137,7 +159,7 @@ def get_roles(server_context, container_path=None):
     return server_context.make_request(url, None)
 
 
-def get_user_by_email(server_context, email):
+def get_user_by_email(server_context: ServerContext, email: str):
     """
     Get the user with the provided email. Throws a ValueError if not found.
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -158,13 +180,20 @@ def get_user_by_email(server_context, email):
         raise ValueError("User not found: " + email)
 
 
-def list_groups(server_context, include_site_groups=False, container_path=None):
+def list_groups(
+    server_context: ServerContext, include_site_groups: bool = False, container_path: str = None
+):
     url = server_context.build_url(SECURITY_CONTROLLER, "listProjectGroups.api", container_path)
 
     return server_context.make_request(url, {"includeSiteGroups": include_site_groups})
 
 
-def remove_from_group(server_context, user_ids, group_id, container_path=None):
+def remove_from_group(
+    server_context: ServerContext,
+    user_ids: Union[int, List[int]],
+    group_id,
+    container_path: str = None,
+):
     """
     Remove user from group
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -178,7 +207,13 @@ def remove_from_group(server_context, user_ids, group_id, container_path=None):
     )
 
 
-def remove_from_role(server_context, role, user_id=None, email=None, container_path=None):
+def remove_from_role(
+    server_context: ServerContext,
+    role: dict,
+    user_id: int = None,
+    email: str = None,
+    container_path: str = None,
+):
     """
     Remove user/group from security role
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -198,7 +233,7 @@ def remove_from_role(server_context, role, user_id=None, email=None, container_p
     )
 
 
-def reset_password(server_context, email, container_path=None):
+def reset_password(server_context: ServerContext, email: str, container_path: str = None):
     """
     Change password for a user  (Requires Admin privileges on the LabKey server)
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -211,7 +246,13 @@ def reset_password(server_context, email, container_path=None):
     return server_context.make_request(url, {"email": email})
 
 
-def __make_security_group_api_request(server_context, api, user_ids, group_id, container_path):
+def __make_security_group_api_request(
+    server_context: ServerContext,
+    api: str,
+    user_ids: Union[int, List[int]],
+    group_id: int,
+    container_path: str = None,
+):
     """
     Execute a request against the LabKey Security Controller Group Membership apis
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -231,7 +272,12 @@ def __make_security_group_api_request(server_context, api, user_ids, group_id, c
 
 
 def __make_security_role_api_request(
-    server_context, api, role, email=None, user_id=None, container_path=None
+    server_context: ServerContext,
+    api: str,
+    role: dict,
+    email: str = None,
+    user_id: int = None,
+    container_path: str = None,
 ):
     """
     Execute a request against the LabKey Security Controller Group Membership apis
@@ -253,7 +299,9 @@ def __make_security_role_api_request(
     )
 
 
-def __make_user_api_request(server_context, target_ids, api, container_path=None):
+def __make_user_api_request(
+    server_context: ServerContext, target_ids: List[int], api: str, container_path: str = None
+):
     """
     Make a request to the LabKey User Controller
     :param server_context: A LabKey server context. See utils.create_server_context.
@@ -265,3 +313,68 @@ def __make_user_api_request(server_context, target_ids, api, container_path=None
     url = server_context.build_url(USER_CONTROLLER, api, container_path)
 
     return server_context.make_request(url, {"userId": target_ids})
+
+
+class SecurityWrapper:
+    """
+    Wrapper for all of the API methods exposed in the security module. Used by the APIWrapper class.
+    """
+
+    def __init__(self, server_context: ServerContext):
+        self.server_context = server_context
+
+    @functools.wraps(activate_users)
+    def activate_users(self, target_ids: List[int], container_path: str = None):
+        return activate_users(self.server_context, target_ids, container_path)
+
+    @functools.wraps(add_to_group)
+    def add_to_group(
+        self, user_ids: Union[int, List[int]], group_id: int, container_path: str = None
+    ):
+        return add_to_group(self.server_context, user_ids, group_id, container_path)
+
+    @functools.wraps(add_to_role)
+    def add_to_role(
+        self, role: dict, user_id: int = None, email: str = None, container_path: str = None
+    ):
+        return add_to_role(self.server_context, role, user_id, email, container_path)
+
+    @functools.wraps(create_user)
+    def create_user(self, email: str, container_path: str = None, send_email=False):
+        return create_user(self.server_context, email, container_path, send_email)
+
+    @functools.wraps(deactivate_users)
+    def deactivate_users(self, target_ids: List[int], container_path: str = None):
+        return deactivate_users(self.server_context, target_ids, container_path)
+
+    @functools.wraps(delete_users)
+    def delete_users(self, target_ids: List[int], container_path: str = None):
+        return delete_users(self.server_context, target_ids, container_path)
+
+    @functools.wraps(get_roles)
+    def get_roles(self, container_path: str = None):
+        return get_roles(self.server_context, container_path)
+
+    @functools.wraps(get_user_by_email)
+    def get_user_by_email(self, email: str):
+        return get_user_by_email(self.server_context, email)
+
+    @functools.wraps(list_groups)
+    def list_groups(self, include_site_groups: bool = False, container_path: str = None):
+        return list_groups(self.server_context, include_site_groups, container_path)
+
+    @functools.wraps(remove_from_group)
+    def remove_from_group(
+        self, user_ids: Union[int, List[int]], group_id, container_path: str = None
+    ):
+        return remove_from_group(self.server_context, user_ids, group_id, container_path)
+
+    @functools.wraps(remove_from_role)
+    def remove_from_role(
+        self, role: dict, user_id: int = None, email: str = None, container_path: str = None
+    ):
+        return remove_from_role(self.server_context, role, user_id, email, container_path)
+
+    @functools.wraps(reset_password)
+    def reset_password(self, email: str, container_path: str = None):
+        return reset_password(self.server_context, email, container_path)

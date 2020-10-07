@@ -44,7 +44,13 @@ def handle_response(response, non_json_response=False):
         raise RequestError(response)
 
 
-class ServerContext(object):
+class ServerContext:
+    """
+    ServerContext is used to encapsulate properties about the LabKey server that is being requested
+    against. This includes, but is not limited to, the domain, container_path, if the server is
+    using SSL, and CSRF token request.
+    """
+
     def __init__(
         self,
         domain,
@@ -72,9 +78,7 @@ class ServerContext(object):
             self._scheme = "http://"
 
     def __repr__(self):
-        return "<ServerContext [ {} | {} | {} ]>".format(
-            self._domain, self._context_path, self._container_path
-        )
+        return f"<ServerContext [ {self._domain} | {self._context_path} | {self._container_path} ]>"
 
     def build_url(self, controller: str, action: str, container_path: str = None) -> str:
         sep = "/"

@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import functools
 from typing import Union, List
 
 from .server_context import ServerContext
@@ -29,7 +30,7 @@ def strip_none_values(data: dict, do_strip: bool = True):
 
 
 # modeled on org.labkey.api.gwt.client.model.GWTPropertyDescriptor
-class PropertyDescriptor(object):
+class PropertyDescriptor:
     def __init__(self, **kwargs):
         self.concept_uri = kwargs.pop("concept_uri", kwargs.pop("conceptURI", None))
 
@@ -174,7 +175,7 @@ class PropertyDescriptor(object):
         return strip_none_values(data, strip_none)
 
 
-class PropertyValidator(object):
+class PropertyValidator:
     def __init__(self, **kwargs):
         self.description = kwargs.pop("description", None)
         self.error_message = kwargs.pop("error_message", kwargs.pop("errorMessage", None))
@@ -204,7 +205,7 @@ class PropertyValidator(object):
         return strip_none_values(data, strip_none)
 
 
-class ConditionalFormat(object):
+class ConditionalFormat:
     def __init__(self, **kwargs):
         self.background_color = kwargs.pop("background_color", kwargs.pop("backgroundColor", None))
         self.bold = kwargs.pop("bold", None)
@@ -231,7 +232,7 @@ class ConditionalFormat(object):
 
 
 # modeled on org.labkey.api.gwt.client.model.GWTDomain
-class Domain(object):
+class Domain:
     def __init__(self, **kwargs):
         self.container = kwargs.pop("container", None)
         self.description = kwargs.pop("description", None)
@@ -301,7 +302,7 @@ class Domain(object):
 
 
 # TODO: Determine if this can be used when initializing domain.create
-class DomainDefinition(object):
+class DomainDefinition:
     def __init__(self, **kwargs):
         self.create_domain = kwargs.pop("create_domain", None)
         self.domain_design = kwargs.pop("domain_design", None)
@@ -314,7 +315,7 @@ class DomainDefinition(object):
 
 
 # modeled on org.labkey.api.gwt.client.model.GWTIndex
-class FieldIndex(object):
+class FieldIndex:
     def __init__(self, **kwargs):
         self.column_names = kwargs.pop("column_names", kwargs.pop("columnNames", None))
         self.unique = kwargs.pop("unique", None)
@@ -515,3 +516,32 @@ def save(
     }
 
     return server_context.make_request(url, json_dumps(payload), headers=headers)
+
+
+class DomainWrapper:
+    """
+    Wrapper for all of the API methods exposed in the domain module. Used by the APIWrapper class.
+    """
+
+    def __init__(self, server_context: ServerContext):
+        self.server_context = server_context
+
+    @functools.wraps(create)
+    def create(self, domain_definition: dict, container_path: str = None):
+        return create(self.server_context, domain_definition, container_path)
+
+    @functools.wraps(drop)
+    def drop(self, schema_name: str, query_name: str, container_path: str = None):
+        return drop(self.server_context, schema_name, query_name, container_path)
+
+    @functools.wraps(get)
+    def get(self, schema_name: str, query_name: str, container_path: str = None):
+        return get(self.server_context, schema_name, query_name, container_path)
+
+    @functools.wraps(infer_fields)
+    def infer_fields(self, data_file: any, container_path: str = None):
+        return infer_fields(self.server_context, data_file, container_path)
+
+    @functools.wraps(save)
+    def save(self, schema_name: str, query_name: str, domain: Domain, container_path: str = None):
+        return save(self.server_context, schema_name, query_name, domain, container_path)

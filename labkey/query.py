@@ -40,6 +40,10 @@ https://www.labkey.org/home/developer/forum/project-start.view
 
 ############################################################################
 """
+import functools
+from typing import List
+
+from .server_context import ServerContext
 from labkey.utils import json_dumps
 
 _query_headers = {"Content-Type": "application/json"}
@@ -429,3 +433,131 @@ def update_rows(
     )
 
 
+class QueryWrapper:
+    """
+    Wrapper for all of the API methods exposed in the query module. Used by the APIWrapper class.
+    """
+
+    def __init__(self, server_context: ServerContext):
+        self.server_context = server_context
+
+    @functools.wraps(delete_rows)
+    def delete_rows(
+        self,
+        schema_name: str,
+        query_name: str,
+        rows: any,
+        container_path: str = None,
+        timeout: int = _default_timeout,
+    ):
+        return delete_rows(
+            self.server_context, schema_name, query_name, rows, container_path, timeout
+        )
+
+    @functools.wraps(truncate_table)
+    def truncate_table(
+        self, schema_name, query_name, container_path=None, timeout=_default_timeout
+    ):
+        return truncate_table(self.server_context, schema_name, query_name, container_path, timeout)
+
+    @functools.wraps(execute_sql)
+    def execute_sql(
+        self,
+        schema_name: str,
+        sql: str,
+        container_path: str = None,
+        max_rows: int = None,
+        sort: str = None,
+        offset: int = None,
+        container_filter: str = None,
+        save_in_session: bool = None,
+        parameters: dict = None,
+        required_version: float = None,
+        timeout: int = _default_timeout,
+    ):
+        return execute_sql(
+            self.server_context,
+            schema_name,
+            sql,
+            container_path,
+            max_rows,
+            sort,
+            offset,
+            container_filter,
+            save_in_session,
+            parameters,
+            required_version,
+            timeout,
+        )
+
+    @functools.wraps(insert_rows)
+    def insert_rows(
+        self,
+        schema_name: str,
+        query_name: str,
+        rows: List[any],
+        container_path: str = None,
+        timeout: int = _default_timeout,
+    ):
+        return insert_rows(
+            self.server_context, schema_name, query_name, rows, container_path, timeout
+        )
+
+    @functools.wraps(select_rows)
+    def select_rows(
+        self,
+        schema_name: str,
+        query_name: str,
+        view_name: str = None,
+        filter_array: List[QueryFilter] = None,
+        container_path: str = None,
+        columns=None,
+        max_rows: int = None,
+        sort: str = None,
+        offset: int = None,
+        container_filter: str = None,
+        parameters: dict = None,
+        show_rows: bool = None,
+        include_total_count: bool = None,
+        include_details_column: bool = None,
+        include_update_column: bool = None,
+        selection_key: str = None,
+        required_version: float = None,
+        timeout: int = _default_timeout,
+        ignore_filter: bool = None,
+    ):
+        return select_rows(
+            self.server_context,
+            schema_name,
+            query_name,
+            view_name,
+            filter_array,
+            container_path,
+            columns,
+            max_rows,
+            sort,
+            offset,
+            container_filter,
+            parameters,
+            show_rows,
+            include_total_count,
+            include_details_column,
+            include_update_column,
+            selection_key,
+            required_version,
+            timeout,
+            ignore_filter,
+        )
+
+    @functools.wraps(update_rows)
+    def update_rows(
+        self,
+        schema_name: str,
+        query_name: str,
+        rows: List[any],
+        container_path: str = None,
+        timeout: int = _default_timeout,
+    ):
+        return update_rows(
+            self.server_context, schema_name, query_name, rows, container_path, timeout
+        )
