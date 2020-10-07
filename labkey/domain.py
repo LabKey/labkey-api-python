@@ -311,7 +311,7 @@ class FieldIndex:
 
 
 def conditional_format(
-    query_filter: any,
+    query_filter: Union[str, QueryFilter, List[QueryFilter]],
     bold: bool = False,
     italic: bool = False,
     strike_through: bool = False,
@@ -329,11 +329,10 @@ def conditional_format(
     elif isinstance(query_filter, list):
         if len(query_filter) > 2:
             raise Exception("Too many QueryFilters given for one conditional format.")
-        if (not isinstance(query_filter[0], QueryFilter)) or (
-            len(query_filter) > 1 and not isinstance(query_filter[1], QueryFilter)
-        ):
+
+        if not all([isinstance(qf, QueryFilter) for qf in query_filter]):
             raise Exception(
-                "Please pass QueryFilter objects when updating a conditional format using a list filter."
+                "Please pass QueryFilter objects when updating a conditional format using a list of filters."
             )
 
         string_filters = [encode_conditional_format_filter(f) for f in query_filter]
@@ -343,7 +342,7 @@ def conditional_format(
             else string_filters[0]
         )
 
-    cf = ConditionalFormat(
+    return ConditionalFormat(
         background_color=background_color,
         bold=bold,
         filter=filter_str,
@@ -352,11 +351,9 @@ def conditional_format(
         text_color=text_color,
     )
 
-    return cf
-
 
 def encode_conditional_format_filter(query_filter: QueryFilter) -> str:
-    return "format.column~{}={}".format(query_filter.filter_type, query_filter.value)
+    return f"format.column~{query_filter.filter_type}={query_filter.value}"
 
 
 def __format_conditional_filters(field: dict) -> dict:
