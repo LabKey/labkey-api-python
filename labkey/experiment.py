@@ -54,48 +54,29 @@ class ExpObject:
         return data
 
 
-# TODO: Move these classes into their own file(s)
 class Batch(ExpObject):
     def __init__(self, **kwargs):
-        super(Batch, self).__init__(**kwargs)
-
+        super().__init__(**kwargs)
         self.batch_protocol_id = kwargs.pop("batch_protocol_id", self.id)
         self.hidden = kwargs.pop("hidden", False)
-
         runs = kwargs.pop("runs", [])
-        run_instances = []
-
-        for run in runs:
-            run_instances.append(Run.from_data(run))
-
-        self.runs = run_instances
-
-    @staticmethod
-    def from_data(data):
-        return Batch(**data)
+        self.runs = [Run(**run) for run in runs]
 
     def to_json(self):
-
-        data = super(Batch, self).to_json()
-
+        data = super().to_json()
         data["batchProtocolId"] = self.batch_protocol_id
-
-        json_runs = []
-        for run in self.runs:
-            json_runs.append(run.to_json())
 
         # The JavaScript API doesn't appear to send these?
         # data['batchProtocolId'] = self.batch_protocol_id
         # data['hidden'] = self.hidden
-        data["runs"] = json_runs
+        data["runs"] = [run.to_json() for run in self.runs]
 
         return data
 
 
 class Run(ExpObject):
     def __init__(self, **kwargs):
-        super(Run, self).__init__(**kwargs)
-
+        super().__init__(**kwargs)
         self.experiments = kwargs.pop("experiments", [])
         self.file_path_root = kwargs.pop("file_path_root", kwargs.pop("filePathRoot", None))
         self.protocol = kwargs.pop("protocol", None)
@@ -109,22 +90,11 @@ class Run(ExpObject):
         # TODO: initialize protocol
         # self._protocol = None
 
-        # initialize data_inputs
         data_inputs = kwargs.pop("data_inputs", kwargs.pop("dataInputs", []))
-        data_inputs_instances = []
-
-        for input_ in data_inputs:
-            data_inputs_instances.append(Data.from_data(input_))
-
-        self.data_inputs = data_inputs_instances
-
-    @staticmethod
-    def from_data(data):
-        return Run(**data)
+        self.data_inputs = [Data(**input_) for input_ in data_inputs]
 
     def to_json(self):
-        data = super(Run, self).to_json()
-
+        data = super().to_json()
         data["dataInputs"] = [data_input.to_json() for data_input in self.data_inputs]
         data["dataRows"] = self.data_rows
         data["experiments"] = self.experiments
@@ -138,8 +108,7 @@ class Run(ExpObject):
 
 class RunItem(ExpObject):
     def __init__(self, **kwargs):
-        super(RunItem, self).__init__(**kwargs)
-
+        super().__init__(**kwargs)
         self.source_protocol = kwargs.pop("source_protocol", kwargs.pop("sourceProtocol", None))
         self.run = kwargs.pop("run", None)  # TODO Check if this should be a Run instance
         self.target_applications = kwargs.pop(
@@ -151,13 +120,8 @@ class RunItem(ExpObject):
         )  # sic
         self.cpas_type = kwargs.pop("cpas_type", kwargs.pop("cpasType", None))
 
-    @staticmethod
-    def from_data(data):
-        return RunItem(**data)
-
     def to_json(self):
-        data = super(RunItem, self).to_json()
-
+        data = super().to_json()
         data["sourceProtocol"] = self.source_protocol
         data["run"] = self.run
         data["targetApplications"] = self.target_applications
@@ -169,20 +133,14 @@ class RunItem(ExpObject):
 
 class Data(RunItem):
     def __init__(self, **kwargs):
-        super(Data, self).__init__(**kwargs)
-
+        super().__init__(**kwargs)
         self.data_type = kwargs.pop("data_type", kwargs.pop("dataType", None))
         self.data_file_url = kwargs.pop("data_file_url", kwargs.pop("dataFileURL", None))
         self.pipeline_path = kwargs.pop("pipeline_path", kwargs.pop("pipelinePath", None))
         self.role = kwargs.pop("role", None)
 
-    @staticmethod
-    def from_data(data):
-        return Data(**data)
-
     def to_json(self):
-        data = super(Data, self).to_json()
-
+        data = super().to_json()
         data["dataFileURL"] = self.data_file_url
         data["dataType"] = self.data_type
         data["pipelinePath"] = self.pipeline_path
@@ -211,7 +169,7 @@ def load_batch(server_context: ServerContext, assay_id: int, batch_id: int) -> O
         load_batch_url, json_dumps(payload, sort_keys=True), headers=headers
     )
     if json_body is not None:
-        loaded_batch = Batch.from_data(json_body["batch"])
+        loaded_batch = Batch(**json_body["batch"])
 
     return loaded_batch
 
@@ -261,7 +219,7 @@ def save_batches(
     )
     if json_body is not None:
         resp_batches = json_body["batches"]
-        return [Batch.from_data(resp_batch) for resp_batch in resp_batches]
+        return [Batch(**resp_batch) for resp_batch in resp_batches]
 
     return None
 

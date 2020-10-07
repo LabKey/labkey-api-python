@@ -37,7 +37,7 @@ class PropertyDescriptor:
         formats = kwargs.pop("conditional_formats", kwargs.pop("conditionalFormats", []))
         format_instances = []
         for f in formats:
-            format_instances.append(ConditionalFormat.from_data(f))
+            format_instances.append(ConditionalFormat(**f))
         self.conditional_formats = format_instances
 
         self.container = kwargs.pop("container", None)
@@ -82,7 +82,7 @@ class PropertyDescriptor:
         validators = kwargs.pop("property_validators", kwargs.pop("propertyValidators", []))
         validator_instances = []
         for v in validators:
-            validator_instances.append(PropertyValidator.from_data(v))
+            validator_instances.append(PropertyValidator(**v))
         self.property_validators = validator_instances
 
         self.range_uri = kwargs.pop("range_uri", kwargs.pop("rangeURI", None))
@@ -110,10 +110,6 @@ class PropertyDescriptor:
         )
         self.type_editable = kwargs.pop("type_editable", kwargs.pop("typeEditable", None))
         self.url = kwargs.pop("url", None)
-
-    @staticmethod
-    def from_data(data):
-        return PropertyDescriptor(**data)
 
     def to_json(self, strip_none=True):
         # TODO: Likely only want to include those that are not None
@@ -186,10 +182,6 @@ class PropertyValidator:
         self.row_id = kwargs.pop("row_id", kwargs.pop("rowId", None))
         self.type = kwargs.pop("type", None)
 
-    @staticmethod
-    def from_data(data):
-        return PropertyValidator(**data)
-
     def to_json(self, strip_none=True):
         data = {
             "description": self.description,
@@ -213,10 +205,6 @@ class ConditionalFormat:
         self.italic = kwargs.pop("italic", None)
         self.strike_through = kwargs.pop("strike_through", kwargs.pop("strikethrough", None))
         self.text_color = kwargs.pop("text_color", kwargs.pop("textColor", None))
-
-    @staticmethod
-    def from_data(data):
-        return ConditionalFormat(**data)
 
     def to_json(self):
         data = {
@@ -249,7 +237,7 @@ class Domain:
         fields_instances = []
 
         for field in fields:
-            fields_instances.append(PropertyDescriptor.from_data(field))
+            fields_instances.append(PropertyDescriptor(**field))
 
         self.fields = fields_instances
 
@@ -257,13 +245,9 @@ class Domain:
         indices_instances = []
 
         for index in indices:
-            indices_instances.append(FieldIndex.from_data(index))
+            indices_instances.append(FieldIndex(**index))
 
         self.indices = indices_instances
-
-    @staticmethod
-    def from_data(data):
-        return Domain(**data)
 
     def add_field(self, field: Union[dict, PropertyDescriptor]):
         if isinstance(field, PropertyDescriptor):
@@ -320,10 +304,6 @@ class FieldIndex:
         self.column_names = kwargs.pop("column_names", kwargs.pop("columnNames", None))
         self.unique = kwargs.pop("unique", None)
 
-    @staticmethod
-    def from_data(data):
-        return FieldIndex(**data)
-
     def to_json(self, strip_none=True):
         data = {"columnNames": self.column_names, "unique": self.unique}
 
@@ -363,15 +343,13 @@ def conditional_format(
             else string_filters[0]
         )
 
-    cf = ConditionalFormat.from_data(
-        {
-            "background_color": background_color,
-            "bold": bold,
-            "filter": filter_str,
-            "italic": italic,
-            "strike_through": strike_through,
-            "text_color": text_color,
-        }
+    cf = ConditionalFormat(
+        background_color=background_color,
+        bold=bold,
+        filter=filter_str,
+        italic=italic,
+        strike_through=strike_through,
+        text_color=text_color
     )
 
     return cf
@@ -424,7 +402,7 @@ def create(
     raw_domain = server_context.make_request(url, json_dumps(domain_definition), headers=headers)
 
     if raw_domain is not None:
-        domain = Domain.from_data(raw_domain)
+        domain = Domain(**raw_domain)
 
     return domain
 
@@ -461,10 +439,10 @@ def get(
     url = server_context.build_url("property", "getDomain.api", container_path=container_path)
     payload = {"schemaName": schema_name, "queryName": query_name}
     domain = None
-
     raw_domain = server_context.make_request(url, payload, method="GET")
+
     if raw_domain is not None:
-        domain = Domain.from_data(raw_domain)
+        domain = Domain(**raw_domain)
 
     return domain
 
@@ -486,7 +464,7 @@ def infer_fields(
     if "fields" in raw_infer:
         fields = []
         for f in raw_infer["fields"]:
-            fields.append(PropertyDescriptor.from_data(f))
+            fields.append(PropertyDescriptor(**f))
 
     return fields
 

@@ -24,7 +24,7 @@ class RequestError(exceptions.RequestException):
         """
         :type server_response: Response
         """
-        super(RequestError, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         # base class allows for kwargs 'request' and 'response'
         self.response = server_response
