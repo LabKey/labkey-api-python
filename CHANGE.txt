@@ -2,6 +2,25 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 2.0.0 package
+==============================
+
+*Release date: ??/??/2020*
+- container.create: rename folderType arg to folder_type, rename isWorkbook arg to is_workbook
+- Remove support for Python 2.x
+- Add Type annotations
+    - We don't have 100% of our API methods typed yet, but we are getting there
+- Format code with Black (a static code formatter)
+- remove build_url helper
+    - it was just a single line wrapper around server_context
+- remove create_server_context
+    - It was just a wrapper around ServerContext, you can replace all usages of create_server_context with ServerContext
+- Add APIWrapper
+    - This wraps all of the supported APIs so you don't need to pass around a server_context
+- Removed various "from_data" methods
+    - They were all simple one line wrappers around Class constructors that were not needed if you were using any you
+    may update your code e.g. "SomeClass.from_data(data)" can be changed to "SomeClass(**data)"
+
 What's New in the LabKey 1.4.1 package
 ==============================
 
