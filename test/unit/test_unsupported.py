@@ -15,7 +15,6 @@
 #
 import unittest
 
-from labkey import utils
 from labkey.unsupported import messageboard
 
 from .utilities import MockLabKey, mock_server_context, success_test
@@ -100,5 +99,4 @@ def suite():
 
 
 if __name__ == "__main__":
-    utils.DISABLE_CSRF_CHECK = True
     unittest.main()

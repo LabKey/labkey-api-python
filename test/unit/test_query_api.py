@@ -20,7 +20,6 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from labkey import utils
 from labkey.query import (
     delete_rows,
     update_rows,
@@ -472,5 +471,4 @@ def suite():
 
 
 if __name__ == "__main__":
-    utils.DISABLE_CSRF_CHECK = True
     unittest.main()

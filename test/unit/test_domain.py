@@ -23,7 +23,6 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from labkey import utils
 from labkey.domain import (
     create,
     conditional_format,
@@ -483,5 +482,4 @@ def suite():
 
 
 if __name__ == "__main__":
-    utils.DISABLE_CSRF_CHECK = True
     unittest.main()

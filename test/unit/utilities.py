@@ -25,7 +25,7 @@ except ImportError:
 
 def mock_server_context(mock_action):
     # mock the CSRF token
-    with mock.patch("labkey.utils.requests.sessions.Session.get") as mock_get:
+    with mock.patch("labkey.server_context.requests.sessions.Session.get") as mock_get:
         mock_get.return_value = mock_action.get_csrf_response()
         return ServerContext(
             mock_action.server_name,
@@ -37,7 +37,7 @@ def mock_server_context(mock_action):
 
 
 def success_test(test, expected_response, api_method, compare_response, *args, **expected_kwargs):
-    with mock.patch("labkey.utils.requests.Session.post") as mock_post:
+    with mock.patch("labkey.server_context.requests.Session.post") as mock_post:
         mock_post.return_value = expected_response
         resp = api_method(*args)
 
@@ -53,7 +53,7 @@ def success_test(test, expected_response, api_method, compare_response, *args, *
 def success_test_get(
     test, expected_response, api_method, compare_response, *args, **expected_kwargs
 ):
-    with mock.patch("labkey.utils.requests.Session.get") as mock_get:
+    with mock.patch("labkey.server_context.requests.Session.get") as mock_get:
         mock_get.return_value = expected_response
         resp = api_method(*args)
 
@@ -69,7 +69,7 @@ def success_test_get(
 def throws_error_test(
     test, expected_error, expected_response, api_method, *args, **expected_kwargs
 ):
-    with mock.patch("labkey.utils.requests.Session.post") as mock_post:
+    with mock.patch("labkey.server_context.requests.Session.post") as mock_post:
         with test.assertRaises(expected_error):
             mock_post.return_value = expected_response
             api_method(*args)
@@ -82,7 +82,7 @@ def throws_error_test(
 def throws_error_test_get(
     test, expected_error, expected_response, api_method, *args, **expected_kwargs
 ):
-    with mock.patch("labkey.utils.requests.Session.get") as mock_get:
+    with mock.patch("labkey.server_context.requests.Session.get") as mock_get:
         with test.assertRaises(expected_error):
             mock_get.return_value = expected_response
             api_method(*args)

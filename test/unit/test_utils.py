@@ -21,7 +21,7 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from labkey import utils
+from labkey.utils import json_dumps
 
 
 class TestJsonDumps(unittest.TestCase):
@@ -32,14 +32,14 @@ class TestJsonDumps(unittest.TestCase):
             "my_date_time": datetime(2018, 9, 18, 5, 25),
         }
 
-        utils.json_dumps(payload)
+        json_dumps(payload)
 
     def test_encoder_override(self):
         payload = {"testdate": datetime(2018, 9, 11, 6, 45)}
 
         try:
             # disable the "cls" override by passing None
-            utils.json_dumps(payload, cls=None)
+            json_dumps(payload, cls=None)
         except TypeError as e:
             if "is not JSON serializable" not in str(e):
                 print("Did not see expected exception")
@@ -52,5 +52,4 @@ def suite():
 
 
 if __name__ == "__main__":
-    utils.DISABLE_CSRF_CHECK = True
     unittest.main()

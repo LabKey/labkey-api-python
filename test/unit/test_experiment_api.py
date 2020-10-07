@@ -20,7 +20,6 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from labkey import utils
 from labkey.experiment import load_batch, save_batch, Batch, Run
 from labkey.exceptions import (
     RequestError,
@@ -360,5 +359,4 @@ def suite():
 
 
 if __name__ == "__main__":
-    utils.DISABLE_CSRF_CHECK = True
     unittest.main()
