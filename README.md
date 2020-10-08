@@ -80,19 +80,18 @@ Sample code is available in the [samples](https://github.com/LabKey/labkey-api-p
 The following gets data from the Users table on your local machine:
 
 ```python
-from labkey.server_context import ServerContext
-from labkey.query import select_rows
+from labkey.api_wrapper import APIWrapper
 
-print("Create a server context")
+print("Create an APIWrapper")
 labkey_server = 'localhost:8080'
 project_name = 'ModuleAssayTest'  # Project folder name
 contextPath = 'labkey'
 schema = 'core'
 table = 'Users'
+api = APIWrapper(labkey_server, project_name, contextPath, use_ssl=False)
 
-server_context = ServerContext(labkey_server, project_name, contextPath, use_ssl=False)
+result = api.query.select_rows(schema, table)
 
-result = select_rows(server_context, schema, table)
 if result is not None:
     print(result['rows'][0])
     print("select_rows: Number of rows returned: " + str(result['rowCount']))
