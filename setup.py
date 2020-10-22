@@ -22,53 +22,46 @@ are not already installed.
 import re
 from setuptools import setup
 
-packages = [
-    'labkey',
-    'labkey.unsupported'
-]
+packages = ["labkey"]
 
-with open('labkey/__init__.py', 'r') as fd:
-    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
-                        fd.read(), re.MULTILINE).group(1)
+with open("labkey/__init__.py", "r") as fd:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE).group(1)
 
 if not version:
-    raise RuntimeError('Cannot find version information')
+    raise RuntimeError("Cannot find version information")
 
 long_desc = "Python client API for LabKey Server. Supports query and experiment APIs."
 
-tests_require = ['pytest', 'requests', 'mock', 'pytest-cov']
+tests_require = ["pytest", "requests", "mock", "pytest-cov"]
 
 setup(
-    name='labkey',
+    name="labkey",
     version=version,
-    description='Python client API for LabKey Server',
+    description="Python client API for LabKey Server",
     long_description=long_desc,
     license="Apache License 2.0",
-    author='LabKey',
-    author_email='nicka@labkey.com',
-    maintainer='Nick Kerr',
-    maintainer_email='nicka@labkey.com',
-    url='https://github.com/LabKey/labkey-api-python',
+    author="LabKey",
+    author_email="alanv@labkey.com",
+    maintainer="Alan Vezina",
+    maintainer_email="alanv@labkey.com",
+    url="https://github.com/LabKey/labkey-api-python",
     packages=packages,
     package_data={},
-    install_requires=['requests'],
+    install_requires=["requests"],
     tests_require=tests_require,
-    setup_requires=['pytest-runner'],
-    extras_require={
-        'test': tests_require
-    },
+    setup_requires=["pytest-runner"],
+    extras_require={"test": tests_require},
     keywords="labkey api client",
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Console',
-        'Intended Audience :: Science/Research',
-        'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: MacOS',
-        'Operating System :: Microsoft',
-        'Operating System :: POSIX',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3',
-        'Topic :: Scientific/Engineering'
-    ]
+        "Development Status :: 4 - Beta",
+        "Environment :: Console",
+        "Intended Audience :: Science/Research",
+        "Intended Audience :: System Administrators",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: MacOS",
+        "Operating System :: Microsoft",
+        "Operating System :: POSIX",
+        "Programming Language :: Python :: 3",
+        "Topic :: Scientific/Engineering",
+    ],
 )

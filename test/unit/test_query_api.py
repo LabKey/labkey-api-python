@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from __future__ import unicode_literals
 import unittest
 
 try:
@@ -21,281 +20,455 @@ try:
 except ImportError:
     import unittest.mock as mock
 
-from labkey import utils
-from labkey.query import delete_rows, update_rows, insert_rows, select_rows, execute_sql, QueryFilter
-from labkey.exceptions import RequestError, QueryNotFoundError, ServerNotFoundError, RequestAuthorizationError
+from labkey.query import (
+    delete_rows,
+    update_rows,
+    insert_rows,
+    select_rows,
+    execute_sql,
+    QueryFilter,
+)
+from labkey.exceptions import (
+    RequestError,
+    QueryNotFoundError,
+    ServerNotFoundError,
+    RequestAuthorizationError,
+)
 
 from .utilities import MockLabKey, mock_server_context, success_test, throws_error_test
 
 
 class MockSelectRows(MockLabKey):
-    api = 'getQuery.api'
+    api = "getQuery.api"
     default_success_body = '{"columnModel": [{"align": "right", "dataIndex": "Participant ID", "editable": true , "header": "Participant ID", "hidden": false , "required": false , "scale": 10 , "sortable": true , "width": 60 }] , "formatVersion": 8.3 , "metaData": {"description": null , "fields": [{"autoIncrement": false , "calculated": false , "caption": "Participant ID", "conceptURI": null , "defaultScale": "LINEAR", "defaultValue": null , "dimension": false , "excludeFromShifting": false , "ext": {} , "facetingBehaviorType": "AUTOMATIC", "fieldKey": "Participant ID", "fieldKeyArray": ["Participant ID"] , "fieldKeyPath": "Participant ID", "friendlyType": "Integer", "hidden": false , "inputType": "text", "isAutoIncrement": false , "isHidden": false , "isKeyField": false , "isMvEnabled": false , "isNullable": true , "isReadOnly": false , "isSelectable": true , "isUserEditable": true , "isVersionField": false , "jsonType": "int", "keyField": false , "measure": false , "mvEnabled": false , "name": "Participant ID", "nullable": true , "protected": false , "rangeURI": "http://www.w3.org/2001/XMLSchema#int", "readOnly": false , "recommendedVariable": false , "required": false , "selectable": true , "shortCaption": "Participant ID", "shownInDetailsView": true , "shownInInsertView": true , "shownInUpdateView": true , "sqlType": "int", "type": "int", "userEditable": true , "versionField": false }] , "id": "Key", "importMessage": null , "importTemplates": [{"label": "Download Template", "url": ""}] , "root": "rows", "title": "Demographics", "totalProperty": "rowCount"} , "queryName": "Demographics", "rowCount": 224 , "rows": [{	"Participant ID": 133428 } , {	"Participant ID": 138488 } , {	"Participant ID": 140163 } , {	"Participant ID": 144740 } , {	"Participant ID": 150489 } ] , "schemaName": "lists"}'
 
 
 class MockInsertRows(MockLabKey):
-    api = 'insertRows.api'
+    api = "insertRows.api"
 
 
 class MockDeleteRows(MockLabKey):
-    api = 'deleteRows.api'
+    api = "deleteRows.api"
 
 
 class MockExecuteSQL(MockLabKey):
-    api = 'executeSql.api'
+    api = "executeSql.api"
 
 
 class MockUpdateRows(MockLabKey):
-    api = 'updateRows.api'
+    api = "updateRows.api"
 
 
-schema = 'testSchema'
-query = 'testQuery'
+schema = "testSchema"
+query = "testQuery"
 
 
 class TestDeleteRows(unittest.TestCase):
-
     def setUp(self):
         self.service = MockDeleteRows()
 
-        rows = '{id:1234}'
+        rows = "{id:1234}"
 
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()],
-            'data': '{"queryName": "' + query + '", "rows": "' + rows + '", "schemaName": "' + schema + '"}',
-            'headers': {'Content-Type': 'application/json'},
-            'timeout': 300
+            "expected_args": [self.service.get_server_url()],
+            "data": '{"queryName": "'
+            + query
+            + '", "rows": "'
+            + rows
+            + '", "schemaName": "'
+            + schema
+            + '"}',
+            "headers": {"Content-Type": "application/json"},
+            "timeout": 300,
         }
 
-        self.args = [
-            mock_server_context(self.service), schema, query, rows
-        ]
+        self.args = [mock_server_context(self.service), schema, query, rows]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(),
-                     delete_rows, True, *self.args, **self.expected_kwargs)
+        success_test(
+            test,
+            self.service.get_successful_response(),
+            delete_rows,
+            True,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
-                          delete_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestAuthorizationError,
+            self.service.get_unauthorized_response(),
+            delete_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
-                          delete_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            QueryNotFoundError,
+            self.service.get_query_not_found_response(),
+            delete_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
-                          delete_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            ServerNotFoundError,
+            self.service.get_server_not_found_response(),
+            delete_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response(),
-                          delete_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestError,
+            self.service.get_general_error_response(),
+            delete_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
 
 class TestUpdateRows(unittest.TestCase):
-
     def setUp(self):
         self.service = MockUpdateRows()
 
-        rows = '{id:1234}'
+        rows = "{id:1234}"
 
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()],
-            'data': '{"queryName": "' + query + '", "rows": "' + rows + '", "schemaName": "' + schema + '"}',
-            'headers': {'Content-Type': 'application/json'},
-            'timeout': 300
+            "expected_args": [self.service.get_server_url()],
+            "data": '{"queryName": "'
+            + query
+            + '", "rows": "'
+            + rows
+            + '", "schemaName": "'
+            + schema
+            + '"}',
+            "headers": {"Content-Type": "application/json"},
+            "timeout": 300,
         }
 
-        self.args = [
-            mock_server_context(self.service), schema, query, rows
-        ]
+        self.args = [mock_server_context(self.service), schema, query, rows]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), update_rows, True,
-                     *self.args, **self.expected_kwargs)
+        success_test(
+            test,
+            self.service.get_successful_response(),
+            update_rows,
+            True,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
-                          update_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestAuthorizationError,
+            self.service.get_unauthorized_response(),
+            update_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
-                          update_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            QueryNotFoundError,
+            self.service.get_query_not_found_response(),
+            update_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
-                          update_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            ServerNotFoundError,
+            self.service.get_server_not_found_response(),
+            update_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response(),
-                          update_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestError,
+            self.service.get_general_error_response(),
+            update_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
 
 class TestInsertRows(unittest.TestCase):
-
     def setUp(self):
         self.service = MockInsertRows()
 
-        rows = '{id:1234}'
+        rows = "{id:1234}"
 
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()],
-            'data': '{"queryName": "' + query + '", "rows": "' + rows + '", "schemaName": "' + schema + '"}',
-            'headers': {'Content-Type': 'application/json'},
-            'timeout': 300
+            "expected_args": [self.service.get_server_url()],
+            "data": '{"queryName": "'
+            + query
+            + '", "rows": "'
+            + rows
+            + '", "schemaName": "'
+            + schema
+            + '"}',
+            "headers": {"Content-Type": "application/json"},
+            "timeout": 300,
         }
 
-        self.args = [
-            mock_server_context(self.service), schema, query, rows
-        ]
+        self.args = [mock_server_context(self.service), schema, query, rows]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), insert_rows, True,
-                     *self.args, **self.expected_kwargs)
+        success_test(
+            test,
+            self.service.get_successful_response(),
+            insert_rows,
+            True,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
-                          insert_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestAuthorizationError,
+            self.service.get_unauthorized_response(),
+            insert_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
-                          insert_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            QueryNotFoundError,
+            self.service.get_query_not_found_response(),
+            insert_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
-                          insert_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            ServerNotFoundError,
+            self.service.get_server_not_found_response(),
+            insert_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response(),
-                          insert_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestError,
+            self.service.get_general_error_response(),
+            insert_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
 
 class TestExecuteSQL(unittest.TestCase):
-
     def setUp(self):
         self.service = MockExecuteSQL()
-        sql = 'select * from ' + schema + '.' + query
+        sql = "select * from " + schema + "." + query
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()],
-            'data': {'sql': sql, "schemaName": schema},
-            'headers': None,
-            'timeout': 300
+            "expected_args": [self.service.get_server_url()],
+            "data": {"sql": sql, "schemaName": schema},
+            "headers": None,
+            "timeout": 300,
         }
 
-        self.args = [
-            mock_server_context(self.service), schema, sql
-        ]
+        self.args = [mock_server_context(self.service), schema, sql]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), execute_sql, True, *self.args, **self.expected_kwargs)
+        success_test(
+            test,
+            self.service.get_successful_response(),
+            execute_sql,
+            True,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
-                          execute_sql, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestAuthorizationError,
+            self.service.get_unauthorized_response(),
+            execute_sql,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
-                          execute_sql, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            QueryNotFoundError,
+            self.service.get_query_not_found_response(),
+            execute_sql,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
-                          execute_sql, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            ServerNotFoundError,
+            self.service.get_server_not_found_response(),
+            execute_sql,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response(),
-                          execute_sql, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestError,
+            self.service.get_general_error_response(),
+            execute_sql,
+            *self.args,
+            **self.expected_kwargs
+        )
 
 
 class TestSelectRows(unittest.TestCase):
-
     def setUp(self):
         self.service = MockSelectRows()
         self.expected_kwargs = {
-            'expected_args': [self.service.get_server_url()],
-            'data': {"schemaName": schema, "query.queryName": query},
-            'headers': None,
-            'timeout': 300
+            "expected_args": [self.service.get_server_url()],
+            "data": {"schemaName": schema, "query.queryName": query},
+            "headers": None,
+            "timeout": 300,
         }
 
-        self.args = [
-            mock_server_context(self.service), schema, query
-        ]
+        self.args = [mock_server_context(self.service), schema, query]
 
     def test_success(self):
         test = self
-        success_test(test, self.service.get_successful_response(), select_rows, True, *self.args, **self.expected_kwargs)
+        success_test(
+            test,
+            self.service.get_successful_response(),
+            select_rows,
+            True,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_query_filter(self):
         test = self
         view_name = None
         filter_array = [
-            QueryFilter('Field1', 'value', 'eq'),
-            QueryFilter('Field2', 'value1', 'contains'),
-            QueryFilter('Field2', 'value2', 'contains'),
+            QueryFilter("Field1", "value", "eq"),
+            QueryFilter("Field2", "value1", "contains"),
+            QueryFilter("Field2", "value2", "contains"),
         ]
         args = list(self.args) + [view_name, filter_array]
         # Expected query field values in post request body
         query_field = {
-            'query.Field1~eq': ['value'],
-            'query.Field2~contains': ['value1', 'value2'],
+            "query.Field1~eq": ["value"],
+            "query.Field2~contains": ["value1", "value2"],
         }
         # Update post request body with expected query field values
-        self.expected_kwargs['data'].update(query_field)
+        self.expected_kwargs["data"].update(query_field)
 
-        success_test(test, self.service.get_successful_response(), select_rows, True, *args, **self.expected_kwargs)
+        success_test(
+            test,
+            self.service.get_successful_response(),
+            select_rows,
+            True,
+            *args,
+            **self.expected_kwargs
+        )
 
     def test_unauthorized(self):
         test = self
-        throws_error_test(test, RequestAuthorizationError, self.service.get_unauthorized_response(),
-                          select_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestAuthorizationError,
+            self.service.get_unauthorized_response(),
+            select_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_query_not_found(self):
         test = self
-        throws_error_test(test, QueryNotFoundError,  self.service.get_query_not_found_response(),
-                          select_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            QueryNotFoundError,
+            self.service.get_query_not_found_response(),
+            select_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_server_not_found(self):
         test = self
-        throws_error_test(test, ServerNotFoundError, self.service.get_server_not_found_response(),
-                          select_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            ServerNotFoundError,
+            self.service.get_server_not_found_response(),
+            select_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
     def test_general_error(self):
         test = self
-        throws_error_test(test, RequestError, self.service.get_general_error_response(),
-                          select_rows, *self.args, **self.expected_kwargs)
+        throws_error_test(
+            test,
+            RequestError,
+            self.service.get_general_error_response(),
+            select_rows,
+            *self.args,
+            **self.expected_kwargs
+        )
 
 
 def suite():
     load_tests = unittest.TestLoader().loadTestsFromTestCase
-    return unittest.TestSuite([
-        load_tests(TestDeleteRows),
-        load_tests(TestUpdateRows),
-        load_tests(TestInsertRows),
-        load_tests(TestExecuteSQL),
-        load_tests(TestSelectRows)
-    ])
+    return unittest.TestSuite(
+        [
+            load_tests(TestDeleteRows),
+            load_tests(TestUpdateRows),
+            load_tests(TestInsertRows),
+            load_tests(TestExecuteSQL),
+            load_tests(TestSelectRows),
+        ]
+    )
 
 
-if __name__ == '__main__':
-    utils.DISABLE_CSRF_CHECK = True
+if __name__ == "__main__":
     unittest.main()

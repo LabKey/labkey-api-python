@@ -80,19 +80,18 @@ Sample code is available in the [samples](https://github.com/LabKey/labkey-api-p
 The following gets data from the Users table on your local machine:
 
 ```python
-from labkey.utils import create_server_context
-from labkey.query import select_rows
+from labkey.api_wrapper import APIWrapper
 
-print("Create a server context")
+print("Create an APIWrapper")
 labkey_server = 'localhost:8080'
 project_name = 'ModuleAssayTest'  # Project folder name
 contextPath = 'labkey'
 schema = 'core'
 table = 'Users'
+api = APIWrapper(labkey_server, project_name, contextPath, use_ssl=False)
 
-server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=False)
+result = api.query.select_rows(schema, table)
 
-result = select_rows(server_context, schema, table)
 if result is not None:
     print(result['rows'][0])
     print("select_rows: Number of rows returned: " + str(result['rowCount']))
@@ -101,11 +100,17 @@ else:
 ```
 
 ## Supported Versions
-Python 2.6+ and 3.4+ are fully supported.
+Python 3.6+ is fully supported.
 LabKey Server v15.1 and later.
 
 ## Contributing
-This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the [LabKey Server developer support forum](https://www.labkey.org/home/developer/forum/project-start.view).
+This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use
+the [LabKey Server developer support forum](https://www.labkey.org/home/developer/forum/project-start.view).
+
+When contributing changes please use `Black` to format your code. To run Black follow these instructions:
+1. Install black: `pip install black`
+2. Run black: `black .`
+3. Commit the newly formatted code.
 
 ### Testing
 If you are looking to contribute please run the tests before issuing a PR. The tests can be initiated by running

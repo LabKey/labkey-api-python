@@ -13,25 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from __future__ import unicode_literals
-
+from labkey.api_wrapper import APIWrapper
 from labkey.exceptions import ServerNotFoundError
-from labkey.security import create_user, delete_users, deactivate_users, add_to_group, add_to_role, \
-     reset_password, get_user_by_email, get_roles
-from labkey.utils import create_server_context
 
-labkey_server = 'localhost:8080'
-project_name = 'Home'  # Project folder name
-contextPath = 'labkey'
-server_context = create_server_context(labkey_server, project_name, contextPath, use_ssl=False)
+labkey_server = "localhost:8080"
+project_name = "Home"  # Project folder name
+contextPath = "labkey"
+api = APIWrapper(labkey_server, project_name, contextPath, use_ssl=False)
 
 
 ###############
 # add User
 ###############
-new_user_email = 'demo@labkey.com'
+new_user_email = "demo@labkey.com"
 
-result = create_user(server_context, new_user_email)
+result = api.security.create_user(new_user_email)
 if result is not None:
     print(result)
 else:
@@ -43,7 +39,7 @@ else:
 # Show Users
 ###############
 try:
-    result = get_user_by_email(server_context, new_user_email)
+    result = api.security.get_user_by_email(new_user_email)
 except ValueError:
     print("User not found")
 
@@ -57,8 +53,8 @@ else:
 ###############
 # reset User's password
 ###############
-new_user_id = result['userId']
-result = reset_password(server_context, new_user_email)
+new_user_id = result["userId"]
+result = api.security.reset_password(new_user_email)
 if result is not None:
     print(result)
 else:
@@ -71,7 +67,7 @@ else:
 ###############
 
 # List Security Roles
-result = get_roles(server_context)
+result = api.security.get_roles()
 if result is not None:
     print(result)
 else:
@@ -79,12 +75,12 @@ else:
     exit()
 
 author_role = None
-for role in result['roles']:
-    if role['name'] == 'Author':
+for role in result["roles"]:
+    if role["name"] == "Author":
         author_role = role
 
 try:
-    result = add_to_role(server_context, role=author_role, user_id=new_user_id)
+    result = api.security.add_to_role(role=author_role, user_id=new_user_id)
 except ServerNotFoundError:
     print("resource not found, check that '" + project_name + "' project exists")
 
@@ -101,10 +97,12 @@ else:
 site_group_id = -1  # This needs to be the ID of a Project Group within the project specified above
 
 if site_group_id == -1:
-    print("NOTE: To successfully complete this sample code a 'site_group_id' must be set in the file.")
+    print(
+        "NOTE: To successfully complete this sample code a 'site_group_id' must be set in the file."
+    )
     exit()
 
-result = add_to_group(server_context, new_user_id, site_group_id)
+result = api.security.add_to_group(new_user_id, site_group_id)
 if result is not None:
     print(result)
 else:
@@ -115,7 +113,7 @@ else:
 # deactivate User
 ###############
 
-result = deactivate_users(server_context, [new_user_id])
+result = api.security.deactivate_users([new_user_id])
 if result is not None:
     print(result)
 else:
@@ -126,11 +124,9 @@ else:
 ###############
 # delete User
 ###############
-result = delete_users(server_context, [new_user_id])
+result = api.security.delete_users([new_user_id])
 if result is not None:
     print(result)
 else:
     print("Delete user: no results returned")
     exit()
-
-

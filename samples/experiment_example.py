@@ -13,15 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from __future__ import unicode_literals
+from labkey.api_wrapper import APIWrapper
+from labkey.experiment import Batch, Run
 
-from labkey.utils import create_server_context
-from labkey.experiment import Batch, Run, load_batch, save_batch
-
-labkey_server = 'localhost:8080'
-project_name = 'ModulesAssayTest'  # Project folder name
-context_path = 'labkey'
-server_context = create_server_context(labkey_server, project_name, context_path, use_ssl=False)
+labkey_server = "localhost:8080"
+project_name = "ModulesAssayTest"  # Project folder name
+context_path = "labkey"
+api = APIWrapper(labkey_server, project_name, context_path, use_ssl=False)
 
 assay_id = 3315  # provide one from your server
 
@@ -31,40 +29,44 @@ assay_id = 3315  # provide one from your server
 
 # Generate the Run object(s)
 run_test = Run()
-run_test.name = 'python upload'
-run_test.data_rows = [{
-    # ColumnName: Value
-    'SampleId': 'Monkey 1',
-    'TimePoint': '2008/11/02 11:22:33',
-    'DoubleData': 4.5,
-    'HiddenData': 'another data point'
-}, {
-    'SampleId': 'Monkey 2',
-    'TimePoint': '2008/11/02 14:00:01',
-    'DoubleData': 3.1,
-    'HiddenData': 'fozzy bear'
-}, {
-    'SampleId': 'Monkey 3',
-    'TimePoint': '2008/11/02 14:00:01',
-    'DoubleData': 1.5,
-    'HiddenData': 'jimbo'
-}]
-run_test.properties['RunFieldName'] = 'Run Field Value'
+run_test.name = "python upload"
+run_test.data_rows = [
+    {
+        # ColumnName: Value
+        "SampleId": "Monkey 1",
+        "TimePoint": "2008/11/02 11:22:33",
+        "DoubleData": 4.5,
+        "HiddenData": "another data point",
+    },
+    {
+        "SampleId": "Monkey 2",
+        "TimePoint": "2008/11/02 14:00:01",
+        "DoubleData": 3.1,
+        "HiddenData": "fozzy bear",
+    },
+    {
+        "SampleId": "Monkey 3",
+        "TimePoint": "2008/11/02 14:00:01",
+        "DoubleData": 1.5,
+        "HiddenData": "jimbo",
+    },
+]
+run_test.properties["RunFieldName"] = "Run Field Value"
 
 # Generate the Batch object(s)
 batch = Batch()
 batch.runs = [run_test]
-batch.name = 'python batch'
-batch.properties['PropertyName'] = 'Property Value'
+batch.name = "python batch"
+batch.properties["PropertyName"] = "Property Value"
 
 # Execute save api
-saved_batch = save_batch(server_context, assay_id, batch)
+saved_batch = api.experiment.save_batch(assay_id, batch)
 
 ###################
 # Load an Assay batch
 ###################
 batch_id = saved_batch.row_id  # provide one from your server
-run_group = load_batch(server_context, assay_id, batch_id)
+run_group = api.experiment.load_batch(assay_id, batch_id)
 
 if run_group is not None:
     print("Batch Id: " + str(run_group.id))
