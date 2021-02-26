@@ -103,7 +103,7 @@ class Run(ExpObject):
         data["materialOutputs"] = self.material_outputs
         data["plateMetadata"] = self.plate_metadata
 
-        # Issue42489: Only add class attributes of Run (and not ExpObject) to json if they are truthy
+        # Issue42489: Only add class attributes of Run to json if they are truthy
         data = {k: v for k, v in data.items() if v}
         return data
 
