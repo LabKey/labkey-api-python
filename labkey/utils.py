@@ -31,3 +31,8 @@ class DateTimeEncoder(json.JSONEncoder):
 def json_dumps(*args, **kwargs):
     kwargs.setdefault("cls", DateTimeEncoder)
     return json.dumps(*args, **kwargs)
+
+
+def snake_to_camel_case(name):
+    components = name.split('_')
+    return components[0] + ''.join(x.title() for x in components[1:])

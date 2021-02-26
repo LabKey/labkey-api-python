@@ -17,7 +17,7 @@ import functools
 from typing import List, Optional
 
 from .server_context import ServerContext
-from labkey.utils import json_dumps
+from labkey.utils import json_dumps, snake_to_camel_case
 
 
 class ExpObject:
@@ -32,6 +32,9 @@ class ExpObject:
         self.created_by = kwargs.pop("created_by", kwargs.pop("createdBy", None))
         self.modified_by = kwargs.pop("modified_by", kwargs.pop("modifiedBy", None))
         self.properties = kwargs.pop("properties", {})
+
+    def getAttrKeys(self):
+        return self.__dict__.keys()
 
     def to_json(self):
         data = {
@@ -93,15 +96,21 @@ class Run(ExpObject):
         data_inputs = kwargs.pop("data_inputs", kwargs.pop("dataInputs", []))
         self.data_inputs = [Data(**input_) for input_ in data_inputs]
 
+    def __getitem__(self, key):
+        return getattr(self, key)
+
     def to_json(self):
         data = super().to_json()
-        data["dataInputs"] = [data_input.to_json() for data_input in self.data_inputs]
-        data["dataRows"] = self.data_rows
-        data["experiments"] = self.experiments
-        data["filePathRoot"] = self.file_path_root
-        data["materialInputs"] = self.material_inputs
-        data["materialOutputs"] = self.material_outputs
-        data["plateMetadata"] = self.plate_metadata
+        runKeys = list(self.__dict__.keys())
+        expObjectKeys = list(ExpObject().getAttrKeys())
+        runKeysWithoutInheritance = [attr for attr in runKeys if attr not in expObjectKeys]
+
+        # Issue42489: Only add class attributes of Run (and not ExpObject) to json if they are truthy
+        for attr in runKeysWithoutInheritance:
+            if attr == "data_inputs":
+                data["dataInputs"] = [data_input.to_json() for data_input in self.data_inputs]
+            elif self[attr]:
+                data[snake_to_camel_case(attr)] = self[attr]
 
         return data
 
