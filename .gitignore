@@ -10,3 +10,6 @@ labkey\.egg-info/
 .idea/
 *.iml
 *.swp
+
+.DS_Store
+.python-version
