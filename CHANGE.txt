@@ -2,6 +2,13 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 2.0.1 package
+==============================
+
+*Release date: 02/01/2021*
+- Updated Run.to_json() to drop unset values, since keys are given default values server-side, and null values on the
+form result in exceptions
+
 What's New in the LabKey 2.0.0 package
 ==============================
 
