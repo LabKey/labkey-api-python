@@ -2,6 +2,12 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 2.1.0 package
+==============================
+
+*Release date: TBD*
+Adding support for ontology based column filters ONTOLOGY_IN_SUBTREE and ONTOLOGY_NOT_IN_SUBTREE
+
 What's New in the LabKey 2.0.1 package
 ==============================
 
