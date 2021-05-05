@@ -130,6 +130,9 @@ class QueryFilter:
         IS_BLANK = "isblank"
         IS_NOT_BLANK = "isnonblank"
 
+        ONTOLOGY_IN_SUBTREE = "concept:insubtree"
+        ONTOLOGY_NOT_IN_SUBTREE = "concept:notinsubtree"
+
         MEMBER_OF = "memberof"
 
     def __init__(self, column, value, filter_type=Types.EQUAL):
