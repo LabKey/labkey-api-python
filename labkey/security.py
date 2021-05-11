@@ -159,7 +159,7 @@ def get_roles(server_context: ServerContext, container_path: str = None):
     url = server_context.build_url(
         SECURITY_CONTROLLER, "getRoles.api", container_path=container_path
     )
-    return server_context.make_request(url, None)
+    return server_context.make_request(url)
 
 
 def get_user_by_email(server_context: ServerContext, email: str):
@@ -170,7 +170,7 @@ def get_user_by_email(server_context: ServerContext, email: str):
     :return:
     """
     url = server_context.build_url(USER_CONTROLLER, "getUsers.api")
-    payload = dict(includeDeactivatedAccounts=True)
+    payload = {"includeDeactivatedAccounts": True}
     result = server_context.make_request(url, payload)
 
     if result is None or result["users"] is None:
@@ -187,7 +187,6 @@ def list_groups(
     server_context: ServerContext, include_site_groups: bool = False, container_path: str = None
 ):
     url = server_context.build_url(SECURITY_CONTROLLER, "listProjectGroups.api", container_path)
-
     return server_context.make_request(url, {"includeSiteGroups": include_site_groups})
 
 
@@ -245,7 +244,6 @@ def reset_password(server_context: ServerContext, email: str, container_path: st
     :return:
     """
     url = server_context.build_url(SECURITY_CONTROLLER, "adminRotatePassword.api", container_path)
-
     return server_context.make_request(url, {"email": email})
 
 
@@ -283,7 +281,7 @@ def stop_impersonating(server_context: ServerContext):
     Stop impersonating a user while keeping the original user logged in.
     """
     url = server_context.build_url(LOGIN_CONTROLLER, "stopImpersonating.api")
-    return server_context.make_request(url, None)
+    return server_context.make_request(url)
 
 
 @dataclass
@@ -300,7 +298,7 @@ def who_am_i(server_context: ServerContext) -> WhoAmI:
     Calls the whoami API and returns a WhoAmI object.
     """
     url = server_context.build_url("login", "whoami.api")
-    response = server_context.make_request(url, None)
+    response = server_context.make_request(url)
     return WhoAmI(
         response["id"],
         response["email"],

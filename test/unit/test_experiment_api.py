@@ -209,7 +209,7 @@ class TestLoadBatch(unittest.TestCase):
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
             "data": '{"assayId": 12345, "batchId": 54321}',
-            "headers": {"Content-type": "application/json", "Accept": "text/plain"},
+            "headers": {"Content-Type": "application/json"},
             "timeout": 300,
         }
 
@@ -291,7 +291,7 @@ class TestSaveBatch(unittest.TestCase):
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
             "data": '{"assayId": 12345, "batches": [{"batchProtocolId": null, "comment": null, "created": null, "createdBy": null, "modified": null, "modifiedBy": null, "name": null, "properties": {"PropertyName": "Property Value"}, "runs": [{"name": "python upload", "properties": {"RunFieldName": "Run Field Value"}}]}]}',
-            "headers": {"Content-type": "application/json", "Accept": "text/plain"},
+            "headers": {"Content-Type": "application/json"},
             "timeout": 300,
         }
 

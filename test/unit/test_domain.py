@@ -70,7 +70,7 @@ class TestCreate(unittest.TestCase):
 
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
-            "data": json.dumps(domain_definition),
+            "data": json.dumps(domain_definition, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
         }
@@ -116,7 +116,7 @@ class TestDrop(unittest.TestCase):
 
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
-            "data": json.dumps(payload),
+            "data": json.dumps(payload, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
         }
@@ -275,7 +275,7 @@ class TestSave(unittest.TestCase):
 
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
-            "data": json.dumps(payload),
+            "data": json.dumps(payload, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
         }
@@ -347,7 +347,7 @@ class TestConditionalFormatCreate(unittest.TestCase):
 
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
-            "data": json.dumps(self.domain_definition),
+            "data": json.dumps(self.domain_definition, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
         }
@@ -431,7 +431,7 @@ class TestConditionalFormatSave(unittest.TestCase):
 
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
-            "data": json.dumps(payload),
+            "data": json.dumps(payload, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
         }

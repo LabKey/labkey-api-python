@@ -390,13 +390,12 @@ def create(
     :return: Domain
     """
     url = server_context.build_url("property", "createDomain.api", container_path=container_path)
-    headers = {"Content-Type": "application/json"}
     domain = None
     domain_fields = domain_definition["domainDesign"]["fields"]
     domain_definition["domainDesign"]["fields"] = list(
         map(__format_conditional_filters, domain_fields)
     )
-    raw_domain = server_context.make_request(url, json_dumps(domain_definition), headers=headers)
+    raw_domain = server_context.make_request(url, json=domain_definition)
 
     if raw_domain is not None:
         domain = Domain(**raw_domain)
@@ -416,10 +415,9 @@ def drop(
     :return:
     """
     url = server_context.build_url("property", "deleteDomain.api", container_path=container_path)
-    headers = {"Content-Type": "application/json"}
     payload = {"schemaName": schema_name, "queryName": query_name}
 
-    return server_context.make_request(url, json_dumps(payload), headers=headers)
+    return server_context.make_request(url, json=payload)
 
 
 def get(
@@ -455,7 +453,7 @@ def infer_fields(
     :return:
     """
     url = server_context.build_url("property", "inferDomain.api", container_path=container_path)
-    raw_infer = server_context.make_request(url, None, file_payload={"inferfile": data_file})
+    raw_infer = server_context.make_request(url, file_payload={"inferfile": data_file})
 
     fields = None
     if "fields" in raw_infer:
@@ -483,14 +481,13 @@ def save(
     :return:
     """
     url = server_context.build_url("property", "saveDomain.api", container_path=container_path)
-    headers = {"Content-Type": "application/json"}
     payload = {
         "domainDesign": domain.to_json(),
         "queryName": query_name,
         "schemaName": schema_name,
     }
 
-    return server_context.make_request(url, json_dumps(payload), headers=headers)
+    return server_context.make_request(url, json=payload)
 
 
 class DomainWrapper:
