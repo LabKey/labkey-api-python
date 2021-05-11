@@ -14,12 +14,15 @@
 # limitations under the License.
 #
 import functools
+from dataclasses import dataclass
+
 from typing import Union, List
 
 from labkey.server_context import ServerContext
 
 SECURITY_CONTROLLER = "security"
 USER_CONTROLLER = "user"
+LOGIN_CONTROLLER = "login"
 
 
 def activate_users(
@@ -246,6 +249,67 @@ def reset_password(server_context: ServerContext, email: str, container_path: st
     return server_context.make_request(url, {"email": email})
 
 
+def impersonate_user(
+    server_context: ServerContext,
+    user_id: int = None,
+    email: str = None,
+    container_path: str = None,
+):
+    """
+    For site-admins or project-admins only, start impersonating a user.
+
+    Admins may impersonate other users to perform actions on their behalf.
+    Site users may impersonate any user in any project. Project admins must
+    execute this command in a project in which they have admin permission
+    and may impersonate any user that has access to the project.
+
+    To finish an impersonation session use either `logout` to
+    log the original user out or use `stop_impersonating` to stop
+    impersonating while keeping the original user logged in.
+
+    :param user_id: to impersonate (must supply this or email)
+    :param email: to impersonate (must supply this or user_id)
+    :param container_path: in which to impersonate the user
+    """
+    if email is None and user_id is None:
+        raise ValueError("Must supply either [email] or [user_id]")
+
+    url = server_context.build_url(USER_CONTROLLER, "impersonateUser.api", container_path)
+    return server_context.make_request(url, {"userId": user_id, "email": email})
+
+
+def stop_impersonating(server_context: ServerContext):
+    """
+    Stop impersonating a user while keeping the original user logged in.
+    """
+    url = server_context.build_url(LOGIN_CONTROLLER, "stopImpersonating.api")
+    return server_context.make_request(url, None)
+
+
+@dataclass
+class WhoAmI:
+    id: int
+    email: str
+    display_name: str
+    impersonated: str
+    CSRF: str
+
+
+def who_am_i(server_context: ServerContext) -> WhoAmI:
+    """
+    Calls the whoami API and returns a WhoAmI object.
+    """
+    url = server_context.build_url("login", "whoami.api")
+    response = server_context.make_request(url, None)
+    return WhoAmI(
+        response["id"],
+        response["email"],
+        response["displayName"],
+        response["impersonated"],
+        response["CSRF"],
+    )
+
+
 def __make_security_group_api_request(
     server_context: ServerContext,
     api: str,
@@ -378,3 +442,15 @@ class SecurityWrapper:
     @functools.wraps(reset_password)
     def reset_password(self, email: str, container_path: str = None):
         return reset_password(self.server_context, email, container_path)
+
+    @functools.wraps(impersonate_user)
+    def impersonate_user(self, user_id: int = None, email: str = None, container_path: str = None):
+        return impersonate_user(self.server_context, user_id, email, container_path)
+
+    @functools.wraps(stop_impersonating)
+    def stop_impersonating(self):
+        return stop_impersonating(self.server_context)
+
+    @functools.wraps(who_am_i)
+    def who_am_i(self):
+        return who_am_i(self.server_context)

@@ -45,7 +45,9 @@ def server_context_vars():
 @pytest.fixture(scope="session")
 def api(server_context_vars):
     server, context_path = server_context_vars
-    return APIWrapper(server, PROJECT_NAME, context_path, use_ssl=False)
+    api = APIWrapper(server, PROJECT_NAME, context_path, use_ssl=False)
+    api.security.stop_impersonating()  # Call stop impersonating incase previous test run failed while impersonating a user.
+    return api
 
 
 @pytest.fixture(autouse=True, scope="session")

@@ -103,7 +103,7 @@ class Run(ExpObject):
         data["materialOutputs"] = self.material_outputs
         data["plateMetadata"] = self.plate_metadata
 
-        # Issue 2489: Drop empty values. Server supplies default values for missing keys, 
+        # Issue 2489: Drop empty values. Server supplies default values for missing keys,
         # and will throw exception if a null value is supplied
         data = {k: v for k, v in data.items() if v}
         return data

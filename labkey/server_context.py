@@ -117,14 +117,13 @@ class ServerContext:
             if self._session.headers.get(API_KEY_TOKEN) is not self._api_key:
                 self._session.headers.update({API_KEY_TOKEN: self._api_key})
 
-        if not self._disable_csrf:
-            if CSRF_TOKEN not in self._session.headers.keys():
-                try:
-                    csrf_url = self.build_url("login", "whoami.api")
-                    response = handle_response(self._session.get(csrf_url))
-                    self._session.headers.update({CSRF_TOKEN: response["CSRF"]})
-                except RequestException as e:
-                    self.handle_request_exception(e)
+        if not self._disable_csrf and CSRF_TOKEN not in self._session.headers.keys():
+            try:
+                csrf_url = self.build_url("login", "whoami.api")
+                response = handle_response(self._session.get(csrf_url))
+                self._session.headers.update({CSRF_TOKEN: response["CSRF"]})
+            except RequestException as e:
+                self.handle_request_exception(e)
 
         try:
             if method == "GET":
