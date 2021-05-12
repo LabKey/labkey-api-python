@@ -17,10 +17,7 @@ import requests
 
 from labkey.server_context import ServerContext
 
-try:
-    import mock
-except ImportError:
-    import unittest.mock as mock
+import unittest.mock as mock
 
 
 def mock_server_context(mock_action):
