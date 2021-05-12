@@ -44,7 +44,6 @@ import functools
 from typing import List
 
 from .server_context import ServerContext
-from labkey.utils import json_dumps
 
 _default_timeout = 60 * 5  # 5 minutes
 

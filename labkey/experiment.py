@@ -17,7 +17,6 @@ import functools
 from typing import List, Optional
 
 from .server_context import ServerContext
-from labkey.utils import json_dumps
 
 
 class ExpObject:

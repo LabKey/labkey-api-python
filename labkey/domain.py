@@ -17,7 +17,6 @@ import functools
 from typing import Union, List
 
 from .server_context import ServerContext
-from labkey.utils import json_dumps
 from labkey.query import QueryFilter
 
 

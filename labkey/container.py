@@ -1,5 +1,4 @@
 from .server_context import ServerContext
-from labkey.utils import json_dumps
 
 
 def create(
