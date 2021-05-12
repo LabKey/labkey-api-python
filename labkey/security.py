@@ -261,9 +261,7 @@ def impersonate_user(
     execute this command in a project in which they have admin permission
     and may impersonate any user that has access to the project.
 
-    To finish an impersonation session use either `logout` to
-    log the original user out or use `stop_impersonating` to stop
-    impersonating while keeping the original user logged in.
+    To finish an impersonation session use `stop_impersonating`.
 
     :param user_id: to impersonate (must supply this or email)
     :param email: to impersonate (must supply this or user_id)
