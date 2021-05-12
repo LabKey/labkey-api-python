@@ -17,7 +17,6 @@ import functools
 from typing import List, Optional
 
 from .server_context import ServerContext
-from labkey.utils import json_dumps
 
 
 class ExpObject:
@@ -103,7 +102,7 @@ class Run(ExpObject):
         data["materialOutputs"] = self.material_outputs
         data["plateMetadata"] = self.plate_metadata
 
-        # Issue 2489: Drop empty values. Server supplies default values for missing keys, 
+        # Issue 2489: Drop empty values. Server supplies default values for missing keys,
         # and will throw exception if a null value is supplied
         data = {k: v for k, v in data.items() if v}
         return data
@@ -163,14 +162,9 @@ def load_batch(server_context: ServerContext, assay_id: int, batch_id: int) -> O
     """
     load_batch_url = server_context.build_url("assay", "getAssayBatch.api")
     loaded_batch = None
-
     payload = {"assayId": assay_id, "batchId": batch_id}
+    json_body = server_context.make_request(load_batch_url, json=payload)
 
-    headers = {"Content-type": "application/json", "Accept": "text/plain"}
-
-    json_body = server_context.make_request(
-        load_batch_url, json_dumps(payload, sort_keys=True), headers=headers
-    )
     if json_body is not None:
         loaded_batch = Batch(**json_body["batch"])
 
@@ -215,11 +209,8 @@ def save_batches(
             raise Exception('save_batch() "batches" expected to be a set Batch instances')
 
     payload = {"assayId": assay_id, "batches": json_batches}
-    headers = {"Content-type": "application/json", "Accept": "text/plain"}
+    json_body = server_context.make_request(save_batch_url, json=payload)
 
-    json_body = server_context.make_request(
-        save_batch_url, json_dumps(payload, sort_keys=True), headers=headers
-    )
     if json_body is not None:
         resp_batches = json_body["batches"]
         return [Batch(**resp_batch) for resp_batch in resp_batches]

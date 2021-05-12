@@ -17,9 +17,9 @@ PROJECT_NAME = "PythonIntegrationTests"
 @pytest.fixture(scope="session")
 def server_context_vars():
     properties_file_path = os.getenv("TEAMCITY_BUILD_PROPERTIES_FILE")
-    host = DEFAULT_HOST
-    port = DEFAULT_PORT
-    context_path = DEFAULT_CONTEXT_PATH
+    host = os.getenv("HOST", DEFAULT_HOST)
+    port = os.getenv("PORT", DEFAULT_PORT)
+    context_path = os.getenv("CONTEXT_PATH", DEFAULT_CONTEXT_PATH)
 
     if properties_file_path is not None:
         with open(properties_file_path) as f:
@@ -45,7 +45,9 @@ def server_context_vars():
 @pytest.fixture(scope="session")
 def api(server_context_vars):
     server, context_path = server_context_vars
-    return APIWrapper(server, PROJECT_NAME, context_path, use_ssl=False)
+    api = APIWrapper(server, PROJECT_NAME, context_path, use_ssl=False)
+    api.security.stop_impersonating()  # Call stop impersonating incase previous test run failed while impersonating a user.
+    return api
 
 
 @pytest.fixture(autouse=True, scope="session")

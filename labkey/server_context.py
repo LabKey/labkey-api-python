@@ -1,3 +1,4 @@
+from labkey.utils import json_dumps
 import requests
 from requests.exceptions import RequestException
 from labkey.exceptions import (
@@ -106,44 +107,50 @@ class ServerContext:
     def make_request(
         self,
         url: str,
-        payload: any,
+        payload: any = None,
         headers: dict = None,
         timeout: int = 300,
         method: str = "POST",
         non_json_response: bool = False,
         file_payload: any = None,
+        json: dict = None,
     ) -> any:
         if self._api_key is not None:
             if self._session.headers.get(API_KEY_TOKEN) is not self._api_key:
                 self._session.headers.update({API_KEY_TOKEN: self._api_key})
 
-        if not self._disable_csrf:
-            if CSRF_TOKEN not in self._session.headers.keys():
-                try:
-                    csrf_url = self.build_url("login", "whoami.api")
-                    response = handle_response(self._session.get(csrf_url))
-                    self._session.headers.update({CSRF_TOKEN: response["CSRF"]})
-                except RequestException as e:
-                    self.handle_request_exception(e)
+        if not self._disable_csrf and CSRF_TOKEN not in self._session.headers.keys():
+            try:
+                csrf_url = self.build_url("login", "whoami.api")
+                response = handle_response(self._session.get(csrf_url))
+                self._session.headers.update({CSRF_TOKEN: response["CSRF"]})
+            except RequestException as e:
+                self.handle_request_exception(e)
 
         try:
             if method == "GET":
-                raw_response = self._session.get(
-                    url, params=payload, headers=headers, timeout=timeout
-                )
+                response = self._session.get(url, params=payload, headers=headers, timeout=timeout)
             else:
                 if file_payload is not None:
-                    raw_response = self._session.post(
+                    response = self._session.post(
                         url,
                         data=payload,
                         files=file_payload,
                         headers=headers,
                         timeout=timeout,
                     )
+                elif json is not None:
+                    if headers is None:
+                        headers = {}
+
+                    headers_ = {**headers, "Content-Type": "application/json"}
+                    # sort_keys is a hack to make unit tests work
+                    data = json_dumps(json, sort_keys=True)
+                    response = self._session.post(url, data=data, headers=headers_, timeout=timeout)
                 else:
-                    raw_response = self._session.post(
+                    response = self._session.post(
                         url, data=payload, headers=headers, timeout=timeout
                     )
-            return handle_response(raw_response, non_json_response)
+            return handle_response(response, non_json_response)
         except RequestException as e:
             self.handle_request_exception(e)

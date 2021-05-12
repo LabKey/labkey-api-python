@@ -13,3 +13,4 @@ labkey\.egg-info/
 
 .DS_Store
 .python-version
+.vscode/

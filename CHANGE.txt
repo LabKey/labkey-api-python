@@ -6,7 +6,13 @@ What's New in the LabKey 2.1.0 package
 ==============================
 
 *Release date: TBD*
-Adding support for ontology based column filters ONTOLOGY_IN_SUBTREE and ONTOLOGY_NOT_IN_SUBTREE
+- Add support for ontology based column filters ONTOLOGY_IN_SUBTREE and ONTOLOGY_NOT_IN_SUBTREE
+- ServerContext.make_request: payload is now optional
+- ServerContext.make_request: add json kwarg
+  - This automatically does json_dumps and sets the content-type header for you
+- Add impersonate_user and stop_impersonating to security module (including APIWrapper)
+- Add more environment variables for integration test configuration
+  - host, port, and context_path can now be overridden via env vars
 
 What's New in the LabKey 2.0.1 package
 ==============================

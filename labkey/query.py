@@ -44,9 +44,6 @@ import functools
 from typing import List
 
 from .server_context import ServerContext
-from labkey.utils import json_dumps
-
-_query_headers = {"Content-Type": "application/json"}
 
 _default_timeout = 60 * 5  # 5 minutes
 
@@ -176,8 +173,7 @@ def delete_rows(
 
     return server_context.make_request(
         url,
-        json_dumps(payload, sort_keys=True),
-        headers=_query_headers,
+        json=payload,
         timeout=timeout,
     )
 
@@ -203,8 +199,7 @@ def truncate_table(
 
     return server_context.make_request(
         url,
-        json_dumps(payload, sort_keys=True),
-        headers=_query_headers,
+        json=payload,
         timeout=timeout,
     )
 
@@ -294,8 +289,7 @@ def insert_rows(
 
     return server_context.make_request(
         url,
-        json_dumps(payload, sort_keys=True),
-        headers=_query_headers,
+        json=payload,
         timeout=timeout,
     )
 
@@ -430,8 +424,7 @@ def update_rows(
 
     return server_context.make_request(
         url,
-        json_dumps(payload, sort_keys=True),
-        headers=_query_headers,
+        json=payload,
         timeout=timeout,
     )
 

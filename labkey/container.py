@@ -1,5 +1,4 @@
 from .server_context import ServerContext
-from labkey.utils import json_dumps
 
 
 def create(
@@ -23,7 +22,6 @@ def create(
     :param title: the title for the container.
     :return:
     """
-    headers = {"Content-Type": "application/json"}
     url = server_context.build_url("core", "createContainer.api", container_path)
     payload = {
         "description": description,
@@ -32,7 +30,7 @@ def create(
         "name": name,
         "title": title,
     }
-    return server_context.make_request(url, json_dumps(payload), headers=headers)
+    return server_context.make_request(url, json=payload)
 
 
 def delete(server_context: ServerContext, container_path: str = None) -> any:
@@ -44,7 +42,7 @@ def delete(server_context: ServerContext, container_path: str = None) -> any:
     """
     headers = {"Content-Type": "application/json"}
     url = server_context.build_url("core", "deleteContainer.api", container_path)
-    return server_context.make_request(url, None, headers=headers)
+    return server_context.make_request(url, headers=headers)
 
 
 class ContainerWrapper:
