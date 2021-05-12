@@ -15,10 +15,7 @@
 #
 import unittest
 
-try:
-    import mock
-except ImportError:
-    import unittest.mock as mock
+import unittest.mock as mock
 
 from labkey.security import (
     create_user,

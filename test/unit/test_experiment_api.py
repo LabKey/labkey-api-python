@@ -15,10 +15,7 @@
 #
 import unittest
 
-try:
-    import mock
-except ImportError:
-    import unittest.mock as mock
+import unittest.mock as mock
 
 from labkey.experiment import load_batch, save_batch, Batch, Run
 from labkey.exceptions import (
