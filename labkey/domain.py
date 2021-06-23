@@ -390,10 +390,14 @@ def create(
     """
     url = server_context.build_url("property", "createDomain.api", container_path=container_path)
     domain = None
-    domain_fields = domain_definition["domainDesign"]["fields"]
-    domain_definition["domainDesign"]["fields"] = list(
-        map(__format_conditional_filters, domain_fields)
-    )
+
+    # domainDesign is not required when creating a domain from a template
+    if domain_definition["domainDesign"] is not None:
+        domain_fields = domain_definition["domainDesign"]["fields"]
+        domain_definition["domainDesign"]["fields"] = list(
+            map(__format_conditional_filters, domain_fields)
+        )
+    
     raw_domain = server_context.make_request(url, json=domain_definition)
 
     if raw_domain is not None:

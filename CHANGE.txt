@@ -2,10 +2,16 @@
 LabKey Python Client API News
 +++++++++++
 
-What's New in the LabKey 2.1.0 package
+What's New in the LabKey 2.1.1 package
 ==============================
 
 *Release date: TBD*
+- Fix issue with domain.create raising exception when attempting to create a domain from a template
+
+What's New in the LabKey 2.1.0 package
+==============================
+
+*Release date: 05/12/2021*
 - Add support for ontology based column filters ONTOLOGY_IN_SUBTREE and ONTOLOGY_NOT_IN_SUBTREE
 - ServerContext.make_request: payload is now optional
 - ServerContext.make_request: add json kwarg
