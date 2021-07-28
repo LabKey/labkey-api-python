@@ -445,20 +445,32 @@ def get(
 
 
 def get_domain_details(
-    server_context: ServerContext, schema_name: str, query_name: str, container_path: str = None
+    server_context: ServerContext,
+    schema_name: str = None,
+    query_name: str = None,
+    domain_id: int = None,
+    domain_kind: str = None,
+    container_path: str = None
 ) -> Tuple[Domain, Dict]:
     """
     Gets a domain design and its associated options.
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param schema_name: schema of table
     :param query_name: table name of domain to get
+    :param domain_id: id of domain to get
+    :param domain_kind: domainKind of domain to get
     :param container_path: labkey container path if not already set in context
     :return: Domain, Dict
     """
     url = server_context.build_url(
         "property", "getDomainDetails.api", container_path=container_path
     )
-    payload = {"schemaName": schema_name, "queryName": query_name}
+    payload = {
+        "schemaName": schema_name,
+        "queryName": query_name,
+        "domainId": domain_id,
+        "domainKind": domain_kind,
+    }
     response = server_context.make_request(url, payload, method="GET")
     raw_domain = response.get("domainDesign", None)
     domain = None
@@ -539,8 +551,15 @@ class DomainWrapper:
         return get(self.server_context, schema_name, query_name, container_path)
 
     @functools.wraps(get_domain_details)
-    def get_domain_details(self, schema_name: str, query_name: str, container_path: str = None):
-        return get_domain_details(self.server_context, schema_name, query_name, container_path)
+    def get_domain_details(
+            self,
+            schema_name: str = None,
+            query_name: str = None,
+            domain_id: int = None,
+            domain_kind: str = None,
+            container_path: str = None
+    ):
+        return get_domain_details(self.server_context, schema_name, query_name, domain_id, domain_kind, container_path)
 
     @functools.wraps(infer_fields)
     def infer_fields(self, data_file: any, container_path: str = None):

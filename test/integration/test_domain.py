@@ -233,6 +233,7 @@ def test_create_list_with_conditional_formatted_field(api: APIWrapper):
 
 
 def test_get_domain_details(api: APIWrapper, list_fixture):
+    # test retrieving domain by specifying schema/query
     domain, options = api.domain.get_domain_details(LISTS_SCHEMA, LIST_NAME)
     assert domain.name == LIST_NAME
     assert len(domain.fields) == 2
@@ -241,3 +242,8 @@ def test_get_domain_details(api: APIWrapper, list_fixture):
     assert domain.fields[1].conditional_formats[0].to_json() == CONDITIONAL_FORMAT[0]
     assert options["keyName"] == "rowId"
     assert options["name"] == LIST_NAME
+
+    # test retrieving domain by specifying domainId
+    assert domain.domain_id is not None
+    domain_from_id, domain_from_id_options = api.domain.get_domain_details(domain_id=domain.domain_id)
+    assert domain_from_id.name == LIST_NAME
