@@ -450,7 +450,7 @@ def get_domain_details(
     query_name: str = None,
     domain_id: int = None,
     domain_kind: str = None,
-    container_path: str = None
+    container_path: str = None,
 ) -> Tuple[Domain, Dict]:
     """
     Gets a domain design and its associated options.
@@ -552,14 +552,16 @@ class DomainWrapper:
 
     @functools.wraps(get_domain_details)
     def get_domain_details(
-            self,
-            schema_name: str = None,
-            query_name: str = None,
-            domain_id: int = None,
-            domain_kind: str = None,
-            container_path: str = None
+        self,
+        schema_name: str = None,
+        query_name: str = None,
+        domain_id: int = None,
+        domain_kind: str = None,
+        container_path: str = None,
     ):
-        return get_domain_details(self.server_context, schema_name, query_name, domain_id, domain_kind, container_path)
+        return get_domain_details(
+            self.server_context, schema_name, query_name, domain_id, domain_kind, container_path
+        )
 
     @functools.wraps(infer_fields)
     def infer_fields(self, data_file: any, container_path: str = None):

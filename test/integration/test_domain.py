@@ -245,5 +245,7 @@ def test_get_domain_details(api: APIWrapper, list_fixture):
 
     # test retrieving domain by specifying domainId
     assert domain.domain_id is not None
-    domain_from_id, domain_from_id_options = api.domain.get_domain_details(domain_id=domain.domain_id)
+    domain_from_id, domain_from_id_options = api.domain.get_domain_details(
+        domain_id=domain.domain_id
+    )
     assert domain_from_id.name == LIST_NAME
