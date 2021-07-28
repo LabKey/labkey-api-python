@@ -397,7 +397,7 @@ def create(
         domain_definition["domainDesign"]["fields"] = list(
             map(__format_conditional_filters, domain_fields)
         )
-    
+
     raw_domain = server_context.make_request(url, json=domain_definition)
 
     if raw_domain is not None:
@@ -436,13 +436,12 @@ def get(
     """
     url = server_context.build_url("property", "getDomain.api", container_path=container_path)
     payload = {"schemaName": schema_name, "queryName": query_name}
-    domain = None
     raw_domain = server_context.make_request(url, payload, method="GET")
 
     if raw_domain is not None:
-        domain = Domain(**raw_domain)
+        return Domain(**raw_domain)
 
-    return domain
+    return None
 
 
 def get_domain_details(
@@ -456,9 +455,10 @@ def get_domain_details(
     :param container_path: labkey container path if not already set in context
     :return: Domain, Dict
     """
-    url = server_context.build_url("property", "getDomainDetails.api", container_path=container_path)
+    url = server_context.build_url(
+        "property", "getDomainDetails.api", container_path=container_path
+    )
     payload = {"schemaName": schema_name, "queryName": query_name}
-    domain = None
     response = server_context.make_request(url, payload, method="GET")
     raw_domain = response.get("domainDesign", None)
     domain = None
@@ -468,7 +468,6 @@ def get_domain_details(
         domain = Domain(**raw_domain)
 
     return domain, options
-
 
 
 def infer_fields(
