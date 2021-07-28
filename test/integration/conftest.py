@@ -61,6 +61,6 @@ def project(server_context_vars):
         # The project may not exist, and that is ok.
         pass
 
-    project_ = container.create(context, PROJECT_NAME, folder_type="study")
+    project_ = container.create(context, PROJECT_NAME, folder_type="Study")
     yield project_
     container.delete(context, PROJECT_NAME)
