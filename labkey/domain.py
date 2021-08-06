@@ -510,7 +510,7 @@ def save(
     query_name: str,
     domain: Domain,
     container_path: str = None,
-    options: Dict = None
+    options: Dict = None,
 ) -> any:
     """
     Saves the provided domain design
@@ -573,5 +573,12 @@ class DomainWrapper:
         return infer_fields(self.server_context, data_file, container_path)
 
     @functools.wraps(save)
-    def save(self, schema_name: str, query_name: str, domain: Domain, container_path: str = None, options: Dict = None):
+    def save(
+        self,
+        schema_name: str,
+        query_name: str,
+        domain: Domain,
+        container_path: str = None,
+        options: Dict = None,
+    ):
         return save(self.server_context, schema_name, query_name, domain, container_path, options)
