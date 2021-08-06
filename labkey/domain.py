@@ -510,6 +510,7 @@ def save(
     query_name: str,
     domain: Domain,
     container_path: str = None,
+    options: Dict = None
 ) -> any:
     """
     Saves the provided domain design
@@ -518,6 +519,7 @@ def save(
     :param query_name: query name of domain
     :param domain: Domain to save
     :param container_path: labkey container path if not already set in context
+    :param options: associated domain options to be saved
     :return:
     """
     url = server_context.build_url("property", "saveDomain.api", container_path=container_path)
@@ -526,6 +528,9 @@ def save(
         "queryName": query_name,
         "schemaName": schema_name,
     }
+
+    if options is not None:
+        payload["options"] = options
 
     return server_context.make_request(url, json=payload)
 
@@ -568,5 +573,5 @@ class DomainWrapper:
         return infer_fields(self.server_context, data_file, container_path)
 
     @functools.wraps(save)
-    def save(self, schema_name: str, query_name: str, domain: Domain, container_path: str = None):
-        return save(self.server_context, schema_name, query_name, domain, container_path)
+    def save(self, schema_name: str, query_name: str, domain: Domain, container_path: str = None, options: Dict = None):
+        return save(self.server_context, schema_name, query_name, domain, container_path, options)

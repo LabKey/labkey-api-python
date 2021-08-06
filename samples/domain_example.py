@@ -65,9 +65,9 @@ dataset_domain_definition = {
 dataset_domain = api.domain.create(dataset_domain_definition)
 
 ###################
-# Get a domain
+# Get a domain and it's associated options
 ###################
-list_domain = api.domain.get("lists", "BloodTypes")
+list_domain, list_domain_options = api.domain.get_domain_details("lists", "BloodTypes")
 
 # examine different from the domain
 print(list_domain.name)
@@ -82,10 +82,13 @@ list_domain.add_field({"name": "canTransfuse", "rangeURI": "boolean"})
 fields_file = open("data/infer.tsv", "rb")
 inferred_fields = api.domain.infer_fields(fields_file)
 
+# Update the description via domain options
+list_domain_options["description"] = "Contains all known human blood types"
+
 for field in inferred_fields:
     list_domain.add_field(field)
 
-api.domain.save("lists", "BloodTypes", list_domain)
+api.domain.save("lists", "BloodTypes", list_domain, options=list_domain_options)
 
 ###################
 # Drop a domain

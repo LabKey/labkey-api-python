@@ -249,3 +249,15 @@ def test_get_domain_details(api: APIWrapper, list_fixture):
         domain_id=domain.domain_id
     )
     assert domain_from_id.name == LIST_NAME
+
+
+def test_domain_save_options(api: APIWrapper, list_fixture):
+    domain, options = api.domain.get_domain_details(LISTS_SCHEMA, LIST_NAME)
+    expected_description = "updated description from test"
+    assert options.get("description") != expected_description
+
+    options["description"] = expected_description
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, domain, options=options)
+
+    updated_domain, updated_options = api.domain.get_domain_details(LISTS_SCHEMA, LIST_NAME)
+    assert updated_options.get("description") == expected_description

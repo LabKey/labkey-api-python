@@ -4,9 +4,9 @@ LabKey Python Client API News
 
 What's New in the LabKey 2.2.0 package
 ==============================
-- Add get_domain_details API to domain module
-- Fix Issue 43337
-- Fix ConditionalFormat.to_json to match what LabKey Server responds with
+- Add `domain.get_domain_details` API to domain module.
+- Support saving domain options via `domain.save`.
+- Fix `ConditionalFormat.to_json()` to match server response.
 
 What's New in the LabKey 2.1.1 package
 ==============================
