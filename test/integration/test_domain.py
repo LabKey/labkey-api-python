@@ -166,8 +166,6 @@ def test_remove_conditional_format(api: APIWrapper, list_fixture):
 
 
 def test_update_conditional_format_serialize_filter(api: APIWrapper, list_fixture):
-    from labkey.query import QueryFilter
-
     new_filter = QueryFilter("formatted", 15, QueryFilter.Types.GREATER_THAN_OR_EQUAL)
     cf = conditional_format(new_filter, text_color="ff00ff")
 
@@ -232,3 +230,34 @@ def test_create_list_with_conditional_formatted_field(api: APIWrapper):
             assert len(field.conditional_formats) == 2
 
     api.domain.drop(LISTS_SCHEMA, "composed_list_name")
+
+
+def test_get_domain_details(api: APIWrapper, list_fixture):
+    # test retrieving domain by specifying schema/query
+    domain, options = api.domain.get_domain_details(LISTS_SCHEMA, LIST_NAME)
+    assert domain.name == LIST_NAME
+    assert len(domain.fields) == 2
+    assert domain.fields[0].name == "rowId"
+    assert domain.fields[1].name == "formatted"
+    assert domain.fields[1].conditional_formats[0].to_json() == CONDITIONAL_FORMAT[0]
+    assert options["keyName"] == "rowId"
+    assert options["name"] == LIST_NAME
+
+    # test retrieving domain by specifying domainId
+    assert domain.domain_id is not None
+    domain_from_id, domain_from_id_options = api.domain.get_domain_details(
+        domain_id=domain.domain_id
+    )
+    assert domain_from_id.name == LIST_NAME
+
+
+def test_domain_save_options(api: APIWrapper, list_fixture):
+    domain, options = api.domain.get_domain_details(LISTS_SCHEMA, LIST_NAME)
+    expected_description = "updated description from test"
+    assert options.get("description") != expected_description
+
+    options["description"] = expected_description
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, domain, options=options)
+
+    updated_domain, updated_options = api.domain.get_domain_details(LISTS_SCHEMA, LIST_NAME)
+    assert updated_options.get("description") == expected_description

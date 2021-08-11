@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 import functools
-from typing import Union, List
+from typing import Dict, List, Union, Tuple
 
 from .server_context import ServerContext
 from labkey.query import QueryFilter
@@ -207,12 +207,12 @@ class ConditionalFormat:
 
     def to_json(self):
         data = {
-            "backgroundColor": self.background_color,
+            "backgroundcolor": self.background_color,
             "bold": self.bold,
             "filter": self.filter,
             "italic": self.italic,
             "strikethrough": self.strike_through,
-            "textColor": self.text_color,
+            "textcolor": self.text_color,
         }
 
         return data
@@ -392,12 +392,12 @@ def create(
     domain = None
 
     # domainDesign is not required when creating a domain from a template
-    if domain_definition["domainDesign"] is not None:
+    if domain_definition.get("domainDesign", None) is not None:
         domain_fields = domain_definition["domainDesign"]["fields"]
         domain_definition["domainDesign"]["fields"] = list(
             map(__format_conditional_filters, domain_fields)
         )
-    
+
     raw_domain = server_context.make_request(url, json=domain_definition)
 
     if raw_domain is not None:
@@ -436,13 +436,50 @@ def get(
     """
     url = server_context.build_url("property", "getDomain.api", container_path=container_path)
     payload = {"schemaName": schema_name, "queryName": query_name}
-    domain = None
     raw_domain = server_context.make_request(url, payload, method="GET")
+
+    if raw_domain is not None:
+        return Domain(**raw_domain)
+
+    return None
+
+
+def get_domain_details(
+    server_context: ServerContext,
+    schema_name: str = None,
+    query_name: str = None,
+    domain_id: int = None,
+    domain_kind: str = None,
+    container_path: str = None,
+) -> Tuple[Domain, Dict]:
+    """
+    Gets a domain design and its associated options.
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name of domain to get
+    :param domain_id: id of domain to get
+    :param domain_kind: domainKind of domain to get
+    :param container_path: labkey container path if not already set in context
+    :return: Domain, Dict
+    """
+    url = server_context.build_url(
+        "property", "getDomainDetails.api", container_path=container_path
+    )
+    payload = {
+        "schemaName": schema_name,
+        "queryName": query_name,
+        "domainId": domain_id,
+        "domainKind": domain_kind,
+    }
+    response = server_context.make_request(url, payload, method="GET")
+    raw_domain = response.get("domainDesign", None)
+    domain = None
+    options = response.get("options", None)
 
     if raw_domain is not None:
         domain = Domain(**raw_domain)
 
-    return domain
+    return domain, options
 
 
 def infer_fields(
@@ -473,6 +510,7 @@ def save(
     query_name: str,
     domain: Domain,
     container_path: str = None,
+    options: Dict = None,
 ) -> any:
     """
     Saves the provided domain design
@@ -481,6 +519,7 @@ def save(
     :param query_name: query name of domain
     :param domain: Domain to save
     :param container_path: labkey container path if not already set in context
+    :param options: associated domain options to be saved
     :return:
     """
     url = server_context.build_url("property", "saveDomain.api", container_path=container_path)
@@ -489,6 +528,9 @@ def save(
         "queryName": query_name,
         "schemaName": schema_name,
     }
+
+    if options is not None:
+        payload["options"] = options
 
     return server_context.make_request(url, json=payload)
 
@@ -513,10 +555,30 @@ class DomainWrapper:
     def get(self, schema_name: str, query_name: str, container_path: str = None):
         return get(self.server_context, schema_name, query_name, container_path)
 
+    @functools.wraps(get_domain_details)
+    def get_domain_details(
+        self,
+        schema_name: str = None,
+        query_name: str = None,
+        domain_id: int = None,
+        domain_kind: str = None,
+        container_path: str = None,
+    ):
+        return get_domain_details(
+            self.server_context, schema_name, query_name, domain_id, domain_kind, container_path
+        )
+
     @functools.wraps(infer_fields)
     def infer_fields(self, data_file: any, container_path: str = None):
         return infer_fields(self.server_context, data_file, container_path)
 
     @functools.wraps(save)
-    def save(self, schema_name: str, query_name: str, domain: Domain, container_path: str = None):
-        return save(self.server_context, schema_name, query_name, domain, container_path)
+    def save(
+        self,
+        schema_name: str,
+        query_name: str,
+        domain: Domain,
+        container_path: str = None,
+        options: Dict = None,
+    ):
+        return save(self.server_context, schema_name, query_name, domain, container_path, options)
