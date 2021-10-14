@@ -1,4 +1,3 @@
-from labkey.security import who_am_i
 import pytest
 from labkey.api_wrapper import APIWrapper
 
@@ -24,21 +23,21 @@ def test_user(api: APIWrapper, project):
 def test_impersonation(api: APIWrapper, test_user):
     # test impersonation via email
     api.security.impersonate_user(email=TEST_EMAIL)
-    who = who_am_i(api.server_context)
+    who = api.security.who_am_i()
     assert who.display_name == test_user["display_name"]
     assert who.email == test_user["email"]
     assert who.id == test_user["id"]
 
     # test stop impersonating
     api.security.stop_impersonating()
-    who = who_am_i(api.server_context)
+    who = api.security.who_am_i()
     assert who.display_name != test_user["display_name"]
     assert who.email != test_user["email"]
     assert who.id != test_user["id"]
 
     # test impersonation via user id
     api.security.impersonate_user(user_id=test_user["id"])
-    who = who_am_i(api.server_context)
+    who = api.security.who_am_i()
     assert who.display_name == test_user["display_name"]
     assert who.email == test_user["email"]
     assert who.id == test_user["id"]

@@ -62,14 +62,15 @@ def dataset(api: APIWrapper, study):
 
 @pytest.fixture(scope="function")
 def qc_states(api: APIWrapper, study):
-    insert_result = api.query.insert_rows("core", "qcstate", TEST_QC_STATES)
+    print(api.security.who_am_i())
+    insert_result = api.query.insert_rows("core", "datastates", TEST_QC_STATES)
     yield insert_result
     # clean up
     cleanup_qc_states = [
         {"rowId": insert_result["rows"][0]["rowid"]},
         {"rowId": insert_result["rows"][1]["rowid"]},
     ]
-    api.query.delete_rows("core", "qcstate", cleanup_qc_states)
+    api.query.delete_rows("core", "datastates", cleanup_qc_states)
 
 
 def test_api_select_rows(api: APIWrapper):
@@ -105,7 +106,7 @@ def test_update_qc_state_definition(api: APIWrapper, qc_states, study):
     edit_rowid = qc_states["rows"][0]["rowid"]
     assert qc_states["rows"][0]["description"] != new_description
     to_edit_row = [{"rowid": edit_rowid, "description": new_description}]
-    update_response = api.query.update_rows("core", "qcstate", to_edit_row)
+    update_response = api.query.update_rows("core", "datastates", to_edit_row)
     assert update_response["rowsAffected"] == 1
     assert update_response["rows"][0]["description"] == new_description
 
@@ -113,7 +114,7 @@ def test_update_qc_state_definition(api: APIWrapper, qc_states, study):
 def test_insert_duplicate_labeled_qc_state_produces_error(api: APIWrapper, qc_states, study):
     with pytest.raises(ServerContextError) as e:
         dupe_qc_state = [{"label": "needs verification", "publicData": "false"}]
-        api.query.insert_rows("core", "qcstate", dupe_qc_state)
+        api.query.insert_rows("core", "datastates", dupe_qc_state)
 
     assert "500: ERROR: duplicate key value violates unique constraint" in e.value.message
 
@@ -135,11 +136,11 @@ def test_cannot_delete_qc_state_in_use(api: APIWrapper, qc_states, study, datase
 
     with pytest.raises(ServerContextError) as e:
         qc_state_to_delete = [{"rowid": qc_state_rowid}]
-        api.query.delete_rows("core", "qcstate", qc_state_to_delete)
+        api.query.delete_rows("core", "datastates", qc_state_to_delete)
 
     assert (
         e.value.message
-        == "\"400: QC state 'needs verification' cannot be deleted as it is currently in use.\""
+        == "\"400: State 'needs verification' cannot be deleted as it is currently in use.\""
     )
     # now clean up/stop using it
     dataset_row_to_remove = [{"lsid": inserted_lsid}]

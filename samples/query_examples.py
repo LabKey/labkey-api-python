@@ -211,7 +211,7 @@ test_row["Country"] = "Antarctica"
 all_rows = api.query.select_rows(schema, table)
 print("Insert Rows: Initials row count [ " + str(all_rows["rowCount"]) + " ]")
 
-insert_result = api.query.select_rows(schema, table, [test_row])
+insert_result = api.query.insert_rows(schema, table, [test_row])
 print("Insert Rows: New rowId [ " + str(insert_result["rows"][0]["Key"]) + " ]")
 
 all_rows = api.query.select_rows(schema, table)
