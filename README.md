@@ -100,7 +100,7 @@ else:
 ```
 
 ## Supported Versions
-Python 3.6+ is fully supported.
+Python 3.7+ is fully supported.
 LabKey Server v15.1 and later.
 
 ## Contributing
