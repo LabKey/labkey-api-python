@@ -1,9 +1,22 @@
 +++++++++++
 LabKey Python Client API News
 +++++++++++
+What's New in the LabKey 2.3.0 package
+==============================
+
+*Release date: 06/28/2022*
+- Add "hostname" property to ServerContext
+- Add "base_url" property to ServerContext
+- Add "webdav_client" method to ServerContext
+  - This method returns a webdavclient3 Client instance
+- Add "webdav_path" method to ServerContext
+- Add docs for WebDav support
+- Add unit tests for ServerContext
 
 What's New in the LabKey 2.2.0 package
 ==============================
+
+*Release date: 08/11/2021*
 - Add `domain.get_domain_details` API to domain module.
 - Support saving domain options via `domain.save`.
 - Fix `ConditionalFormat.to_json()` to match server response.
