@@ -30,7 +30,7 @@ detect your `.netrc` file and authenticate using those credentials.
 ### The webdav_path utility method
 If you are using the `webdavclient3` library you'll still need to know the appropriate WebDav path in order to access
 your files. We provide a utility method, `webdav_path` to make it easier to construct LabKey WebDav paths. The method
-takes to keyword arguments, `container_path`, and `file_name`.
+takes two keyword arguments, `container_path`, and `file_name`.
 
 ```python
 from labkey.api_wrapper import APIWrapper
