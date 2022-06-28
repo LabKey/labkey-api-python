@@ -36,6 +36,10 @@ Security API - [sample code](samples/security_example.py)
 
 - Available for administrating and configuring user accounts and permissions.
 
+WebDav
+
+- Documentation and example code can be found [here](docs/webdav.md).
+
 ## Installation
 To install, simply use `pip`:
 
@@ -98,8 +102,6 @@ if result is not None:
 else:
     print('select_rows: Failed to load results from ' + schema + '.' + table)
 ```
-
-Documentation and example code for working with WebDav can be found [docs/webdav.md](here).
 
 ## Supported Versions
 Python 3.7+ is fully supported.

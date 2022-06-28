@@ -3,7 +3,7 @@
 Our Python API includes some convenience methods for creating "webdavclient3" clients, and building webdav file paths.
 
 ### Creating a WebDav client
-First, make sure you have the [https://github.com/ezhov-evgeny/webdav-client-python-3](webdavclient3) library installed:
+First, make sure you have the [webdavclient3](https://github.com/ezhov-evgeny/webdav-client-python-3) library installed:
 
 ```bash
 $ pip install webdavclient3
@@ -21,7 +21,7 @@ webdav_client = api.server_context.webdav_client()
 ```
 
 The `webdav_client` method has a single optional argument, `webdav_options`, a dict that you can use to pass any options
-that you would pass to the [https://github.com/ezhov-evgeny/webdav-client-python-3#webdav-api](webdavclient3) library.
+that you would pass to the [webdavclient3](https://github.com/ezhov-evgeny/webdav-client-python-3#webdav-api) library.
 If you are using API Key authentication with your APIWrapper we will automatically configure the WebDav Client to use
 API Key authentication with your API Key. If you are using a `.netrc` file for authentication it should automatically
 detect your `.netrc` file and authenticate using those credentials. 
