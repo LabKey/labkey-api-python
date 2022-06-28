@@ -99,6 +99,8 @@ else:
     print('select_rows: Failed to load results from ' + schema + '.' + table)
 ```
 
+Documentation and example code for working with WebDav can be found [docs/webdav.md](here).
+
 ## Supported Versions
 Python 3.7+ is fully supported.
 LabKey Server v15.1 and later.
