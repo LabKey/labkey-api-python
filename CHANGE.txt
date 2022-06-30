@@ -4,7 +4,7 @@ LabKey Python Client API News
 What's New in the LabKey 2.3.0 package
 ==============================
 
-*Release date: 06/28/2022*
+*Release date: 06/30/2022*
 - Add "hostname" property to ServerContext
 - Add "base_url" property to ServerContext
 - Add "webdav_client" method to ServerContext
