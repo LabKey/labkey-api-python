@@ -81,22 +81,80 @@ class ServerContext:
     def __repr__(self):
         return f"<ServerContext [ {self._domain} | {self._context_path} | {self._container_path} ]>"
 
-    def build_url(self, controller: str, action: str, container_path: str = None) -> str:
-        sep = "/"
+    @property
+    def hostname(self) -> str:
+        return self._scheme + self._domain
 
-        url = self._scheme + self._domain
+    @property
+    def base_url(self) -> str:
+        base_url = self.hostname
 
         if self._context_path is not None:
-            url += sep + self._context_path
+            base_url += "/" + self._context_path
+
+        return base_url
+
+    def build_url(self, controller: str, action: str, container_path: str = None) -> str:
+        url = self.base_url
 
         if container_path is not None:
-            url += sep + container_path
+            url += "/" + container_path
         elif self._container_path is not None:
-            url += sep + self._container_path
+            url += "/" + self._container_path
 
-        url += sep + controller + "-" + action
+        url += "/" + controller + "-" + action
 
         return url
+
+    def webdav_path(self, container_path: str = None, file_name: str = None):
+        path = "/_webdav"
+        container_path = container_path or self._container_path
+
+        if container_path is not None:
+            if container_path.endswith("/"):
+                # trim the slash
+                container_path = container_path[0:-1]
+
+            if not container_path.startswith("/"):
+                path += "/"
+
+            path += container_path
+
+        path += "/@files"
+
+        if file_name is not None:
+            if not file_name.startswith("/"):
+                path += "/"
+
+            path += file_name
+
+        return path
+
+    def webdav_client(self, webdav_options: dict = None):
+        # We localize the import of webdav3 here so it is an optional dependency. Only users who want to use webdav will
+        # need to pip install webdavclient3
+        from webdav3.client import Client
+
+        options = {
+            "webdav_hostname": self.base_url,
+        }
+
+        if self._api_key is not None:
+            options["webdav_login"] = "apikey"
+            options["webdav_password"] = f"apikey|{self._api_key}"
+
+        if webdav_options is not None:
+            options = {
+                **options,
+                **webdav_options,
+            }
+
+        client = Client(options)
+
+        if self._verify_ssl is False:
+            client.verify = False  # Set verify to false if using localhost without HTTPS
+
+        return client
 
     def handle_request_exception(self, exception):
         if type(exception) in [RequestAuthorizationError, QueryNotFoundError, ServerNotFoundError]:

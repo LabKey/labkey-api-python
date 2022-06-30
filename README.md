@@ -36,6 +36,10 @@ Security API - [sample code](samples/security_example.py)
 
 - Available for administrating and configuring user accounts and permissions.
 
+WebDav
+
+- Documentation and example code can be found [here](docs/webdav.md).
+
 ## Installation
 To install, simply use `pip`:
 
