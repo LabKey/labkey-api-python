@@ -3,6 +3,7 @@ from .domain import DomainWrapper
 from .experiment import ExperimentWrapper
 from .query import QueryWrapper
 from .security import SecurityWrapper
+from .storage import StorageWrapper
 from .server_context import ServerContext
 
 
@@ -36,3 +37,4 @@ class APIWrapper:
         self.experiment = ExperimentWrapper(self.server_context)
         self.query = QueryWrapper(self.server_context)
         self.security = SecurityWrapper(self.server_context)
+        self.storage = StorageWrapper(self.server_context)

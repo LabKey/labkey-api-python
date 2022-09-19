@@ -1,6 +1,14 @@
 +++++++++++
 LabKey Python Client API News
 +++++++++++
+What's New in the LabKey 2.4.0 package
+==============================
+
+*Release date: TBD*
+- Add support for creating Freezer Manager freezer hierarchies via StorageController APIs
+  - earliest compatible LabKey Server version: 22.10.0
+  - StorageWrapper: create_storage_item, update_storage_item, delete_storage_item
+
 What's New in the LabKey 2.3.0 package
 ==============================
 
