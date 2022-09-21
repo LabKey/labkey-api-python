@@ -36,9 +36,13 @@ Security API - [sample code](samples/security_example.py)
 
 - Available for administrating and configuring user accounts and permissions.
 
-WebDav
+Storage API - [docs](docs/storage.md) 
 
-- Documentation and example code can be found [here](docs/webdav.md).
+- Create, update, or delete a LabKey Freezer Manager storage item.
+
+WebDav - [docs](docs/webdav.md)
+
+- Convenience methods for creating "webdavclient3" clients and building webdav file paths.
 
 ## Installation
 To install, simply use `pip`:
