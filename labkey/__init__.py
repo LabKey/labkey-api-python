@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from labkey import domain, query, experiment, security, utils
-
 __title__ = "labkey"
 __version__ = "2.4.0"
 __author__ = "LabKey"

@@ -8,6 +8,7 @@ What's New in the LabKey 2.4.0 package
 - Add support for creating Freezer Manager freezer hierarchies via StorageController APIs
   - earliest compatible LabKey Server version: 22.10.0
   - StorageWrapper: create_storage_item, update_storage_item, delete_storage_item
+- Set User-Agent header for requests to "LabKey Python API/<version>"
 
 What's New in the LabKey 2.3.0 package
 ==============================

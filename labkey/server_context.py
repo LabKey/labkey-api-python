@@ -1,4 +1,5 @@
 from labkey.utils import json_dumps
+from . import __version__
 import requests
 from requests.exceptions import RequestException
 from labkey.exceptions import (
@@ -70,6 +71,7 @@ class ServerContext:
         self._api_key = api_key
         self._disable_csrf = disable_csrf
         self._session = requests.Session()
+        self._session.headers.update({"User-Agent": f"LabKey Python API/{__version__}"})
 
         if self._use_ssl:
             self._scheme = "https://"
