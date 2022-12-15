@@ -2,20 +2,21 @@
 
 Create, update, or delete a LabKey Freezer Manager storage item. 
 
-Storage items can be used in the creation of a freezer hierarchy. Freezer hierarchies consist of a top level Freezer, 
-which can have any combination of child non-terminal storage locations (i.e. those that do not directly contain samples 
-but can contain other units) and terminal storage locations (i.e. units in the freezer that directly contain samples 
-and cannot contain other units).
+Storage items can be used in the creation of a storage hierarchy. Storage hierarchies consist of a top level Freezer
+or Primary Storage location, which can have any combination of child non-terminal storage locations (i.e. those that 
+do not directly contain samples but can contain other units) and terminal storage locations (i.e. units in the storage 
+that directly contain samples and cannot contain other units).
 
-Storage items can be of the following types: Physical Location, Freezer, Shelf, Rack, Canister, Storage Unit Type, or 
-Terminal Storage Location.
+Storage items can be of the following types: Physical Location, Freezer, Primary Storage, Shelf, Rack, Canister, 
+Storage Unit Type, or Terminal Storage Location.
 
 The specific set of props will differ for each storage item type:
 - Physical Location: name, description, locationId (rowId of the parent Physical Location)
-- Freezer: name, description, locationId (rowId of the parent Physical Location), manufacturer, freezerModel, temperature, temperatureUnits, serialNumber, sensorName, lossRate, status
-- Shelf/Rack/Canister: name, description, locationId (rowId of the parent freezer or Shelf/Rack/Canister)
+- Freezer: name, description, locationId (rowId of the parent Physical Location), temperatureControlled (boolean), manufacturer, freezerModel, temperature, temperatureUnits, serialNumber, sensorName, lossRate, status
+- Primary Storage: name, description, locationId (rowId of the parent Physical Location), temperatureControlled (boolean)
+- Shelf/Rack/Canister: name, description, locationId (rowId of the parent freezer, primary storage, or Shelf/Rack/Canister)
 - Storage Unit Type: name, description, unitType (one of the following: "Box", "Plate", "Bag", "Cane", "Tube Rack"), rows, cols (required if positionFormat is not "Num"), positionFormat (one of the following: "Num", "AlphaNum", "AlphaAlpha", "NumAlpha", "NumNum"), positionOrder (one of the following: "RowColumn", "ColumnRow")
-- Terminal Storage Location: name, description, typeId (rowId of the Storage Unit Type), locationId (rowId of the parent freezer or Shelf/Rack/Canister)
+- Terminal Storage Location: name, description, typeId (rowId of the Storage Unit Type), locationId (rowId of the parent freezer, primary storage, or Shelf/Rack/Canister)
 
 ### Installation and Setup for the LabKey Python API:
 - https://github.com/LabKey/labkey-api-python/blob/master/README.md

@@ -1,6 +1,13 @@
 +++++++++++
 LabKey Python Client API News
 +++++++++++
+
+What's New in the LabKey 2.4.1 package
+==============================
+
+*Release date: 12/15/2022*
+- Freezer Manager API - add Primary Storage option to storage related action documentation
+
 What's New in the LabKey 2.4.0 package
 ==============================
 
