@@ -31,7 +31,7 @@ other units).
 Storage items can be of the following types: Physical Location, Freezer, Primary Storage, Shelf, Rack, Canister, Storage Unit Type, or Terminal Storage Location.
 The specific set of props will differ for each storage item type:
  - Physical Location: name, description, locationId (rowId of the parent Physical Location)
- - Freezer: name, description, locationId (rowId of the parent Physical Location), temperatureControlled (boolean), manufacturer, freezerModel, temperature, temperatureUnits, serialNumber, sensorName, lossRate, status
+ - Freezer: name, description, locationId (rowId of the parent Physical Location), manufacturer, freezerModel, temperature, temperatureUnits, serialNumber, sensorName, lossRate, status
  - Primary Storage: name, description, locationId (rowId of the parent Physical Location), temperatureControlled (boolean)
  - Shelf/Rack/Canister: name, description, locationId (rowId of the parent freezer, primary storage, or Shelf/Rack/Canister)
  - Storage Unit Type: name, description, unitType (one of the following: "Box", "Plate", "Bag", "Cane", "Tube Rack"), rows, cols (required if positionFormat is not "Num"), positionFormat (one of the following: "Num", "AlphaNum", "AlphaAlpha", "NumAlpha", "NumNum"), positionOrder (one of the following: "RowColumn", "ColumnRow")
