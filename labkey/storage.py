@@ -23,17 +23,19 @@ This module provides functions for interacting with storage items on a LabKey Se
 
 DESCRIPTION:
 Create, update, or delete a LabKey Freezer Manager storage item. Storage items can be used in the creation of a
-freezer hierarchy. Freezer hierarchies consist of a top level Freezer, which can have any combination of child
-non-terminal storage locations (i.e. those that do not directly contain samples but can contain other units) and
-terminal storage locations (i.e. units in the freezer that directly contain samples and cannot contain other units).
+storage hierarchy. Storage hierarchies consist of a top level Freezer or Primary Storage location, which can have any
+combination of child non-terminal storage locations (i.e. those that do not directly contain samples but can contain
+other units) and terminal storage locations (i.e. units in the storage that directly contain samples and cannot contain
+other units).
 
-Storage items can be of the following types: Physical Location, Freezer, Shelf, Rack, Canister, Storage Unit Type, or Terminal Storage Location.
+Storage items can be of the following types: Physical Location, Freezer, Primary Storage, Shelf, Rack, Canister, Storage Unit Type, or Terminal Storage Location.
 The specific set of props will differ for each storage item type:
  - Physical Location: name, description, locationId (rowId of the parent Physical Location)
  - Freezer: name, description, locationId (rowId of the parent Physical Location), manufacturer, freezerModel, temperature, temperatureUnits, serialNumber, sensorName, lossRate, status
- - Shelf/Rack/Canister: name, description, locationId (rowId of the parent freezer or Shelf/Rack/Canister)
+ - Primary Storage: name, description, locationId (rowId of the parent Physical Location), temperatureControlled (boolean)
+ - Shelf/Rack/Canister: name, description, locationId (rowId of the parent freezer, primary storage, or Shelf/Rack/Canister)
  - Storage Unit Type: name, description, unitType (one of the following: "Box", "Plate", "Bag", "Cane", "Tube Rack"), rows, cols (required if positionFormat is not "Num"), positionFormat (one of the following: "Num", "AlphaNum", "AlphaAlpha", "NumAlpha", "NumNum"), positionOrder (one of the following: "RowColumn", "ColumnRow")
- - Terminal Storage Location: name, description, typeId (rowId of the Storage Unit Type), locationId (rowId of the parent freezer or Shelf/Rack/Canister)
+ - Terminal Storage Location: name, description, typeId (rowId of the Storage Unit Type), locationId (rowId of the parent freezer, primary storage, or Shelf/Rack/Canister)
 
 Installation and Setup for the LabKey Python API:
 https://github.com/LabKey/labkey-api-python/blob/master/README.md
@@ -58,7 +60,7 @@ def create_storage_item(
     server_context: ServerContext, type: str, props: dict, container_path: str = None
 ):
     """
-    Create a new LabKey Freezer Manager storage item that can be used in the creation of a freezer hierarchy.
+    Create a new LabKey Freezer Manager storage item that can be used in the creation of a storage hierarchy.
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param type:
     :param props:
@@ -75,7 +77,7 @@ def update_storage_item(
     server_context: ServerContext, type: str, props: dict, container_path: str = None
 ):
     """
-    Update an existing LabKey Freezer Manager storage item to change its properties or location within the freezer hierarchy.
+    Update an existing LabKey Freezer Manager storage item to change its properties or location within the storage hierarchy.
     For update_storage_item, the "rowId" primary key value is required to be set within the props.
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param type:
@@ -93,9 +95,9 @@ def delete_storage_item(
     server_context: ServerContext, type: str, row_id: int, container_path: str = None
 ):
     """
-    Delete an existing LabKey Freezer Manager storage item. Note that deletion of freezers or locations within the
-    freezer hierarchy will cascade the delete down the hierarchy to remove child locations and terminal storage locations.
-    Samples in the deleted freezer location(s) will not be deleted but will be removed from storage.
+    Delete an existing LabKey Freezer Manager storage item. Note that deletion of freezers, primary storage, or locations
+    within the storage hierarchy will cascade the delete down the hierarchy to remove child locations and terminal
+    storage locations. Samples in the deleted storage location(s) will not be deleted but will be removed from storage.
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param type:
     :param row_id:
