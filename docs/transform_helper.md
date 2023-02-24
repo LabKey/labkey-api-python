@@ -27,7 +27,8 @@ def transform(grid):
             row.append('averageResult')
             isHeaderChecked = True
         else:
-            # In this example, we are taking the average of the 3rd-5th column values by row and appending that average value in a 6th column called "averageResult"
+            # In this example, we are taking the average of the 3rd-5th column values by row 
+            # and appending that average value in a 6th column called "averageResult"
             newValTemp = sum([float(val) for val in row[2:]])/len(row[2:])
             row.append(round(newValTemp, 2))
     return grid
