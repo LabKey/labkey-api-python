@@ -33,42 +33,43 @@ def json_dumps(*args, **kwargs):
     return json.dumps(*args, **kwargs)
 
 
-def transform_helper(userTransformFunc, filePathRunProperties):
-    #filePathRunProperties must be explicitly defined as ${runInfo} within the user's transform script
+def transform_helper(user_transform_func, file_path_run_properties):
+    #file_path_run_properties must be explicitly defined as ${runInfo} within the user's transform script
     #parse run properties to for results data in and out filepaths
-    filePathIn = ''
-    filePathOut = ''
-    fileRunProperties = open(filePathRunProperties) 
-    for l in fileRunProperties:
+    file_path_in = ''
+    file_path_out = ''
+    file_run_properties = open(file_path_run_properties) 
+    for l in file_run_properties:
         row = l.strip().split('\t')
         if row[0] == 'runDataFile':
-            filePathIn = row[1]
-            filePathOut = row[3]
-    fileRunProperties.close()
+            file_path_out = row[3]
+        if row[0] == 'runDataUploadedFile':
+            file_path_in = row[1]
+    file_run_properties.close()
     
     #parse results data into array, confirming supported file type is used
-    fileIn = open(filePathIn)
-    dataGrid = []
+    file_in = open(file_path_in)
+    data_grid = []
     
-    for l in fileIn:
+    for l in file_in:
         if '\t' in l:
             row = l.replace('\n', '').split('\t')
         elif ',' in l:
             row = l.replace('\n', '').split(',')
         else:
             raise ValueError('Unsupported file type or delimiter used. Header used: \n' + str(l))
-        dataGrid.append(row)    
-    fileIn.close()
+        data_grid.append(row)    
+    file_in.close()
     
     #run user transform on parsed results data array
-    transformedGrid = userTransformFunc(dataGrid)
+    transformed_grid = user_transform_func(data_grid)
     
     #write transformed results data array to LabKey assay results data grid
     #transformed array must be a python list object, not a numpy array or pandas dataframe
-    fileOut = open(filePathOut, mode='w')
-    for row in transformedGrid:
+    file_out = open(file_path_out, mode='w')
+    for row in transformed_grid:
         row = [str(el).strip() for el in row]
         row = '\t'.join(row)        
-        fileOut.write(row + '\n')
+        file_out.write(row + '\n')
     
-    fileOut.close()
+    file_out.close()
