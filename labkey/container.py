@@ -45,6 +45,31 @@ def delete(server_context: ServerContext, container_path: str = None) -> any:
     return server_context.make_request(url, headers=headers)
 
 
+def rename(
+    server_context: ServerContext,
+    name: str,
+    title: str = None,
+    add_alias: bool = True,
+    container_path: str = None,
+) -> any:
+    """
+    Renames a container at the given container_path, or at the server_context's container path
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param name: The new name of the container.
+    :param title: The new title of the container.
+    :param add_alias: Whether to add a folder alias for the folder's current name.
+    :param container_path: The path of the container to rename.
+    :return:
+    """
+    url = server_context.build_url("admin", "renameContainer.api", container_path)
+    payload = {
+        "name": name,
+        "title": title,
+        "addAlias": add_alias,
+    }
+    return server_context.make_request(url, json=payload)
+
+
 class ContainerWrapper:
     """
     Wrapper for all of the API methods exposed in the container module. Used by the APIWrapper class.
@@ -68,3 +93,8 @@ class ContainerWrapper:
 
     def delete(self, container_path: str = None):
         return delete(self.server_context, container_path)
+
+    def rename(
+        self, name: str, title: str = None, add_alias: bool = True, container_path: str = None
+    ):
+        return rename(self.server_context, name, title, add_alias, container_path)

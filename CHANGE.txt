@@ -2,6 +2,12 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 2.4.2 package
+==============================
+
+*Release date: TBD*
+- Container API - add ability to rename containers
+
 What's New in the LabKey 2.4.1 package
 ==============================
 
