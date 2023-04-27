@@ -47,7 +47,7 @@ def delete(server_context: ServerContext, container_path: str = None) -> any:
 
 def rename(
     server_context: ServerContext,
-    name: str,
+    name: str = None,
     title: str = None,
     add_alias: bool = True,
     container_path: str = None,
@@ -95,6 +95,6 @@ class ContainerWrapper:
         return delete(self.server_context, container_path)
 
     def rename(
-        self, name: str, title: str = None, add_alias: bool = True, container_path: str = None
+        self, name: str = None, title: str = None, add_alias: bool = True, container_path: str = None
     ):
         return rename(self.server_context, name, title, add_alias, container_path)
