@@ -38,14 +38,13 @@ def transform_helper(user_transform_func, file_path_run_properties):
     #parse run properties to for results data in and out filepaths
     file_path_in = ''
     file_path_out = ''
-    file_run_properties = open(file_path_run_properties) 
-    for l in file_run_properties:
-        row = l.strip().split('\t')
-        if row[0] == 'runDataFile':
-            file_path_out = row[3]
-        if row[0] == 'runDataUploadedFile':
-            file_path_in = row[1]
-    file_run_properties.close()
+    with open(file_path_run_properties) as file_run_properties:
+        for l in file_run_properties:
+            row = l.strip().split('\t')
+            if row[0] == 'runDataFile':
+                file_path_out = row[3]
+            if row[0] == 'runDataUploadedFile':
+                file_path_in = row[1]
     
     #parse results data into array, confirming supported file type is used
     file_in = open(file_path_in)
