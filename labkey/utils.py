@@ -47,28 +47,26 @@ def transform_helper(user_transform_func, file_path_run_properties):
                 file_path_in = row[1]
     
     #parse results data into array, confirming supported file type is used
-    file_in = open(file_path_in)
-    data_grid = []
-    
-    for l in file_in:
-        if '\t' in l:
-            row = l.replace('\n', '').split('\t')
-        elif ',' in l:
-            row = l.replace('\n', '').split(',')
-        else:
-            raise ValueError('Unsupported file type or delimiter used. Header used: \n' + str(l))
-        data_grid.append(row)    
-    file_in.close()
+    with open(file_path_in) as file_in:
+        data_grid = []
+
+        for l in file_in:
+            if '\t' in l:
+                row = l.replace('\n', '').split('\t')
+            elif ',' in l:
+                row = l.replace('\n', '').split(',')
+            else:
+                raise ValueError('Unsupported file type or delimiter used. Header used: \n' + str(l))
+            data_grid.append(row)    
     
     #run user transform on parsed results data array
     transformed_grid = user_transform_func(data_grid)
     
     #write transformed results data array to LabKey assay results data grid
     #transformed array must be a python list object, not a numpy array or pandas dataframe
-    file_out = open(file_path_out, mode='w')
-    for row in transformed_grid:
-        row = [str(el).strip() for el in row]
-        row = '\t'.join(row)        
-        file_out.write(row + '\n')
+    with open(file_path_out, mode='w') as file_out:
+        for row in transformed_grid:
+            row = [str(el).strip() for el in row]
+            row = '\t'.join(row)        
+            file_out.write(row + '\n')
     
-    file_out.close()
