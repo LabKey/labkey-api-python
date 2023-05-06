@@ -16,6 +16,7 @@
 import json
 from functools import wraps
 from datetime import date, datetime
+import csv
 
 
 # Issue #14: json.dumps on datetime throws TypeError
@@ -69,4 +70,87 @@ def transform_helper(user_transform_func, file_path_run_properties):
             row = [str(el).strip() for el in row]
             row = '\t'.join(row)        
             file_out.write(row + '\n')
+   
+def bulk_import_freezerpro_storage(
+        api,
+        file_path
+    ):
+    data = []
     
+    with open(file_path) as freezer_file:
+        lines = csv.reader(freezer_file)
+        is_header = True
+        for line in lines:
+            if is_header:
+                is_header = False
+            else:
+                data += [line]
+             
+    #func uses these dicts to minimize calls to server
+    loc_dict = {}
+    term_dict = {}
+    
+    #iterate through list of locations
+    for row in data:
+        l2_name, l3_name, l4_name, box, box_name = row
+        
+        #check if l2 location was already created; create it if not
+        if l2_name not in loc_dict:
+            result = api.storage.create_storage_item(
+                'Freezer',
+                {
+                    'name': l2_name
+                }
+            )
+            loc_dict[l2_name] = result['data']['rowId'] 
+            
+        #check if l3 location was already created; create it if not
+        if l2_name + l3_name not in loc_dict:        
+            l3_type = l3_name.split(' ')[0]
+            
+            result = api.storage.create_storage_item(
+                l3_type,
+                {
+                    'name': l3_name,
+                    'locationId': loc_dict[l2_name]
+                }
+            )
+            l3_loc = result['data']['rowId']
+            loc_dict[l2_name + l3_name] = l3_loc
+            
+            
+        #check if l4 location was already created; create it if not
+        if l2_name + l3_name + l4_name not in loc_dict:      
+            l4_type = l4_name.split(' ')[0]
+            
+            result = api.storage.create_storage_item(
+                l4_type,
+                {
+                    'name': l4_name,
+                    'locationId': loc_dict[l2_name + l3_name]
+                }
+            )
+            l4_loc = result['data']['rowId']
+            loc_dict[l2_name + l3_name + l4_name] = l4_loc
+            
+        #lookup terminal storage location types. these must be created in UI or separately via API because they're nuanced. 
+        if box_name not in term_dict:
+            term_type_id = api.query.select_rows(
+                'inventory',
+                'BoxType',
+                filter_array=[
+                    QueryFilter('Name', box_name, 'eq')
+                    ],
+                columns='RowId'
+            )['rows'][0]['RowId']
+            term_dict['box_name'] = term_type_id
+        
+        #create terminal storage
+        api.storage.create_storage_item(
+            'Terminal Storage Location',
+            {
+                'name': box,
+                'typeId': term_dict['box_name'],
+                'locationId': loc_dict[l2_name + l3_name + l4_name]
+            }
+        )
