@@ -69,6 +69,78 @@ def rename(
     }
     return server_context.make_request(url, json=payload)
 
+def get_folders(
+        server_context: ServerContext, 
+        container_path: str = None,
+        include_effective_permissions: bool = True, 
+        include_subfolders: bool = False, 
+        depth: int = 50,
+        include_child_workbooks: bool = True, 
+        include_standard_properties: bool = True
+    ):
+    
+    # request parameters
+    inclsf = "1" if include_subfolders else "0"
+    inclep = "1" if include_effective_permissions else "0"
+    inclcw = "1" if include_child_workbooks else "0"
+    inclsp = "1" if include_standard_properties else "0"
+    result_cols = ["name", "path", "id", "title", "type", "folderType", "effectivePermissions"] if include_standard_properties else ["name", "path", "id", "effectivePermissions"]
+
+    #build url for request
+    url = server_context.build_url('project', 'getContainers.view', container_path=container_path)
+    payload = {
+        'includeSubfolders': inclsf, 
+        'includeEffectivePermissions': inclep, 
+        'includeChildWorkbooks': inclcw,
+        'includeStandardProperties': inclsp
+    }
+    
+    if include_subfolders:
+        payload['depth'] = depth
+        
+    #set list column headers
+    if include_standard_properties:
+        result_cols = ['name', 'path', 'id', 'title', 'type', 'folderType', 'effectivePermissions']
+    else:
+        result_cols = ['name', 'path', 'id', 'effectivePermissions']
+    
+    #make request and create output object
+    data = server_context.make_request(url, json=payload)
+    output = []
+    output += [result_cols]
+
+    # parse for current project
+    row_starter = []
+    for col in result_cols:
+        if col != 'effectivePermissions':
+            if data[col] is None:
+                row_starter += ['']
+            else:
+                row_starter += [data[col]]
+        elif col == 'effectivePermissions':
+            for perm in data[col]:
+                row = []
+                row += row_starter
+                row += [perm]
+                output += [row]
+    
+    #parse for all children to current project
+    for child in data['children']:
+        row_starter = []
+        for col in result_cols:
+            if col != 'effectivePermissions':
+                if child[col] is None:
+                    row_starter += ['']
+                else:
+                    row_starter += [child[col]]
+            elif col == 'effectivePermissions':
+                for perm in child[col]:
+                    row = []
+                    row += row_starter
+                    row += [perm]
+                    output += [row]
+    
+    return output
 
 class ContainerWrapper:
     """
@@ -98,3 +170,22 @@ class ContainerWrapper:
         self, name: str = None, title: str = None, add_alias: bool = True, container_path: str = None
     ):
         return rename(self.server_context, name, title, add_alias, container_path)
+        
+    def get_folders(
+        self,
+        container_path: str = None,
+        include_effective_permissions: bool = True, 
+        include_subfolders: bool = True, 
+        depth: int = 50,
+        include_child_workbooks: bool = True, 
+        include_standard_properties: bool = True
+    ):
+        return get_folders(
+            self.server_context,
+            container_path,
+            include_effective_permissions, 
+            include_subfolders, 
+            depth,
+            include_child_workbooks, 
+            include_standard_properties
+        )
