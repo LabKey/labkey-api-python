@@ -70,9 +70,43 @@ def rename(
     return server_context.make_request(url, json=payload)
 
 
+def get_containers(
+    server_context: ServerContext,
+    container_path: str = None,
+    include_effective_permissions: bool = True,
+    include_subfolders: bool = False,
+    depth: int = 50,
+    include_standard_properties: bool = True,
+):
+    """
+    Gets the containers for a given container_path
+    :param server_context: a ServerContext object
+    :param container_path: The container path to query against, defaults to the container path of the ServerContext
+    :param include_effective_permissions: If set to false, the effective permissions for this container resource will
+    not be included (defaults to True)
+    :param include_subfolders: If set to true, the entire branch of containers will be returned. If false, only the
+    immediate children of the starting container will be returned (defaults to False).
+    :param depth: May be used to control the depth of recursion if includeSubfolders is set to true
+    :param include_standard_properties: Includes the standard properties for containers, if f False returns a limited
+    subset of properties: ['path', 'children', 'name', 'id'] (defaults to True)
+    :return:
+    """
+    url = server_context.build_url("project", "getContainers.view", container_path=container_path)
+    payload = {
+        "includeSubfolders": include_subfolders,
+        "includeEffectivePermissions": include_effective_permissions,
+        "includeStandardProperties": include_standard_properties,
+    }
+
+    if include_subfolders:
+        payload["depth"] = depth
+
+    return server_context.make_request(url, json=payload)
+
+
 class ContainerWrapper:
     """
-    Wrapper for all of the API methods exposed in the container module. Used by the APIWrapper class.
+    Wrapper for all the API methods exposed in the container module. Used by the APIWrapper class.
     """
 
     def __init__(self, server_context: ServerContext):
@@ -95,6 +129,27 @@ class ContainerWrapper:
         return delete(self.server_context, container_path)
 
     def rename(
-        self, name: str = None, title: str = None, add_alias: bool = True, container_path: str = None
+        self,
+        name: str = None,
+        title: str = None,
+        add_alias: bool = True,
+        container_path: str = None,
     ):
         return rename(self.server_context, name, title, add_alias, container_path)
+
+    def get_containers(
+        self,
+        container_path: str = None,
+        include_effective_permissions: bool = True,
+        include_subfolders: bool = True,
+        depth: int = 50,
+        include_standard_properties: bool = True,
+    ):
+        return get_containers(
+            self.server_context,
+            container_path,
+            include_effective_permissions,
+            include_subfolders,
+            depth,
+            include_standard_properties,
+        )
