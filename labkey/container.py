@@ -69,82 +69,44 @@ def rename(
     }
     return server_context.make_request(url, json=payload)
 
-def get_folders(
-        server_context: ServerContext, 
-        container_path: str = None,
-        include_effective_permissions: bool = True, 
-        include_subfolders: bool = False, 
-        depth: int = 50,
-        include_child_workbooks: bool = True, 
-        include_standard_properties: bool = True
-    ):
-    
-    # request parameters
-    inclsf = "1" if include_subfolders else "0"
-    inclep = "1" if include_effective_permissions else "0"
-    inclcw = "1" if include_child_workbooks else "0"
-    inclsp = "1" if include_standard_properties else "0"
-    result_cols = ["name", "path", "id", "title", "type", "folderType", "effectivePermissions"] if include_standard_properties else ["name", "path", "id", "effectivePermissions"]
 
-    #build url for request
-    url = server_context.build_url('project', 'getContainers.view', container_path=container_path)
+def get_containers(
+    server_context: ServerContext,
+    container_path: str = None,
+    include_effective_permissions: bool = True,
+    include_subfolders: bool = False,
+    depth: int = 50,
+    include_standard_properties: bool = True,
+):
+    """
+    Gets the containers for a given container_path
+    :param server_context: a ServerContext object
+    :param container_path: The container path to query against, defaults to the container path of the ServerContext
+    :param include_effective_permissions: If set to false, the effective permissions for this container resource will
+    not be included (defaults to True)
+    :param include_subfolders: If set to true, the entire branch of containers will be returned. If false, only the
+    immediate children of the starting container will be returned (defaults to False).
+    :param depth: May be used to control the depth of recursion if includeSubfolders is set to true
+    :param include_standard_properties: Includes the standard properties for containers, if f False returns a limited
+    subset of properties: ['path', 'children', 'name', 'id'] (defaults to True)
+    :return:
+    """
+    url = server_context.build_url("project", "getContainers.view", container_path=container_path)
     payload = {
-        'includeSubfolders': inclsf, 
-        'includeEffectivePermissions': inclep, 
-        'includeChildWorkbooks': inclcw,
-        'includeStandardProperties': inclsp
+        "includeSubfolders": include_subfolders,
+        "includeEffectivePermissions": include_effective_permissions,
+        "includeStandardProperties": include_standard_properties,
     }
-    
-    if include_subfolders:
-        payload['depth'] = depth
-        
-    #set list column headers
-    if include_standard_properties:
-        result_cols = ['name', 'path', 'id', 'title', 'type', 'folderType', 'effectivePermissions']
-    else:
-        result_cols = ['name', 'path', 'id', 'effectivePermissions']
-    
-    #make request and create output object
-    data = server_context.make_request(url, json=payload)
-    output = []
-    output += [result_cols]
 
-    # parse for current project
-    row_starter = []
-    for col in result_cols:
-        if col != 'effectivePermissions':
-            if data[col] is None:
-                row_starter += ['']
-            else:
-                row_starter += [data[col]]
-        elif col == 'effectivePermissions':
-            for perm in data[col]:
-                row = []
-                row += row_starter
-                row += [perm]
-                output += [row]
-    
-    #parse for all children to current project
-    for child in data['children']:
-        row_starter = []
-        for col in result_cols:
-            if col != 'effectivePermissions':
-                if child[col] is None:
-                    row_starter += ['']
-                else:
-                    row_starter += [child[col]]
-            elif col == 'effectivePermissions':
-                for perm in child[col]:
-                    row = []
-                    row += row_starter
-                    row += [perm]
-                    output += [row]
-    
-    return output
+    if include_subfolders:
+        payload["depth"] = depth
+
+    return server_context.make_request(url, json=payload)
+
 
 class ContainerWrapper:
     """
-    Wrapper for all of the API methods exposed in the container module. Used by the APIWrapper class.
+    Wrapper for all the API methods exposed in the container module. Used by the APIWrapper class.
     """
 
     def __init__(self, server_context: ServerContext):
@@ -167,25 +129,27 @@ class ContainerWrapper:
         return delete(self.server_context, container_path)
 
     def rename(
-        self, name: str = None, title: str = None, add_alias: bool = True, container_path: str = None
+        self,
+        name: str = None,
+        title: str = None,
+        add_alias: bool = True,
+        container_path: str = None,
     ):
         return rename(self.server_context, name, title, add_alias, container_path)
-        
-    def get_folders(
+
+    def get_containers(
         self,
         container_path: str = None,
-        include_effective_permissions: bool = True, 
-        include_subfolders: bool = True, 
+        include_effective_permissions: bool = True,
+        include_subfolders: bool = True,
         depth: int = 50,
-        include_child_workbooks: bool = True, 
-        include_standard_properties: bool = True
+        include_standard_properties: bool = True,
     ):
-        return get_folders(
+        return get_containers(
             self.server_context,
             container_path,
-            include_effective_permissions, 
-            include_subfolders, 
+            include_effective_permissions,
+            include_subfolders,
             depth,
-            include_child_workbooks, 
-            include_standard_properties
+            include_standard_properties,
         )
