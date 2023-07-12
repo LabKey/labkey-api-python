@@ -143,7 +143,7 @@ class ServerContext:
 
         if self._api_key is not None:
             options["webdav_login"] = "apikey"
-            options["webdav_password"] = f"apikey|{self._api_key}"
+            options["webdav_password"] = f"{self._api_key}"
 
         if webdav_options is not None:
             options = {
