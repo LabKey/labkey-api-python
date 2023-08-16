@@ -2,6 +2,12 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 2.6.0 package
+==============================
+
+*Release date: TBD*
+- Query API - add lineage-related filter types
+
 What's New in the LabKey 2.5.0 package
 ==============================
 

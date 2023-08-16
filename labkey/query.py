@@ -77,8 +77,7 @@ class QueryFilter:
         Enumeration of acceptable filter types
         """
 
-        HAS_ANY_VALUE = ""
-
+        # These operators require a data value
         EQUAL = "eq"
         DATE_EQUAL = "dateeq"
 
@@ -124,13 +123,28 @@ class QueryFilter:
         BETWEEN = "between"
         NOT_BETWEEN = "notbetween"
 
+        MEMBER_OF = "memberof"
+
+        # These are the "no data value" operators
+        HAS_ANY_VALUE = ""
+
         IS_BLANK = "isblank"
         IS_NOT_BLANK = "isnonblank"
 
+        HAS_MISSING_VALUE = "hasmvvalue"
+        DOES_NOT_HAVE_MISSING_VALUE = "nomvvalue"
+
+        # Table/Query-wise operators
+        Q = "q"
+
+        # Ontology operators
         ONTOLOGY_IN_SUBTREE = "concept:insubtree"
         ONTOLOGY_NOT_IN_SUBTREE = "concept:notinsubtree"
 
-        MEMBER_OF = "memberof"
+        # Lineage operators
+        EXP_CHILD_OF = "exp:childof"
+        EXP_PARENT_OF = "exp:parentof"
+        EXP_LINEAGE_OF = "exp:lineageof"
 
     def __init__(self, column, value, filter_type=Types.EQUAL):
         self.column_name = column
