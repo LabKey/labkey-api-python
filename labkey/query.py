@@ -522,7 +522,7 @@ class QueryWrapper:
         filter_array: List[QueryFilter] = None,
         container_path: str = None,
         columns=None,
-        max_rows: int = None,
+        max_rows: int = -1,
         sort: str = None,
         offset: int = None,
         container_filter: str = None,
