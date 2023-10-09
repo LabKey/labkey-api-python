@@ -316,7 +316,7 @@ def select_rows(
     filter_array: List[QueryFilter] = None,
     container_path: str = None,
     columns=None,
-    max_rows: int = None,
+    max_rows: int = -1,
     sort: str = None,
     offset: int = None,
     container_filter: str = None,
@@ -339,7 +339,7 @@ def select_rows(
     :param filter_array: set of filter objects to apply
     :param container_path: folder path if not already part of server_context
     :param columns: set of columns to retrieve
-    :param max_rows: max number of rows to retrieve
+    :param max_rows: max number of rows to retrieve, defaults to -1 (unlimited)
     :param sort: comma separated list of column names to sort by, prefix a column with '-' to sort descending
     :param offset: number of rows to offset results by
     :param container_filter: enumeration of the various container filters available. See:
@@ -522,7 +522,7 @@ class QueryWrapper:
         filter_array: List[QueryFilter] = None,
         container_path: str = None,
         columns=None,
-        max_rows: int = None,
+        max_rows: int = -1,
         sort: str = None,
         offset: int = None,
         container_filter: str = None,

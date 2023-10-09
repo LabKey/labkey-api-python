@@ -365,7 +365,7 @@ class TestSelectRows(unittest.TestCase):
         self.service = MockSelectRows()
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
-            "data": {"schemaName": schema, "query.queryName": query},
+            "data": {"schemaName": schema, "query.queryName": query, "query.maxRows": -1},
             "headers": None,
             "timeout": 300,
         }

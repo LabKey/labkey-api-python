@@ -2,6 +2,12 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 2.6.1 package
+==============================
+
+*Release date: 10/09/2023*
+- Query API - Change max_rows default value to -1 in select_rows
+
 What's New in the LabKey 2.6.0 package
 ==============================
 
