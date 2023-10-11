@@ -122,7 +122,7 @@ def export_archive(
     :return:
     """
 
-    headers = {"includeSubfolders": "on",
+    data = {"includeSubfolders": "on",
                "includePhi": "on",
                "exportPhiLevel": "Restricted",
                "location": "2"}
@@ -133,7 +133,7 @@ def export_archive(
         os.chdir(download_directory)
         
     url = server_context.build_url("admin", "exportFolder.view", container_path)
-    content = server_context.make_request(url, headers=headers)['content']
+    content = server_context.make_request(url, payload=data)['content']
     
     with open(filename, "wb") as exported_file:
         exported_file.write(content)
