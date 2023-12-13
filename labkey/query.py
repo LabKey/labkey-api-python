@@ -44,6 +44,7 @@ import functools
 from typing import List
 
 from .server_context import ServerContext
+from .utils import waf_encode
 
 _default_timeout = 60 * 5  # 5 minutes
 
@@ -231,6 +232,7 @@ def execute_sql(
     parameters: dict = None,
     required_version: float = None,
     timeout: int = _default_timeout,
+    waf_encode_sql: bool = True
 ):
     """
     Execute sql query against a LabKey server.
@@ -248,11 +250,12 @@ def execute_sql(
     :param parameters: parameter values to pass through to a parameterized query
     :param required_version: Api version of response
     :param timeout: timeout of request in seconds (defaults to 30s)
+    :param waf_encode_sql: WAF encode sql in request (defaults to True)
     :return:
     """
     url = server_context.build_url("query", "executeSql.api", container_path=container_path)
 
-    payload = {"schemaName": schema_name, "sql": sql}
+    payload = {"schemaName": schema_name, "sql": waf_encode(sql) if waf_encode_sql else sql}
 
     if container_filter is not None:
         payload["containerFilter"] = container_filter
@@ -484,6 +487,7 @@ class QueryWrapper:
         parameters: dict = None,
         required_version: float = None,
         timeout: int = _default_timeout,
+        waf_encode_sql: bool = True
     ):
         return execute_sql(
             self.server_context,
@@ -498,6 +502,7 @@ class QueryWrapper:
             parameters,
             required_version,
             timeout,
+            waf_encode_sql
         )
 
     @functools.wraps(insert_rows)
