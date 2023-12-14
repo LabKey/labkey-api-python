@@ -2,7 +2,7 @@
 LabKey Python Client API News
 +++++++++++
 
-What's New in the LabKey 2.6.2 package
+What's New in the LabKey 3.0.0 package
 ==============================
 
 *Release date: 12/14/2023*
