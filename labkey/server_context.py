@@ -169,7 +169,7 @@ class ServerContext:
         url: str,
         payload: any = None,
         headers: dict = None,
-        timeout: int = 300,
+        timeout: int = 1800,
         method: str = "POST",
         non_json_response: bool = False,
         file_payload: any = None,
