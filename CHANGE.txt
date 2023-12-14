@@ -2,6 +2,14 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 2.6.2 package
+==============================
+
+*Release date: 12/14/2023*
+- Query API - WAF encode "sql" parameter for execute_sql
+    - WAF encoding of parameters is initially supported with LabKey Server v23.09
+    - WAF encoding can be opted out of on execute_sql calls by specifying waf_encode_sql=False
+
 What's New in the LabKey 2.6.1 package
 ==============================
 
