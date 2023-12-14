@@ -101,6 +101,14 @@ def test_create_qc_state_definition(qc_states):
     assert qc_states["rows"][1]["label"] == "approved"
 
 
+def test_execute_sql(api: APIWrapper):
+    resp = api.query.execute_sql("core", "SELECT userId FROM core.users LIMIT 1")
+    assert resp["schemaName"] == "core"
+    assert resp["queryName"] == "sql"
+    assert resp["rowCount"] > 0
+    assert len(resp["rows"]) > 0
+
+
 def test_update_qc_state_definition(api: APIWrapper, qc_states, study):
     new_description = "for sure that is not right"
     edit_rowid = qc_states["rows"][0]["rowid"]

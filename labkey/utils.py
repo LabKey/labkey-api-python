@@ -16,6 +16,8 @@
 import json
 from functools import wraps
 from datetime import date, datetime
+from base64 import b64encode
+from urllib import parse
 
 
 # Issue #14: json.dumps on datetime throws TypeError
@@ -71,3 +73,21 @@ def transform_helper(user_transform_func, file_path_run_properties):
             row = [str(el).strip() for el in row]
             row = "\t".join(row)
             file_out.write(row + "\n")
+
+
+def btoa(value: str) -> str:
+    if not value:
+        return value
+    binary = value.encode("utf-8")
+    return b64encode(binary).decode()
+
+
+def encode_uri_component(value: str) -> str:
+    # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
+    return parse.quote(value, encoding="utf-8", safe="-_.!~*'()")
+
+
+def waf_encode(value: str) -> str:
+    if value:
+        return "/*{{base64/x-www-form-urlencoded/wafText}}*/" + btoa(encode_uri_component(value))
+    return value
