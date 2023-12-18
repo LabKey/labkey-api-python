@@ -170,6 +170,7 @@ def delete_rows(
     query_name: str,
     rows: any,
     container_path: str = None,
+    options: dict = None,
     timeout: int = _default_timeout,
 ):
     """
@@ -179,11 +180,15 @@ def delete_rows(
     :param query_name: table name to delete from
     :param rows: Set of rows to delete
     :param container_path: labkey container path if not already set in context
+    :param options: Additional parameters
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
     url = server_context.build_url("query", "deleteRows.api", container_path=container_path)
     payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
+
+    if options is not None:
+        payload = payload | options
 
     return server_context.make_request(
         url,
@@ -285,6 +290,7 @@ def insert_rows(
     query_name: str,
     rows: List[any],
     container_path: str = None,
+    options: dict = None,
     timeout: int = _default_timeout,
 ):
     """
@@ -294,12 +300,16 @@ def insert_rows(
     :param query_name: table name to insert into
     :param rows: set of rows to insert
     :param container_path: labkey container path if not already set in context
+    :param options: Additional parameters
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
     url = server_context.build_url("query", "insertRows.api", container_path=container_path)
 
     payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
+
+    if options is not None:
+        payload = payload | options
 
     return server_context.make_request(
         url,
@@ -419,6 +429,7 @@ def update_rows(
     query_name: str,
     rows: List[any],
     container_path: str = None,
+    options: dict = None,
     timeout: int = _default_timeout,
 ):
     """
@@ -429,12 +440,16 @@ def update_rows(
     :param query_name: table name to update
     :param rows: Set of rows to update
     :param container_path: labkey container path if not already set in context
+    :param options: Additional parameters
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
     url = server_context.build_url("query", "updateRows.api", container_path=container_path)
 
     payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
+
+    if options is not None:
+        payload = payload | options
 
     return server_context.make_request(
         url,
@@ -458,10 +473,11 @@ class QueryWrapper:
         query_name: str,
         rows: any,
         container_path: str = None,
+        options: dict = None,
         timeout: int = _default_timeout,
     ):
         return delete_rows(
-            self.server_context, schema_name, query_name, rows, container_path, timeout
+            self.server_context, schema_name, query_name, rows, container_path, options, timeout
         )
 
     @functools.wraps(truncate_table)
@@ -507,10 +523,11 @@ class QueryWrapper:
         query_name: str,
         rows: List[any],
         container_path: str = None,
+        options: dict = None,
         timeout: int = _default_timeout,
     ):
         return insert_rows(
-            self.server_context, schema_name, query_name, rows, container_path, timeout
+            self.server_context, schema_name, query_name, rows, container_path, options, timeout
         )
 
     @functools.wraps(select_rows)
@@ -566,8 +583,9 @@ class QueryWrapper:
         query_name: str,
         rows: List[any],
         container_path: str = None,
+        options: dict = None,
         timeout: int = _default_timeout,
     ):
         return update_rows(
-            self.server_context, schema_name, query_name, rows, container_path, timeout
+            self.server_context, schema_name, query_name, rows, container_path, options, timeout
         )
