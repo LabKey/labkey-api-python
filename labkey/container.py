@@ -1,5 +1,6 @@
 from .server_context import ServerContext
-
+import os
+from datetime import datetime
 
 def create(
     server_context: ServerContext,
@@ -103,6 +104,42 @@ def get_containers(
 
     return server_context.make_request(url, json=payload)
 
+def export_archive(
+    server_context: ServerContext,
+    container_path: str = None,
+    download_directory: str = None,
+    includeSubfolders: str = "on",
+    includePhi: str =  "on",
+    exportPhiLevel: str = "Restricted",
+    location: str =  "2"
+):
+    
+    """
+    Export the select container's folder archive. A lot of API args are ignored. That could be addressed in future development.
+    
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param container_path: the path of where you want to create the container.
+    :return:
+    """
+
+    data = {"includeSubfolders": "on",
+               "includePhi": "on",
+               "exportPhiLevel": "Restricted",
+               "location": "2"}
+    timestamp = datetime.now().strftime("%Y-%m-%d %H_%M_%S")
+    filename = f"exported_archive_{timestamp}.zip"
+    
+    if download_directory != None:
+        os.chdir(download_directory)
+        
+    url = server_context.build_url("admin", "exportFolder.view", container_path)
+    content = server_context.make_request(url, payload=data)['content']
+    
+    with open(filename, "wb") as exported_file:
+        exported_file.write(content)
+
+    return content
+
 
 class ContainerWrapper:
     """
@@ -152,4 +189,23 @@ class ContainerWrapper:
             include_subfolders,
             depth,
             include_standard_properties,
+        )
+        
+    def export_archive(
+        self,
+        container_path: str = None,
+        download_directory: str = None,
+        includeSubfolders: str = "on",
+        includePhi: str =  "on",
+        exportPhiLevel: str = "Restricted",
+        location: str =  "2"
+    ):
+        return export_archive(
+            self.server_context,
+            container_path,
+            download_directory,
+            includeSubfolders,
+            includePhi,
+            exportPhiLevel,
+            location
         )
