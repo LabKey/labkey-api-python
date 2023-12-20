@@ -309,7 +309,7 @@ def insert_rows(
     payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
 
     if options is not None:
-        payload = payload | options
+        payload = {**payload, **options}
 
     return server_context.make_request(
         url,
