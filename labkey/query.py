@@ -44,6 +44,7 @@ import functools
 from typing import List
 
 from .server_context import ServerContext
+from .utils import waf_encode
 
 _default_timeout = 60 * 5  # 5 minutes
 
@@ -254,6 +255,7 @@ def execute_sql(
     parameters: dict = None,
     required_version: float = None,
     timeout: int = _default_timeout,
+    waf_encode_sql: bool = True
 ):
     """
     Execute sql query against a LabKey server.
@@ -271,11 +273,12 @@ def execute_sql(
     :param parameters: parameter values to pass through to a parameterized query
     :param required_version: Api version of response
     :param timeout: timeout of request in seconds (defaults to 30s)
+    :param waf_encode_sql: WAF encode sql in request (defaults to True)
     :return:
     """
     url = server_context.build_url("query", "executeSql.api", container_path=container_path)
 
-    payload = {"schemaName": schema_name, "sql": sql}
+    payload = {"schemaName": schema_name, "sql": waf_encode(sql) if waf_encode_sql else sql}
 
     if container_filter is not None:
         payload["containerFilter"] = container_filter
@@ -355,7 +358,7 @@ def select_rows(
     filter_array: List[QueryFilter] = None,
     container_path: str = None,
     columns=None,
-    max_rows: int = None,
+    max_rows: int = -1,
     sort: str = None,
     offset: int = None,
     container_filter: str = None,
@@ -378,7 +381,7 @@ def select_rows(
     :param filter_array: set of filter objects to apply
     :param container_path: folder path if not already part of server_context
     :param columns: set of columns to retrieve
-    :param max_rows: max number of rows to retrieve
+    :param max_rows: max number of rows to retrieve, defaults to -1 (unlimited)
     :param sort: comma separated list of column names to sort by, prefix a column with '-' to sort descending
     :param offset: number of rows to offset results by
     :param container_filter: enumeration of the various container filters available. See:
@@ -547,6 +550,7 @@ class QueryWrapper:
         parameters: dict = None,
         required_version: float = None,
         timeout: int = _default_timeout,
+        waf_encode_sql: bool = True
     ):
         return execute_sql(
             self.server_context,
@@ -561,6 +565,7 @@ class QueryWrapper:
             parameters,
             required_version,
             timeout,
+            waf_encode_sql
         )
 
     @functools.wraps(insert_rows)
@@ -598,7 +603,7 @@ class QueryWrapper:
         filter_array: List[QueryFilter] = None,
         container_path: str = None,
         columns=None,
-        max_rows: int = None,
+        max_rows: int = -1,
         sort: str = None,
         offset: int = None,
         container_filter: str = None,

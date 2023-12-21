@@ -2,11 +2,25 @@
 LabKey Python Client API News
 +++++++++++
 
-What's New in the LabKey 2.7.0 package
+What's New in the LabKey 3.1.0 package
 ==============================
 
 *Release date: TBD*
 - Query API - add optional parameters to insert_rows, select_rows, update_rows, and delete_rows
+
+What's New in the LabKey 3.0.0 package
+==============================
+
+*Release date: 12/14/2023*
+- Query API - WAF encode "sql" parameter for execute_sql
+    - WAF encoding of parameters is initially supported with LabKey Server v23.09
+    - WAF encoding can be opted out of on execute_sql calls by specifying waf_encode_sql=False
+
+What's New in the LabKey 2.6.1 package
+==============================
+
+*Release date: 10/09/2023*
+- Query API - Change max_rows default value to -1 in select_rows
 
 What's New in the LabKey 2.6.0 package
 ==============================

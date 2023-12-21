@@ -31,6 +31,7 @@ from labkey.exceptions import (
     ServerNotFoundError,
     RequestAuthorizationError,
 )
+from labkey.utils import waf_encode
 
 from .utilities import MockLabKey, mock_server_context, success_test, throws_error_test
 
@@ -297,7 +298,7 @@ class TestExecuteSQL(unittest.TestCase):
         sql = "select * from " + schema + "." + query
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
-            "data": {"sql": sql, "schemaName": schema},
+            "data": {"sql": waf_encode(sql), "schemaName": schema},
             "headers": None,
             "timeout": 300,
         }
@@ -365,7 +366,7 @@ class TestSelectRows(unittest.TestCase):
         self.service = MockSelectRows()
         self.expected_kwargs = {
             "expected_args": [self.service.get_server_url()],
-            "data": {"schemaName": schema, "query.queryName": query},
+            "data": {"schemaName": schema, "query.queryName": query, "query.maxRows": -1},
             "headers": None,
             "timeout": 300,
         }
