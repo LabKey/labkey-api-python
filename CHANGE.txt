@@ -6,7 +6,7 @@ What's New in the LabKey 3.1.0 package
 ==============================
 
 *Release date: TBD*
-- Query API - add optional parameters to insert_rows, select_rows, update_rows, and delete_rows
+- Query API - add optional parameters to insert_rows, update_rows, and delete_rows
 
 What's New in the LabKey 3.0.0 package
 ==============================
