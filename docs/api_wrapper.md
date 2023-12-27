@@ -39,6 +39,10 @@ It includes the following arguments:
 - The default value is False. In most cases, this argument must be set to False for API calls to work successfully as CSRF tokens are a fundamental security mechanism. For more info about using CSRF with your LabKey Server instance, see here, https://www.labkey.org/Documentation/wiki-page.view?name=csrfProtection.
 
 
+### Using LabKey Python APIs 
+
+The labkey-api-python library can be used to select rows, insert rows, edit containers, edit storage, modify security settings and permissions, as well as many other functions. To learn more about these different functions, see the other documentation pages in this docs folder.
+
 ### Automatic script generation
 
 In LabKey Server, data grids by default provide the ability to generate the Python code to export the displayed grid view using the APIWrapper class and the select_rows method. This is often an easy and convenient way to create a starting point for further Python development. For more information on this topic: https://www.labkey.org/Documentation/wiki-page.view?name=exportScripts
