@@ -204,10 +204,16 @@ def delete_rows(
         "schemaName": schema_name,
         "queryName": query_name,
         "rows": rows,
-        "transacted": transacted,
-        "auditBehavior": audit_behavior,
-        "auditUserComment": audit_user_comment
     }
+
+    if transacted is False:
+        payload["transacted"] = transacted
+
+    if audit_behavior is not None:
+        payload["auditBehavior"] = audit_behavior
+
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
 
     return server_context.make_request(
         url,
@@ -342,6 +348,18 @@ def insert_rows(
         "auditBehavior": audit_behavior,
         "auditUserComment": audit_user_comment
     }
+
+    if skip_reselect_rows is True:
+        payload["skipReselectRows"] = skip_reselect_rows
+
+    if transacted is False:
+        payload["transacted"] = transacted
+
+    if audit_behavior is not None:
+        payload["auditBehavior"] = audit_behavior
+
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
 
     return server_context.make_request(
         url,
@@ -486,10 +504,16 @@ def update_rows(
         "schemaName": schema_name,
         "queryName": query_name,
         "rows": rows,
-        "transacted": transacted,
-        "auditBehavior": audit_behavior,
-        "auditUserComment": audit_user_comment
     }
+
+    if transacted is False:
+        payload["transacted"] = transacted
+
+    if audit_behavior is not None:
+        payload["auditBehavior"] = audit_behavior
+
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
 
     return server_context.make_request(
         url,
