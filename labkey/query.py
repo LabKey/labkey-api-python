@@ -200,11 +200,8 @@ def delete_rows(
     :return:
     """
     url = server_context.build_url("query", "deleteRows.api", container_path=container_path)
-    payload = {
-        "schemaName": schema_name,
-        "queryName": query_name,
-        "rows": rows,
-    }
+
+    payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
 
     if transacted is False:
         payload["transacted"] = transacted
@@ -339,15 +336,7 @@ def insert_rows(
     """
     url = server_context.build_url("query", "insertRows.api", container_path=container_path)
 
-    payload = {
-        "schemaName": schema_name,
-        "queryName": query_name,
-        "rows": rows,
-        "skipReselectRows": skip_reselect_rows,
-        "transacted": transacted,
-        "auditBehavior": audit_behavior,
-        "auditUserComment": audit_user_comment
-    }
+    payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
 
     if skip_reselect_rows is True:
         payload["skipReselectRows"] = skip_reselect_rows
@@ -500,11 +489,7 @@ def update_rows(
     """
     url = server_context.build_url("query", "updateRows.api", container_path=container_path)
 
-    payload = {
-        "schemaName": schema_name,
-        "queryName": query_name,
-        "rows": rows,
-    }
+    payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
 
     if transacted is False:
         payload["transacted"] = transacted
