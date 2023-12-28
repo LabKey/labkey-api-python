@@ -165,12 +165,25 @@ class QueryFilter:
         return "<QueryFilter [{} {} {}]>".format(self.column_name, self.filter_type, self.value)
 
 
+class AuditBehavior:
+    """
+    Enum of different auditing levels
+    """
+
+    DETAILED = "DETAILED"
+    NONE = "NONE"
+    SUMMARY = "SUMMARY"
+
+
 def delete_rows(
     server_context: ServerContext,
     schema_name: str,
     query_name: str,
     rows: any,
     container_path: str = None,
+    transacted: bool = True,
+    audit_behavior: AuditBehavior = None,
+    audit_user_comment: str = None,
     timeout: int = _default_timeout,
 ):
     """
@@ -180,11 +193,24 @@ def delete_rows(
     :param query_name: table name to delete from
     :param rows: Set of rows to delete
     :param container_path: labkey container path if not already set in context
+    :param transacted: whether all of the updates should be done in a single transaction
+    :param audit_behavior: used to override the audit behavior for the update. See class query.AuditBehavior
+    :param audit_user_comment: used to provide a comment that will be attached to certain detailed audit log records
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
     url = server_context.build_url("query", "deleteRows.api", container_path=container_path)
+
     payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
+
+    if transacted is False:
+        payload["transacted"] = transacted
+
+    if audit_behavior is not None:
+        payload["auditBehavior"] = audit_behavior
+
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
 
     return server_context.make_request(
         url,
@@ -288,6 +314,10 @@ def insert_rows(
     query_name: str,
     rows: List[any],
     container_path: str = None,
+    skip_reselect_rows: bool = False,
+    transacted: bool = True,
+    audit_behavior: AuditBehavior = None,
+    audit_user_comment: str = None,
     timeout: int = _default_timeout,
 ):
     """
@@ -297,12 +327,28 @@ def insert_rows(
     :param query_name: table name to insert into
     :param rows: set of rows to insert
     :param container_path: labkey container path if not already set in context
+    :param skip_reselect_rows: whether the full detailed response for the insert can be skipped
+    :param transacted: whether all of the updates should be done in a single transaction
+    :param audit_behavior: used to override the audit behavior for the update. See class query.AuditBehavior
+    :param audit_user_comment: used to provide a comment that will be attached to certain detailed audit log records
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
     url = server_context.build_url("query", "insertRows.api", container_path=container_path)
 
     payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
+
+    if skip_reselect_rows is True:
+        payload["skipReselectRows"] = skip_reselect_rows
+
+    if transacted is False:
+        payload["transacted"] = transacted
+
+    if audit_behavior is not None:
+        payload["auditBehavior"] = audit_behavior
+
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
 
     return server_context.make_request(
         url,
@@ -422,6 +468,9 @@ def update_rows(
     query_name: str,
     rows: List[any],
     container_path: str = None,
+    transacted: bool = True,
+    audit_behavior: AuditBehavior = None,
+    audit_user_comment: str = None,
     timeout: int = _default_timeout,
 ):
     """
@@ -432,12 +481,24 @@ def update_rows(
     :param query_name: table name to update
     :param rows: Set of rows to update
     :param container_path: labkey container path if not already set in context
+    :param transacted: whether all of the updates should be done in a single transaction
+    :param audit_behavior: used to override the audit behavior for the update. See class query.AuditBehavior
+    :param audit_user_comment: used to provide a comment that will be attached to certain detailed audit log records
     :param timeout: timeout of request in seconds (defaults to 30s)
     :return:
     """
     url = server_context.build_url("query", "updateRows.api", container_path=container_path)
 
     payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
+
+    if transacted is False:
+        payload["transacted"] = transacted
+
+    if audit_behavior is not None:
+        payload["auditBehavior"] = audit_behavior
+
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
 
     return server_context.make_request(
         url,
@@ -461,10 +522,21 @@ class QueryWrapper:
         query_name: str,
         rows: any,
         container_path: str = None,
+        transacted: bool = True,
+        audit_behavior: AuditBehavior = None,
+        audit_user_comment: str = None,
         timeout: int = _default_timeout,
     ):
         return delete_rows(
-            self.server_context, schema_name, query_name, rows, container_path, timeout
+            self.server_context,
+            schema_name,
+            query_name,
+            rows,
+            container_path,
+            transacted,
+            audit_behavior,
+            audit_user_comment,
+            timeout
         )
 
     @functools.wraps(truncate_table)
@@ -512,10 +584,23 @@ class QueryWrapper:
         query_name: str,
         rows: List[any],
         container_path: str = None,
+        skip_reselect_rows: bool = False,
+        transacted: bool = True,
+        audit_behavior: AuditBehavior = None,
+        audit_user_comment: str = None,
         timeout: int = _default_timeout,
     ):
         return insert_rows(
-            self.server_context, schema_name, query_name, rows, container_path, timeout
+            self.server_context,
+            schema_name,
+            query_name,
+            rows,
+            container_path,
+            skip_reselect_rows,
+            transacted,
+            audit_behavior,
+            audit_user_comment,
+            timeout
         )
 
     @functools.wraps(select_rows)
@@ -571,8 +656,19 @@ class QueryWrapper:
         query_name: str,
         rows: List[any],
         container_path: str = None,
+        transacted: bool = True,
+        audit_behavior: AuditBehavior = None,
+        audit_user_comment: str = None,
         timeout: int = _default_timeout,
     ):
         return update_rows(
-            self.server_context, schema_name, query_name, rows, container_path, timeout
+            self.server_context,
+            schema_name,
+            query_name,
+            rows,
+            container_path,
+            transacted,
+            audit_behavior,
+            audit_user_comment,
+            timeout
         )
