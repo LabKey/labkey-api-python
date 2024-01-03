@@ -507,6 +507,52 @@ def update_rows(
     )
 
 
+def move_rows(
+    server_context: ServerContext,
+    target_container_path: str,
+    schema_name: str,
+    query_name: str,
+    rows: any,
+    container_path: str = None,
+    transacted: bool = True,
+    audit_behavior: AuditBehavior = None,
+    audit_user_comment: str = None,
+    timeout: int = _default_timeout,
+):
+    """
+    Move a set of rows from the schema.query
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param target_container_path: target labkey container path for the move
+    :param schema_name: schema of table
+    :param query_name: table name to move from
+    :param rows: Set of rows to move
+    :param container_path: source labkey container path if not already set in context
+    :param transacted: whether all of the updates should be done in a single transaction
+    :param audit_behavior: used to override the audit behavior for the update. See class query.AuditBehavior
+    :param audit_user_comment: used to provide a comment that will be attached to certain detailed audit log records
+    :param timeout: timeout of request in seconds (defaults to 30s)
+    :return:
+    """
+    url = server_context.build_url("query", "moveRows.api", container_path=container_path)
+
+    payload = {"targetContainerPath": target_container_path, "schemaName": schema_name, "queryName": query_name, "rows": rows}
+
+    if transacted is False:
+        payload["transacted"] = transacted
+
+    if audit_behavior is not None:
+        payload["auditBehavior"] = audit_behavior
+
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
+
+    return server_context.make_request(
+        url,
+        json=payload,
+        timeout=timeout,
+    )
+
+
 class QueryWrapper:
     """
     Wrapper for all of the API methods exposed in the query module. Used by the APIWrapper class.
@@ -663,6 +709,32 @@ class QueryWrapper:
     ):
         return update_rows(
             self.server_context,
+            schema_name,
+            query_name,
+            rows,
+            container_path,
+            transacted,
+            audit_behavior,
+            audit_user_comment,
+            timeout
+        )
+
+    @functools.wraps(move_rows)
+    def move_rows(
+        self,
+        target_container_path: str,
+        schema_name: str,
+        query_name: str,
+        rows: any,
+        container_path: str = None,
+        transacted: bool = True,
+        audit_behavior: AuditBehavior = None,
+        audit_user_comment: str = None,
+        timeout: int = _default_timeout,
+    ):
+        return move_rows(
+            self.server_context,
+            target_container_path,
             schema_name,
             query_name,
             rows,
