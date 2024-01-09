@@ -2,13 +2,6 @@
 LabKey Python Client API News
 +++++++++++
 
-What's New in the LabKey 3.1.0 package
-==============================
-
-*Release date: TBD*
-- Query API - move_rows()
-    - earliest compatible LabKey Server version: 24.1.0
-
 What's New in the LabKey 3.0.0 package
 ==============================
 
@@ -17,6 +10,8 @@ What's New in the LabKey 3.0.0 package
     - WAF encoding of parameters is initially supported with LabKey Server v23.09
     - WAF encoding can be opted out of on execute_sql calls by specifying waf_encode_sql=False
 - Query API - add optional parameters to insert_rows, update_rows, and delete_rows
+- Query API - add move_rows()
+    - earliest compatible LabKey Server version: 24.1.0
 
 What's New in the LabKey 2.6.1 package
 ==============================
