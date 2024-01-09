@@ -16,6 +16,7 @@ Query API - [sample code](samples/query_examples.py)
 - **insert_rows()** - Insert rows into a table.
 - **select_rows()** - Query and get results sets.
 - **update_rows()** - Update rows in a table.
+- **move_rows()()** - Move rows in a table.
 - **truncate_table()** - Delete all rows from a table.
 
 Domain API - [sample code](samples/domain_example.py)
