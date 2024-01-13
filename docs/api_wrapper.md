@@ -14,7 +14,7 @@ from labkey.api_wrapper import APIWrapper
 
 It includes the following arguments:
 
-**Domain**
+**domain**
 - This is the base URL for a LabKey Server instance.
 - Example: 'www.labkey.org'
 
