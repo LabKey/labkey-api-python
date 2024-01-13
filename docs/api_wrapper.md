@@ -19,7 +19,7 @@ It includes the following arguments:
 - Example: 'www.labkey.org'
 
 **Container_path**
-- This is the path to the targeted project, folder, or subfolder in a LabKey Server instance. It is similar to a file path. Only absolute paths can be inputted.
+- This is the path to the targeted project, folder, or subfolder in a LabKey Server instance. This path will be used as the default container path for all API requests, you can override this default by passing a container_path to any API method you are using.
 - Example: 'Project/Folder/Subfolder'
 
 **context_path** 
