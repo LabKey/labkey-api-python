@@ -1,6 +1,6 @@
 # APIWrapper support
 
-Create an API session that facilitates usage of the other APIs. 
+Create an API session that facilitates usage of the API methods supported by our Python API. 
 
 The api_wrapper class is a wrapper for all of the supported API methods in the Python Client API. This makes it easier to use the supported API methods without having to manually pass around a ServerContext object.
 
