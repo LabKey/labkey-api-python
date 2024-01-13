@@ -30,7 +30,7 @@ It includes the following arguments:
 - The default value is True. This should be set to True if your server is configured to use SSL. If you are not sure if your server uses SSL, refer to any URL for accessing your server. Servers using SSL will have a URL that begins with https instead of http. LabKey Sample Manager-only clients must have this argument set to True.
 
 **verify_ssl**
-- The default value is True. This argument is only relevant for scripts that use webdav-related features in the LabKey Python API. It forces your script to check if the targeted server is configured to use SSL or not.
+- The default value is True. This argument toggles whether or not the SSL certificate is validated when attempting to connect to a server. This flag is useful when you are connecting to a development server with a self-signed SSL certificate, which would otherwise cause a failure. You should never disable this flag if you are connecting to a production server with a proper SSL certificate.
 
 **api_key**
 - The default value is None. Scripts can authenticate their LabKey API calls by using either a netrc file (details on that here, https://www.labkey.org/Documentation/wiki-page.view?name=netrc) or an API key (details about API keys and how to generate and manage them are here, https://www.labkey.org/Documentation/wiki-page.view?name=apikey). 
