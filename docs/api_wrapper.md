@@ -19,7 +19,7 @@ It includes the following arguments:
 - Example: 'www.labkey.org'
 
 **container_path**
-- This is the path to the targeted project, folder, or subfolder in a LabKey Server instance. This path will be used as the default container path for all API requests, you can override this default by passing a container_path to any API method you are using.
+- This is the path to the targeted project, folder, or subfolder in a LabKey Server instance. This path will be used as the default container path for all API requests, you can override this default by passing a container_path to any API method you are using. This parameter does not need to be supplied to any of the APIWrapper class's methods once it is defined in the class, unless the container_path intended for a method differs from the one used when instantiating the class.
 - Example: 'Project/Folder/Subfolder'
 
 **context_path** 
