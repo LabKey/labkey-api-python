@@ -38,10 +38,31 @@ It includes the following arguments:
 **disable_csrf** 
 - The default value is False. In most cases, this argument must be set to False for API calls to work successfully as CSRF tokens are a fundamental security mechanism. For more info about using CSRF with your LabKey Server instance, see here, https://www.labkey.org/Documentation/wiki-page.view?name=csrfProtection.
 
-
 ### Using LabKey Python APIs 
 
 The labkey-api-python library can be used to select rows, insert rows, edit containers, edit storage, modify security settings and permissions, as well as many other functions. To learn more about these different functions, see the other documentation pages in this docs folder.
+
+See below for an example of how to properly use the APIWrapper class to create a session and run the select_rows method.
+
+```python
+from labkey.api_wrapper import APIWrapper
+
+print("Create an APIWrapper")
+labkey_server = 'localhost:8080'
+project_name = 'ModuleAssayTest'  # Project folder name
+contextPath = 'labkey'
+schema = 'core'
+table = 'Users'
+api = APIWrapper(labkey_server, project_name, contextPath, use_ssl=False)
+
+result = api.query.select_rows(schema, table)
+
+if result is not None:
+    print(result['rows'][0])
+    print("select_rows: Number of rows returned: " + str(result['rowCount']))
+else:
+    print('select_rows: Failed to load results from ' + schema + '.' + table)
+```
 
 ### Automatic script generation
 
