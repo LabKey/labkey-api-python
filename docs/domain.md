@@ -72,19 +72,15 @@ to_json returns a copy of the Domain object's data in a json format.
 
 ### Attributes
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+- **fields** - This attribute is an iterable object containing a set of fields and their associated properties.
+- **container** - The lsid of the container where the domain is or will be defined.
+- **description** - The description of the domain.
+- **domain_id** - The ID value associated with the domain in its LabKey Server instance.
+- **domain_uri** - The URI for the domain in its LabKey Server instance.
+- **name** - The name of the domain.
+- **query_name** - The query associated with the domain.
+- **schema_name** - The schema of the query associated with the domain.
+- **template_description** - The description of the template used to make this domain, if a template was used.
 
 ## Examples
 For examples, see the /samples/domain_example.py file.
