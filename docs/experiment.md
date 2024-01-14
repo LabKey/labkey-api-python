@@ -27,3 +27,7 @@ List of method parameters:
 List of method parameters:
 - assay_id: The assay protocol id.
 - batches: The Batch(es) to save.
+
+### Examples
+
+For more information about how to use the experiment API in practice, please see the /samples/experiment_example.py file.
