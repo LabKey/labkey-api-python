@@ -23,20 +23,23 @@ It includes the following arguments:
 - Example: 'Project/Folder/Subfolder'
 
 **context_path** 
-- The default value is None. Depending on how the LabKey Server instance is implemented, it may be necessary to include a value for the context_path argument. If your LabKey Server instance has text after the base URL, that is the context path. 
+- Defaults to `None`. Depending on how the LabKey Server instance is implemented, it may be necessary to include a value for the context_path argument. If your LabKey Server instance has text after the base URL, that is the context path. 
 - Example: If your home project has a URL such as https://labkey.org/contextpath/home/project-begin.view, then the context path is 'contextpath'.
 
 **use_ssl**
-- The default value is True. This should be set to True if your server is configured to use SSL. If you are not sure if your server uses SSL, refer to any URL for accessing your server. Servers using SSL will have a URL that begins with `https://` instead of `http://`. LabKey Sample Manager-only clients must have this argument set to True.
+- Defaults to `True`. This should be set to True if your server is configured to use SSL. If you are not sure if your server uses SSL, refer to any URL for accessing your server. Servers using SSL will have a URL that begins with `https://` instead of `http://`. LabKey Sample Manager-only clients must have this argument set to True.
 
 **verify_ssl**
-- The default value is True. This argument toggles whether or not the SSL certificate is validated when attempting to connect to a server. This flag is useful when you are connecting to a development server with a self-signed SSL certificate, which would otherwise cause a failure. You should never disable this flag if you are connecting to a production server with a proper SSL certificate.
+- Defaults to `True`. This argument toggles whether or not the SSL certificate is validated when attempting to connect to a server. This flag is useful when you are connecting to a development server with a self-signed SSL certificate, which would otherwise cause a failure. You should never disable this flag if you are connecting to a production server with a proper SSL certificate.
 
 **api_key**
-- The default value is None. Scripts can authenticate their LabKey API calls by using either a netrc file (details on that here, https://www.labkey.org/Documentation/wiki-page.view?name=netrc) or an API key (details about API keys and how to generate and manage them are here, https://www.labkey.org/Documentation/wiki-page.view?name=apikey). 
+- Defaults to `None`. Scripts can authenticate their LabKey API calls by using either a netrc file (details on that here, https://www.labkey.org/Documentation/wiki-page.view?name=netrc) or an API key (details about API keys and how to generate and manage them are here, https://www.labkey.org/Documentation/wiki-page.view?name=apikey). 
 
 **disable_csrf** 
-- The default value is False. In most cases, this argument must be set to False for API calls to work successfully as CSRF tokens are a fundamental security mechanism. For more info about using CSRF with your LabKey Server instance, see here, https://www.labkey.org/Documentation/wiki-page.view?name=csrfProtection.
+- Defaults to `False`. In most cases, this argument must be set to False for API calls to work successfully as CSRF tokens are a fundamental security mechanism. For more info about using CSRF with your LabKey Server instance, see here, https://www.labkey.org/Documentation/wiki-page.view?name=csrfProtection.
+
+**allow_redirects**
+- Defaults to `False`. When the server issues a redirect during an API call the ServerContext will throw an error.
 
 ### Using LabKey Python APIs 
 
