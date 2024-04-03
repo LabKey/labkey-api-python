@@ -178,7 +178,9 @@ class ServerContext:
         non_json_response: bool = False,
         file_payload: any = None,
         json: dict = None,
+        allow_redirects=False,
     ) -> any:
+        allow_redirects_ = allow_redirects or self.allow_redirects
         if self._api_key is not None:
             if self._session.headers.get(API_KEY_TOKEN) is not self._api_key:
                 self._session.headers.update({API_KEY_TOKEN: self._api_key})
@@ -198,7 +200,7 @@ class ServerContext:
                     params=payload,
                     headers=headers,
                     timeout=timeout,
-                    allow_redirects=self.allow_redirects,
+                    allow_redirects=allow_redirects_,
                 )
             else:
                 if file_payload is not None:
@@ -208,7 +210,7 @@ class ServerContext:
                         files=file_payload,
                         headers=headers,
                         timeout=timeout,
-                        allow_redirects=self.allow_redirects,
+                        allow_redirects=allow_redirects_,
                     )
                 elif json is not None:
                     if headers is None:
@@ -222,7 +224,7 @@ class ServerContext:
                         data=data,
                         headers=headers_,
                         timeout=timeout,
-                        allow_redirects=self.allow_redirects,
+                        allow_redirects=allow_redirects_,
                     )
                 else:
                     response = self._session.post(
@@ -230,7 +232,7 @@ class ServerContext:
                         data=payload,
                         headers=headers,
                         timeout=timeout,
-                        allow_redirects=self.allow_redirects,
+                        allow_redirects=allow_redirects_,
                     )
             return handle_response(response, non_json_response)
         except RequestException as e:

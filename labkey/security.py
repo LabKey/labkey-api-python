@@ -279,7 +279,7 @@ def stop_impersonating(server_context: ServerContext):
     Stop impersonating a user while keeping the original user logged in.
     """
     url = server_context.build_url(LOGIN_CONTROLLER, "stopImpersonating.api")
-    return server_context.make_request(url)
+    return server_context.make_request(url, allow_redirects=True)
 
 
 @dataclass
