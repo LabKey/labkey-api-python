@@ -65,6 +65,7 @@ class TestCreateUser(unittest.TestCase):
             "data": {"email": TestCreateUser.__email, "sendEmail": False},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), self.__email]
@@ -138,6 +139,7 @@ class TestResetPassword(unittest.TestCase):
             "data": {"email": TestResetPassword.__email},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), self.__email]
@@ -211,6 +213,7 @@ class TestActivateUsers(unittest.TestCase):
             "data": {"userId": [123]},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), self.__user_id]
@@ -284,6 +287,7 @@ class TestDeactivateUsers(unittest.TestCase):
             "data": {"userId": [123]},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), self.__user_id]
@@ -357,6 +361,7 @@ class TestDeleteUsers(unittest.TestCase):
             "data": {"userId": [123]},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), self.__user_id]
@@ -431,6 +436,7 @@ class TestAddToGroup(unittest.TestCase):
             "data": {"groupId": 123, "principalIds": [321]},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), self.__user_id, self.__group_id]
@@ -505,6 +511,7 @@ class TestRemoveFromGroup(unittest.TestCase):
             "data": {"groupId": 123, "principalIds": [321]},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), self.__user_id, self.__group_id]
@@ -584,6 +591,7 @@ class TestRemoveFromRole(unittest.TestCase):
             },
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [
@@ -668,6 +676,7 @@ class TestAddToRole(unittest.TestCase):
             },
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [
@@ -744,6 +753,7 @@ class TestGetRoles(unittest.TestCase):
             "data": None,
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service)]
@@ -815,6 +825,7 @@ class TestListGroups(unittest.TestCase):
             "data": {"includeSiteGroups": True},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), True]

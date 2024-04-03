@@ -78,6 +78,7 @@ class TestDeleteRows(unittest.TestCase):
             + '"}',
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), schema, query, rows]
@@ -155,6 +156,7 @@ class TestUpdateRows(unittest.TestCase):
             + '"}',
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), schema, query, rows]
@@ -232,6 +234,7 @@ class TestInsertRows(unittest.TestCase):
             + '"}',
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), schema, query, rows]
@@ -301,6 +304,7 @@ class TestExecuteSQL(unittest.TestCase):
             "data": {"sql": waf_encode(sql), "schemaName": schema},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), schema, sql]
@@ -369,6 +373,7 @@ class TestSelectRows(unittest.TestCase):
             "data": {"schemaName": schema, "query.queryName": query, "query.maxRows": -1},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), schema, query]

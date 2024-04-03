@@ -70,6 +70,7 @@ class TestCreate(unittest.TestCase):
             "data": json.dumps(domain_definition, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), domain_definition]
@@ -116,6 +117,7 @@ class TestDrop(unittest.TestCase):
             "data": json.dumps(payload, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [
@@ -164,6 +166,7 @@ class TestGet(unittest.TestCase):
             "headers": None,
             "params": {"schemaName": self.schema_name, "queryName": self.query_name},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [
@@ -215,6 +218,7 @@ class TestInferFields(unittest.TestCase):
             "files": {"inferfile": self.file},
             "headers": None,
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), self.file]
@@ -275,6 +279,7 @@ class TestSave(unittest.TestCase):
             "data": json.dumps(payload, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [
@@ -347,6 +352,7 @@ class TestConditionalFormatCreate(unittest.TestCase):
             "data": json.dumps(self.domain_definition, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), self.domain_definition]
@@ -431,6 +437,7 @@ class TestConditionalFormatSave(unittest.TestCase):
             "data": json.dumps(payload, sort_keys=True),
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [
