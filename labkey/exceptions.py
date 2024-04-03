@@ -61,6 +61,8 @@ class UnexpectedRedirectError(RequestError):
         # If the server is redirecting from http to https the user probably has a misconfigured ServerContext with use_ssl=False
         if server_response.url.startswith("http://") and location.startswith("https://"):
             self.message = "Redirected from http to https, set use_ssl=True in your APIWrapper or ServerContext"
+        elif location != "":
+            self.message = f"Unexpected redirect to: {location}"
 
 
 class QueryNotFoundError(RequestError):
