@@ -258,7 +258,7 @@ def execute_sql(
     parameters: dict = None,
     required_version: float = None,
     timeout: int = _default_timeout,
-    waf_encode_sql: bool = True
+    waf_encode_sql: bool = True,
 ):
     """
     Execute sql query against a LabKey server.
@@ -535,7 +535,12 @@ def move_rows(
     """
     url = server_context.build_url("query", "moveRows.api", container_path=container_path)
 
-    payload = {"targetContainerPath": target_container_path, "schemaName": schema_name, "queryName": query_name, "rows": rows}
+    payload = {
+        "targetContainerPath": target_container_path,
+        "schemaName": schema_name,
+        "queryName": query_name,
+        "rows": rows,
+    }
 
     if transacted is False:
         payload["transacted"] = transacted
@@ -582,7 +587,7 @@ class QueryWrapper:
             transacted,
             audit_behavior,
             audit_user_comment,
-            timeout
+            timeout,
         )
 
     @functools.wraps(truncate_table)
@@ -605,7 +610,7 @@ class QueryWrapper:
         parameters: dict = None,
         required_version: float = None,
         timeout: int = _default_timeout,
-        waf_encode_sql: bool = True
+        waf_encode_sql: bool = True,
     ):
         return execute_sql(
             self.server_context,
@@ -620,7 +625,7 @@ class QueryWrapper:
             parameters,
             required_version,
             timeout,
-            waf_encode_sql
+            waf_encode_sql,
         )
 
     @functools.wraps(insert_rows)
@@ -646,7 +651,7 @@ class QueryWrapper:
             transacted,
             audit_behavior,
             audit_user_comment,
-            timeout
+            timeout,
         )
 
     @functools.wraps(select_rows)
@@ -716,7 +721,7 @@ class QueryWrapper:
             transacted,
             audit_behavior,
             audit_user_comment,
-            timeout
+            timeout,
         )
 
     @functools.wraps(move_rows)
@@ -742,5 +747,5 @@ class QueryWrapper:
             transacted,
             audit_behavior,
             audit_user_comment,
-            timeout
+            timeout,
         )
