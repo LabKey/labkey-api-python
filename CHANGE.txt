@@ -6,7 +6,9 @@ What's New in the LabKey 3.1.0 package
 ==============================
 
 *Release date: 04/??/2024*
-- ServerContext: Add allow_redirects flag (defaults to False)
+- ServerContext
+    - Add allow_redirects flag (defaults to False) to constructor
+    - Add allow_redirects flag to make_request
 - APIWrapper: Add allow_redirects flag (defaults to False)
 - Add UnexpectedRedirectError
     - thrown when allow_redirects is False and the server issues a redirect
