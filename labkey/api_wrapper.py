@@ -22,6 +22,7 @@ class APIWrapper:
         verify_ssl=True,
         api_key=None,
         disable_csrf=False,
+        allow_redirects=False,
     ):
         self.server_context = ServerContext(
             domain=domain,
@@ -31,6 +32,7 @@ class APIWrapper:
             verify_ssl=verify_ssl,
             api_key=api_key,
             disable_csrf=disable_csrf,
+            allow_redirects=allow_redirects,
         )
         self.container = ContainerWrapper(self.server_context)
         self.domain = DomainWrapper(self.server_context)

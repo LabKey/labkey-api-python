@@ -8,6 +8,7 @@ from labkey.exceptions import (
     QueryNotFoundError,
     ServerContextError,
     ServerNotFoundError,
+    UnexpectedRedirectError,
 )
 
 API_KEY_TOKEN = "apikey"
@@ -29,7 +30,8 @@ def handle_response(response, non_json_response=False):
                 content=response.content,
             )
             return result
-
+    elif sc == 302:
+        raise UnexpectedRedirectError(response)
     elif sc == 401:
         raise RequestAuthorizationError(response)
     elif sc == 404:
@@ -62,6 +64,7 @@ class ServerContext:
         verify_ssl=True,
         api_key=None,
         disable_csrf=False,
+        allow_redirects=False,
     ):
         self._container_path = container_path
         self._context_path = context_path
@@ -70,6 +73,7 @@ class ServerContext:
         self._verify_ssl = verify_ssl
         self._api_key = api_key
         self._disable_csrf = disable_csrf
+        self.allow_redirects = allow_redirects
         self._session = requests.Session()
         self._session.headers.update({"User-Agent": f"LabKey Python API/{__version__}"})
 
@@ -189,7 +193,13 @@ class ServerContext:
 
         try:
             if method == "GET":
-                response = self._session.get(url, params=payload, headers=headers, timeout=timeout)
+                response = self._session.get(
+                    url,
+                    params=payload,
+                    headers=headers,
+                    timeout=timeout,
+                    allow_redirects=self.allow_redirects,
+                )
             else:
                 if file_payload is not None:
                     response = self._session.post(
@@ -198,6 +208,7 @@ class ServerContext:
                         files=file_payload,
                         headers=headers,
                         timeout=timeout,
+                        allow_redirects=self.allow_redirects,
                     )
                 elif json is not None:
                     if headers is None:
@@ -206,10 +217,20 @@ class ServerContext:
                     headers_ = {**headers, "Content-Type": "application/json"}
                     # sort_keys is a hack to make unit tests work
                     data = json_dumps(json, sort_keys=True)
-                    response = self._session.post(url, data=data, headers=headers_, timeout=timeout)
+                    response = self._session.post(
+                        url,
+                        data=data,
+                        headers=headers_,
+                        timeout=timeout,
+                        allow_redirects=self.allow_redirects,
+                    )
                 else:
                     response = self._session.post(
-                        url, data=payload, headers=headers, timeout=timeout
+                        url,
+                        data=payload,
+                        headers=headers,
+                        timeout=timeout,
+                        allow_redirects=self.allow_redirects,
                     )
             return handle_response(response, non_json_response)
         except RequestException as e:

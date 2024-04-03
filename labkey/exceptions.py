@@ -47,7 +47,20 @@ class RequestError(exceptions.RequestException):
             self.message = "No response received"
 
     def __str__(self):
-        return repr(self.message)
+        return str(self.message)
+
+
+class UnexpectedRedirectError(RequestError):
+    default_msg = "Unexpected redirect occurred"
+
+    def __init__(self, server_response, **kwargs):
+        super().__init__(server_response, **kwargs)
+
+        location = server_response.headers.get("Location", "")
+
+        # If the server is redirecting from http to https the user probably has a misconfigured ServerContext with use_ssl=False
+        if server_response.url.startswith("http://") and location.startswith("https://"):
+            self.message = "Redirected from http to https, set use_ssl=True in your APIWrapper or ServerContext"
 
 
 class QueryNotFoundError(RequestError):
