@@ -2,6 +2,17 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 3.1.0 package
+==============================
+
+*Release date: 04/03/2024*
+- ServerContext
+    - Add allow_redirects flag (defaults to False) to constructor
+    - Add allow_redirects flag to make_request
+- APIWrapper: Add allow_redirects flag (defaults to False)
+- Add UnexpectedRedirectError
+    - thrown when allow_redirects is False and the server issues a redirect
+
 What's New in the LabKey 3.0.0 package
 ==============================
 

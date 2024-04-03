@@ -43,10 +43,14 @@ def study(api: APIWrapper):
         "subjectNounSingular": "People",
         "label": "Python Integration Tests Study",
     }
-    created_study = api.server_context.make_request(url, payload, non_json_response=True)
+    created_study = api.server_context.make_request(
+        url, payload, non_json_response=True, allow_redirects=True
+    )
     yield created_study
     url = api.server_context.build_url("study", "deleteStudy.view")
-    api.server_context.make_request(url, {"confirm": "true"}, non_json_response=True)
+    api.server_context.make_request(
+        url, {"confirm": "true"}, non_json_response=True, allow_redirects=True
+    )
 
 
 @pytest.fixture(scope="session")
@@ -91,7 +95,7 @@ def test_create_duplicate_dataset(api: APIWrapper, dataset):
     with pytest.raises(ServerContextError) as e:
         api.domain.create(DATASET_DOMAIN)
 
-    expected = f"'500: A Dataset or Query already exists with the name \"{QUERY_NAME}\".'"
+    expected = f'500: A Dataset or Query already exists with the name "{QUERY_NAME}".'
     assert e.value.message == expected
 
 
@@ -148,7 +152,7 @@ def test_cannot_delete_qc_state_in_use(api: APIWrapper, qc_states, study, datase
 
     assert (
         e.value.message
-        == "\"400: State 'needs verification' cannot be deleted as it is currently in use.\""
+        == "400: State 'needs verification' cannot be deleted as it is currently in use."
     )
     # now clean up/stop using it
     dataset_row_to_remove = [{"lsid": inserted_lsid}]

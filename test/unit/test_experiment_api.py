@@ -208,6 +208,7 @@ class TestLoadBatch(unittest.TestCase):
             "data": '{"assayId": 12345, "batchId": 54321}',
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), assay_id, batch_id]
@@ -290,6 +291,7 @@ class TestSaveBatch(unittest.TestCase):
             "data": '{"assayId": 12345, "batches": [{"batchProtocolId": null, "comment": null, "created": null, "createdBy": null, "modified": null, "modifiedBy": null, "name": null, "properties": {"PropertyName": "Property Value"}, "runs": [{"name": "python upload", "properties": {"RunFieldName": "Run Field Value"}}]}]}',
             "headers": {"Content-Type": "application/json"},
             "timeout": 300,
+            "allow_redirects": False,
         }
 
         self.args = [mock_server_context(self.service), assay_id, batch]
