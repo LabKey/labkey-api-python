@@ -93,7 +93,7 @@ from labkey.api_wrapper import APIWrapper
 
 print("Create an APIWrapper")
 labkey_server = 'localhost:8080'
-container_path = 'ModuleAssayTest'  # A project folder name is used here, but subfolders can be referenced also.
+container_path = 'Tutorials/HIV Study'  # in this example, Tutorials is a project name and HIV study is a subfolder under it.
 contextPath = 'labkey'
 schema = 'core'
 table = 'Users'
