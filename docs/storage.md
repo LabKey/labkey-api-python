@@ -31,9 +31,9 @@ The specific set of props will differ for each storage item type:
 from labkey.api_wrapper import APIWrapper
 
 labkey_server = "localhost:8080"
-project_name = "FM API Test"  # Project folder name
+container_path = 'Tutorials/HIV Study' # Full project/folder container path
 contextPath = "labkey"
-api = APIWrapper(labkey_server, project_name, contextPath, use_ssl=False)
+api = APIWrapper(labkey_server, container_path, contextPath, use_ssl=False)
 
 
 ###############
