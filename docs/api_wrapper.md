@@ -52,7 +52,7 @@ from labkey.api_wrapper import APIWrapper
 
 print("Create an APIWrapper")
 labkey_server = 'www.example.com'
-container_path = 'ModuleAssayTest'  # Project folder name
+container_path = 'Tutorials/HIV Study' # Full project/folder container path
 contextPath = 'labkey'
 schema = 'core'
 table = 'Users'
