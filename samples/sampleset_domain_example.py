@@ -1,9 +1,9 @@
 from labkey.api_wrapper import APIWrapper
 
 labkey_server = "localhost:8080"
-project_name = "MySamples"  # Project folder name
+container_path = "Tutorials/MySamples"  # Full project/folder container path
 context_path = "labkey"
-api = APIWrapper(labkey_server, project_name, context_path, use_ssl=False)
+api = APIWrapper(labkey_server, container_path, context_path, use_ssl=False)
 
 ###################
 # Create a SampleSet domain
