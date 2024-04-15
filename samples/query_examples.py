@@ -30,9 +30,9 @@ import copy
 
 print("Create a server context")
 labkey_server = "localhost:8080"
-project_name = "ModuleAssayTest"  # Project folder name
+container_path = 'Tutorials/HIV Study' # Full project/folder container path
 context_path = "labkey"
-api = APIWrapper(labkey_server, project_name, context_path, use_ssl=False)
+api = APIWrapper(labkey_server, container_path, context_path, use_ssl=False)
 
 schema = "lists"
 table = "Demographics"
@@ -76,7 +76,7 @@ except QueryNotFoundError:
     print("Caught bad schema")
 
 # catch SSL error
-ssl_api = APIWrapper(labkey_server, project_name, context_path, use_ssl=True)
+ssl_api = APIWrapper(labkey_server, container_path, context_path, use_ssl=True)
 try:
     result = ssl_api.query.select_rows(schema, table)
     print(result)
@@ -85,7 +85,7 @@ except ServerContextError:
 
 
 # catch bad context path
-bad_api = APIWrapper(labkey_server, project_name, "", use_ssl=False)
+bad_api = APIWrapper(labkey_server, container_path, "", use_ssl=False)
 try:
     result = bad_api.query.select_rows(schema, table)
     print(result)
@@ -93,7 +93,7 @@ except ServerNotFoundError:
     print("Caught context path")
 
 # catch bad folder path error
-bad_api = APIWrapper(labkey_server, "bad_project_name", context_path, use_ssl=False)
+bad_api = APIWrapper(labkey_server, "bad_container_path", context_path, use_ssl=False)
 try:
     result = bad_api.query.select_rows(schema, table)
     print(result)
