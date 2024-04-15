@@ -93,12 +93,15 @@ from labkey.api_wrapper import APIWrapper
 
 print("Create an APIWrapper")
 labkey_server = 'localhost:8080'
-project_name = 'ModuleAssayTest'  # Project folder name
+container_path = 'ModuleAssayTest'  # A project folder name is used here, but subfolders can be referenced also.
 contextPath = 'labkey'
 schema = 'core'
 table = 'Users'
-api = APIWrapper(labkey_server, project_name, contextPath, use_ssl=False)
 
+# Note: If developing against localhost with https disabled, set use_ssl=False below
+api = APIWrapper(labkey_server, container_path, contextPath)
+
+# Makes an API request to https://www.example.com/labkey/ModuleAssayTest/query-getQuery.api
 result = api.query.select_rows(schema, table)
 
 if result is not None:
