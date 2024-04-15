@@ -15,10 +15,6 @@
 #
 """
 Examples using the Query.py API
-
-Sample data from the New Study tutorial on labkey.org:
-    https://www.labkey.org/Documentation/wiki-page.view?name=studySetupManual
-
 """
 from labkey.api_wrapper import APIWrapper
 from labkey.exceptions import (
