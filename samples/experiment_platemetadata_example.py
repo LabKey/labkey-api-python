@@ -17,9 +17,9 @@ from labkey.api_wrapper import APIWrapper
 from labkey.experiment import Batch, Run
 
 labkey_server = "localhost:8080"
-project_name = "assays"  # Project folder name
+container_path = 'Tutorials/assay' # Full project/folder container path
 context_path = "labkey"
-api = APIWrapper(labkey_server, project_name, context_path, use_ssl=False)
+api = APIWrapper(labkey_server, container_path, context_path, use_ssl=False)
 assay_id = 310  # provide one from your server
 
 ###################

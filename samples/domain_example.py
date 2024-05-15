@@ -18,9 +18,9 @@ from labkey.domain import conditional_format
 from labkey.query import QueryFilter
 
 labkey_server = "localhost:8080"
-project_name = "Study"  # Project folder name
+container_path = 'Tutorials/HIV Study' # Full project/folder container path
 context_path = "labkey"
-api = APIWrapper(labkey_server, project_name, context_path, use_ssl=False)
+api = APIWrapper(labkey_server, container_path, context_path, use_ssl=False)
 
 ###################
 # Create a list domain
