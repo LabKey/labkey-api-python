@@ -101,7 +101,7 @@ table = 'Users'
 # Note: If developing against localhost with https disabled, set use_ssl=False below
 api = APIWrapper(labkey_server, container_path, contextPath)
 
-# Makes an API request to https://www.example.com/labkey/ModuleAssayTest/query-getQuery.api
+# Makes an API request to https://www.example.com/labkey/tutorials/hiv%20study/query-getQuery.api
 result = api.query.select_rows(schema, table)
 
 if result is not None:
