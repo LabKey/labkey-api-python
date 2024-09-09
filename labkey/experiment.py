@@ -218,6 +218,55 @@ def save_batches(
     return None
 
 
+def lineage(
+    server_context: ServerContext,
+    lsids: List[str],
+    children: bool = None,
+    container_path: str = None,
+    cpas_type: str = None,
+    exp_type: str = None,
+    depth: int = None,
+    parents: bool = None,
+    run_protocol_lsid: str = None,
+):
+    """
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param lsids: Array of LSIDs for the seed ExpData, ExpMaterials, or ExpRun
+    :param children: Include children in the lineage response. Defaults to true.
+    :param container_path: labkey container path if not already set in context
+    :param cpas_type: Optional LSID of a SampleSet or DataClass to filter the response. Defaults to include all.
+    :param exp_type: Optional experiment type to filter response -- either "Data", "Material", or "ExperimentRun".
+    Defaults to include all.
+    :param depth: An optional depth argument. Defaults to include all.
+    :param parents: Include parents in the lineage response. Defaults to true.
+    :param run_protocol_lsid: Optional Exp Run Protocol Lsid to filter response. Defaults to include all.
+    """
+    lineage_url = server_context.build_url(
+        "experiment", "lineage.api", container_path=container_path
+    )
+    payload = {"lsids": lsids}
+
+    if children is not None:
+        payload["children"] = children
+
+    if cpas_type is not None:
+        payload["cpasType"] = cpas_type
+
+    if exp_type is not None:
+        payload["expType"] = exp_type
+
+    if depth is not None:
+        payload["depth"] = depth
+
+    if parents is not None:
+        payload["parents"] = parents
+
+    if run_protocol_lsid is not None:
+        payload["runProtocolLsid"] = run_protocol_lsid
+
+    return server_context.make_request(lineage_url, payload=payload, method="GET")
+
+
 class ExperimentWrapper:
     """
     Wrapper for all of the API methods exposed in the experiment module. Used by the APIWrapper class.
@@ -237,3 +286,27 @@ class ExperimentWrapper:
     @functools.wraps(save_batches)
     def save_batches(self, assay_id: int, batches: List[Batch]) -> Optional[List[Batch]]:
         return save_batches(self.server_context, assay_id, batches)
+
+    @functools.wraps(lineage)
+    def lineage(
+        self,
+        lsids: List[str],
+        children: bool = None,
+        container_path: str = None,
+        cpas_type: str = None,
+        exp_type: str = None,
+        depth: int = None,
+        parents: bool = None,
+        run_protocol_lsid: str = None,
+    ):
+        return lineage(
+            self.server_context,
+            lsids,
+            children,
+            container_path,
+            cpas_type,
+            exp_type,
+            depth,
+            parents,
+            run_protocol_lsid,
+        )
