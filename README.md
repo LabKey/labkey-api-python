@@ -130,6 +130,7 @@ pip install -e '.[dev]'
 
 ### Formatting your code
 When contributing changes please use `Black` to format your code. To run Black you can run the following command:
+
 ```bash
 black .
 ```
