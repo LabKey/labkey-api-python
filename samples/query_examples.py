@@ -30,7 +30,7 @@ import copy
 
 print("Create a server context")
 labkey_server = "localhost:8080"
-container_path = 'Tutorials/HIV Study' # Full project/folder container path
+container_path = "Tutorials/HIV Study"  # Full project/folder container path
 context_path = "labkey"
 api = APIWrapper(labkey_server, container_path, context_path, use_ssl=False)
 

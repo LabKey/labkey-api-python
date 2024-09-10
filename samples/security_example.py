@@ -17,7 +17,7 @@ from labkey.api_wrapper import APIWrapper
 from labkey.exceptions import ServerNotFoundError
 
 labkey_server = "localhost:8080"
-container_path = 'Tutorials/HIV Study' # Full project/folder container path
+container_path = "Tutorials/HIV Study"  # Full project/folder container path
 contextPath = "labkey"
 api = APIWrapper(labkey_server, container_path, contextPath, use_ssl=False)
 
