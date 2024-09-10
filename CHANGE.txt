@@ -5,7 +5,7 @@ LabKey Python Client API News
 What's New in the LabKey 3.2.0 package
 ==============================
 
-*Release date: 09/??/2024*
+*Release date: 09/10/2024*
 - Add lineage API to experiment module
     - Accessible via API wrappers e.g. api.experiment.lineage()
 
