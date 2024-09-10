@@ -48,8 +48,6 @@ setup(
     packages=packages,
     package_data={},
     install_requires=["requests"],
-    tests_require=tests_require,
-    setup_requires=["pytest-runner"],
     extras_require={"test": tests_require},
     keywords="labkey api client",
     classifiers=[
