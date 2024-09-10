@@ -124,7 +124,7 @@ This package is maintained by [LabKey](http://www.labkey.com/). If you have any 
 To install the necessary dependencies for local development you can run the following command:
 
 ```bash
-pip install -e '.[test]'
+pip install -e '.[dev]'
 ```
 
 
