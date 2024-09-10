@@ -224,8 +224,11 @@ def lineage(
     children: bool = None,
     container_path: str = None,
     cpas_type: str = None,
-    exp_type: str = None,
     depth: int = None,
+    exp_type: str = None,
+    include_inputs_and_outputs: bool = None,
+    include_properties: bool = None,
+    include_run_steps: bool = None,
     parents: bool = None,
     run_protocol_lsid: str = None,
 ):
@@ -235,9 +238,12 @@ def lineage(
     :param children: Include children in the lineage response. Defaults to true.
     :param container_path: labkey container path if not already set in context
     :param cpas_type: Optional LSID of a SampleSet or DataClass to filter the response. Defaults to include all.
+    :param depth: An optional depth argument. Defaults to include all.
     :param exp_type: Optional experiment type to filter response -- either "Data", "Material", or "ExperimentRun".
     Defaults to include all.
-    :param depth: An optional depth argument. Defaults to include all.
+    :param include_inputs_and_outputs: Include inputs and outputs in the lineage response.
+    :param include_properties: Include properties in the lineage response.
+    :param include_run_steps: Include run steps in the lineage response.
     :param parents: Include parents in the lineage response. Defaults to true.
     :param run_protocol_lsid: Optional Exp Run Protocol Lsid to filter response. Defaults to include all.
     """
@@ -252,11 +258,20 @@ def lineage(
     if cpas_type is not None:
         payload["cpasType"] = cpas_type
 
+    if depth is not None:
+        payload["depth"] = depth
+
     if exp_type is not None:
         payload["expType"] = exp_type
 
-    if depth is not None:
-        payload["depth"] = depth
+    if include_inputs_and_outputs is not None:
+        payload["includeInputsAndOutputs"] = include_inputs_and_outputs
+
+    if include_properties is not None:
+        payload["includeProperties"] = include_properties
+
+    if include_run_steps is not None:
+        payload["includeRunSteps"] = include_run_steps
 
     if parents is not None:
         payload["parents"] = parents
@@ -264,7 +279,7 @@ def lineage(
     if run_protocol_lsid is not None:
         payload["runProtocolLsid"] = run_protocol_lsid
 
-    return server_context.make_request(lineage_url, payload=payload, method="GET")
+    return server_context.make_request(lineage_url, payload=payload, method="POST")
 
 
 class ExperimentWrapper:
@@ -296,6 +311,9 @@ class ExperimentWrapper:
         cpas_type: str = None,
         exp_type: str = None,
         depth: int = None,
+        include_properties: bool = None,
+        include_inputs_and_outputs: bool = None,
+        include_run_steps: bool = None,
         parents: bool = None,
         run_protocol_lsid: str = None,
     ):
@@ -305,8 +323,11 @@ class ExperimentWrapper:
             children,
             container_path,
             cpas_type,
-            exp_type,
             depth,
+            exp_type,
             parents,
+            include_inputs_and_outputs,
+            include_properties,
+            include_run_steps,
             run_protocol_lsid,
         )
