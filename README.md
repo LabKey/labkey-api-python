@@ -117,29 +117,28 @@ Python 3.7+ is fully supported.
 LabKey Server v15.1 and later.
 
 ## Contributing
-This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use
-the [LabKey Server developer support forum](https://www.labkey.org/home/developer/forum/project-start.view).
+This package is maintained by [LabKey](http://www.labkey.com/). If you have any questions or need support, please use the
+[LabKey Server developer support forum](https://www.labkey.org/home/developer/forum/project-start.view).
 
+### Setup
 To install the necessary dependencies for local development you can run the following command:
 
 ```bash
-pip install -e .
+pip install -e '.[test]'
 ```
 
-When contributing changes please use `Black` to format your code. To run Black follow these instructions:
-1. Install black: `pip install black`
-2. Run black: `black .`
-3. Commit the newly formatted code.
+
+### Formatting your code
+When contributing changes please use `Black` to format your code. To run Black you can run the following command:
+```bash
+black .
+```
+
+After black has run it may have formatted some files, commit the changed files before opening a PR.
 
 ### Testing
-If you are looking to contribute please run the tests before issuing a PR. To run the tests you'll need to install the
-additional testing dependencies, to do this run:
+If you are looking to contribute please run the tests before issuing a PR. The tests can be run with:
 
-```bash
-$ pip install -e '.[test]'
-```
-
-Then, the tests can be run with
 ```bash
 $ pytest .
 ```
@@ -154,3 +153,20 @@ $ pytest . -m "integration"
 ### Maintainers
 Package maintainer's can reference the [Python Package Maintenance](https://docs.google.com/document/d/13nVxwyctH4YZ6gDhcrOu9Iz6qGFPAxicE1VHiVYpw9A/) document (requires permission) for updating
 releases.
+
+To build the package before releasing you will need to install the build dependencies. This can be done by running:
+
+```bash
+pip install -e '.[build]'
+```
+
+To build the package you can run:
+
+```bash
+python -m build
+```
+
+You should now have a `dist/` folder with two files:
+
+1. `labkey-<version from __init__.py>.tar.gz` - This is the source distribution
+2. `labkey-<version from __init__.py>-py3-none-any.whl` - This is the wheel
