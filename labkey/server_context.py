@@ -1,3 +1,4 @@
+from typing import Dict, TextIO
 from labkey.utils import json_dumps
 from . import __version__
 import requests
@@ -176,7 +177,7 @@ class ServerContext:
         timeout: int = 300,
         method: str = "POST",
         non_json_response: bool = False,
-        file_payload: any = None,
+        file_payload: Dict[str, TextIO] = None,
         json: dict = None,
         allow_redirects=False,
     ) -> any:

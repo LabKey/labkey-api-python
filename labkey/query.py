@@ -41,7 +41,7 @@ https://www.labkey.org/home/developer/forum/project-start.view
 ############################################################################
 """
 import functools
-from typing import List
+from typing import List, TextIO
 
 from .server_context import ServerContext
 from .utils import waf_encode
@@ -357,6 +357,56 @@ def insert_rows(
     )
 
 
+def import_rows(
+    server_context: ServerContext,
+    schema_name: str,
+    query_name: str,
+    data_file: TextIO,
+    container_path: str = None,
+    insert_option: str = None,
+    audit_behavior: str = None,
+    import_lookup_by_alternate_key: bool = False,
+):
+    """
+    Import row(s) into a table
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param query_name: table name to import into
+    :param data_file: the file containing the rows to import. The column names in the file must match the column names
+    from the LabKey server.
+    :param container_path: labkey container path if not already set in context
+    :param insert_option: Whether the import action should be done as an insert, creating new rows for each provided row
+    of the data frame, or a merge. When merging during import, any data you provide for the rows representing records
+    that already exist will replace the previous values. Note that when updating an existing record, you only need to
+    provide the columns you wish to update, existing data for other columns will be left as is. Available options are
+    "INSERT" and "MERGE". Defaults to "INSERT".
+    :param audit_behavior: Set the level of auditing details for this import action. Available options are "SUMMARY" and
+    "DETAILED". SUMMARY - Audit log reflects that a change was made, but does not mention the nature of the change.
+    DETAILED - Provides full details on what change was made, including values before and after the change. Defaults to
+    the setting as specified by the LabKey query.
+    :param import_lookup_by_alternate_key: Allows lookup target rows to be resolved by values rather than the target's
+    primary key. This option will only be available for lookups that are configured with unique column information
+    :return:
+    """
+    url = server_context.build_url("query", "import.api", container_path=container_path)
+    file_payload = {"file": data_file}
+    payload = {
+        "schemaName": schema_name,
+        "queryName": query_name,
+    }
+
+    if insert_option is not None:
+        payload["insertOption"] = insert_option
+
+    if audit_behavior is not None:
+        payload["auditBehavior"] = audit_behavior
+
+    if import_lookup_by_alternate_key is not None:
+        payload["importLookupByAlternateKey"] = import_lookup_by_alternate_key
+
+    return server_context.make_request(url, payload, method="POST", file_payload=file_payload)
+
+
 def select_rows(
     server_context: ServerContext,
     schema_name: str,
@@ -652,6 +702,28 @@ class QueryWrapper:
             audit_behavior,
             audit_user_comment,
             timeout,
+        )
+
+    @functools.wraps(import_rows)
+    def import_rows(
+        self,
+        schema_name: str,
+        query_name: str,
+        data_file,
+        container_path: str = None,
+        insert_option: str = None,
+        audit_behavior: str = None,
+        import_lookup_by_alternate_key: bool = False,
+    ):
+        return import_rows(
+            self.server_context,
+            schema_name,
+            query_name,
+            data_file,
+            container_path,
+            insert_option,
+            audit_behavior,
+            import_lookup_by_alternate_key,
         )
 
     @functools.wraps(select_rows)

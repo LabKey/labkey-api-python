@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 import functools
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Union, Tuple, TextIO
 
 from .server_context import ServerContext
 from labkey.query import QueryFilter
@@ -483,7 +483,7 @@ def get_domain_details(
 
 
 def infer_fields(
-    server_context: ServerContext, data_file: any, container_path: str = None
+    server_context: ServerContext, data_file: TextIO, container_path: str = None
 ) -> List[PropertyDescriptor]:
     """
     Infer fields for a domain from a file
