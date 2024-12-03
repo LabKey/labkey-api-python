@@ -2,7 +2,6 @@ import pytest
 
 from labkey.api_wrapper import APIWrapper
 from labkey.exceptions import ServerContextError
-from test.test_importlib.fixtures import tempdir
 
 pytestmark = pytest.mark.integration  # Mark all tests in this module as integration tests
 STUDY_NAME = "TestStudy"
