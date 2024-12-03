@@ -157,3 +157,105 @@ def test_cannot_delete_qc_state_in_use(api: APIWrapper, qc_states, study, datase
     # now clean up/stop using it
     dataset_row_to_remove = [{"lsid": inserted_lsid}]
     api.query.delete_rows(SCHEMA_NAME, QUERY_NAME, dataset_row_to_remove)
+
+LISTS_SCHEMA = "lists"
+PARENT_LIST_NAME = "parent_list"
+PARENT_LIST_DEFINITION = {
+    "kind": "IntList",
+    "domainDesign": {
+        "name": PARENT_LIST_NAME,
+        "fields": [
+            {"name": "rowId", "rangeURI": "int"},
+            {
+                "name": "name",
+                "rangeURI": "string",
+                "required": True,
+            },
+        ],
+    },
+    "indices": {
+        "columnNames": ["name"],
+        "unique": True,
+    },
+    "options": {"keyName": "rowId", "keyType": "AutoIncrementInteger"},
+}
+CHILD_LIST_NAME = "child_list"
+CHILD_LIST_DEFINITION = {
+    "kind": "IntList",
+    "domainDesign": {
+        "name": CHILD_LIST_NAME,
+        "fields": [
+            {"name": "rowId", "rangeURI": "int"},
+            {
+                "name": "name",
+                "rangeURI": "string",
+                "required": True,
+            },
+            {
+                "name": "parent",
+                "lookupQuery": "parent_list",
+                "lookupSchema": "lists",
+                "rangeURI": "int",
+            },
+        ],
+    },
+    "options": {"keyName": "rowId", "keyType": "AutoIncrementInteger"},
+}
+
+parent_data = """name
+parent_one
+parent_two
+parent_three
+"""
+
+child_data = """name,parent
+child_one,parent_one
+child_two,parent_two
+child_three,parent_three
+"""
+
+@pytest.fixture
+def parent_list_fixture(api: APIWrapper):
+    api.domain.create(PARENT_LIST_DEFINITION)
+    created_list = api.domain.get(LISTS_SCHEMA, PARENT_LIST_NAME)
+    yield created_list
+    # clean up
+    api.domain.drop(LISTS_SCHEMA, PARENT_LIST_NAME)
+
+
+@pytest.fixture
+def child_list_fixture(api: APIWrapper):
+    api.domain.create(CHILD_LIST_DEFINITION)
+    created_list = api.domain.get(LISTS_SCHEMA, CHILD_LIST_NAME)
+    yield created_list
+    # clean up
+    api.domain.drop(LISTS_SCHEMA, CHILD_LIST_NAME)
+
+
+def test_import_rows(api: APIWrapper, parent_list_fixture, child_list_fixture, tmpdir):
+    parent_data_path = tmpdir.join("parent_data.csv")
+    parent_data_path.write(parent_data)
+    child_data_path = tmpdir.join("child_data.csv")
+    child_data_path.write(child_data)
+
+    # Should succeed
+    parent_file = parent_data_path.open()
+    resp = api.query.import_rows("lists", PARENT_LIST_NAME, data_file=parent_file)
+    parent_file.close()
+    assert resp["success"] == True
+    assert resp["rowCount"] == 3
+
+    # Should fail, because data doesn't use rowIds and import_lookup_by_alternate_key defaults to False
+    child_file = child_data_path.open()
+    resp = api.query.import_rows("lists", CHILD_LIST_NAME, data_file=child_file)
+    child_file.close()
+    assert resp["success"] == False
+    assert resp["errorCount"] == 1
+    assert resp["errors"][0]["exception"] == "Could not convert value 'parent_one' (String) for Integer field 'parent'"
+
+    # Should pass, because import_lookup_by_alternate_key is True
+    child_file = child_data_path.open()
+    resp = api.query.import_rows("lists", CHILD_LIST_NAME, data_file=child_file, import_lookup_by_alternate_key=True)
+    child_file.close()
+    assert resp["success"] == True
+    assert resp["rowCount"] == 3
