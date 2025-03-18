@@ -109,6 +109,7 @@ class PropertyDescriptor:
         )
         self.type_editable = kwargs.pop("type_editable", kwargs.pop("typeEditable", None))
         self.url = kwargs.pop("url", None)
+        self.value_expression = kwargs.pop("value_expression", kwargs.pop("valueExpression", None))
 
     def to_json(self, strip_none=True):
         # TODO: Likely only want to include those that are not None
@@ -155,6 +156,7 @@ class PropertyDescriptor:
             "shownInUpdateView": self.shown_in_update_view,
             "typeEditable": self.type_editable,
             "url": self.url,
+            "valueExpression": self.value_expression,
         }
 
         json_formats = []
