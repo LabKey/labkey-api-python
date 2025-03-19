@@ -261,3 +261,21 @@ def test_domain_save_options(api: APIWrapper, list_fixture):
 
     updated_domain, updated_options = api.domain.get_domain_details(LISTS_SCHEMA, LIST_NAME)
     assert updated_options.get("description") == expected_description
+
+
+def test_domain_add_calculated_field(api: APIWrapper, list_fixture):
+    domain, options = api.domain.get_domain_details(LISTS_SCHEMA, LIST_NAME)
+    domain.add_field({"name": "calcDouble", "conceptURI": "http://www.labkey.org/exp/xml#calculated", "valueExpression": "rowId * 2"})
+    domain.add_field({"name": "calcCube", "conceptURI": "http://www.labkey.org/exp/xml#calculated", "valueExpression": "power(rowId, 3)"})
+
+    api.domain.save(LISTS_SCHEMA, LIST_NAME, domain, options=options)
+    saved_domain = api.domain.get(LISTS_SCHEMA, LIST_NAME)
+
+    assert len(saved_domain.fields) == 4
+    for field in saved_domain.fields:
+        if field.name == "calcDouble":
+            assert field.concept_uri == "http://www.labkey.org/exp/xml#calculated"
+            assert field.value_expression == "rowId * 2"
+        if field.name == "calcCube":
+            assert field.concept_uri == "http://www.labkey.org/exp/xml#calculated"
+            assert field.value_expression == "power(rowId, 3)"
