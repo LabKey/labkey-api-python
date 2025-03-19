@@ -234,9 +234,11 @@ class Domain:
             "template_description", kwargs.pop("templateDescription", None)
         )
 
-        fields = kwargs.pop("fields", [])
         fields_instances = []
-
+        fields = kwargs.pop("fields", [])
+        for field in fields:
+            fields_instances.append(PropertyDescriptor(**field))
+        fields = kwargs.pop("calculatedFields", [])
         for field in fields:
             fields_instances.append(PropertyDescriptor(**field))
 
