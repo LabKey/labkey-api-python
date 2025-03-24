@@ -238,7 +238,7 @@ class Domain:
         fields = kwargs.pop("fields", [])
         for field in fields:
             fields_instances.append(PropertyDescriptor(**field))
-        fields = kwargs.pop("calculatedFields", [])
+        fields = kwargs.pop("calculated_fields", kwargs.pop("calculatedFields", []))
         for field in fields:
             fields_instances.append(PropertyDescriptor(**field))
 
