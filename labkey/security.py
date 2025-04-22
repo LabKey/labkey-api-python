@@ -121,6 +121,7 @@ def deactivate_users(
         target_ids=target_ids,
         api="deactivateUsers.view",
         container_path=container_path,
+        allow_redirects=True,
     )
     if response is not None and response["status_code"] == 200:
         return dict(success=True)
@@ -360,7 +361,11 @@ def __make_security_role_api_request(
 
 
 def __make_user_api_request(
-    server_context: ServerContext, target_ids: List[int], api: str, container_path: str = None
+    server_context: ServerContext,
+    target_ids: List[int],
+    api: str,
+    container_path: str = None,
+    allow_redirects: bool = False,
 ):
     """
     Make a request to the LabKey User Controller
@@ -372,7 +377,7 @@ def __make_user_api_request(
     """
     url = server_context.build_url(USER_CONTROLLER, api, container_path)
 
-    return server_context.make_request(url, {"userId": target_ids})
+    return server_context.make_request(url, {"userId": target_ids}, allow_redirects=allow_redirects)
 
 
 class SecurityWrapper:

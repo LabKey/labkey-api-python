@@ -9,6 +9,9 @@ What's New in the LabKey 3.4.0 package
 - Add "valueExpression" to PropertyDescriptor class
     - needed for creating/adding domain calculated fields
     - update Domain class to append calculatedFields to the domain's fields
+- Fix Issue 52904
+    - UnexpectedRedirectError is not wrapped with ServerContextError
+    - Allow redirects when deactivating users
 
 What's New in the LabKey 3.3.0 package
 ==============================

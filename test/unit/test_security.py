@@ -287,7 +287,7 @@ class TestDeactivateUsers(unittest.TestCase):
             "data": {"userId": [123]},
             "headers": None,
             "timeout": 300,
-            "allow_redirects": False,
+            "allow_redirects": True,
         }
 
         self.args = [mock_server_context(self.service), self.__user_id]

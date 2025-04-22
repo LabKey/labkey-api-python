@@ -265,8 +265,20 @@ def test_domain_save_options(api: APIWrapper, list_fixture):
 
 def test_domain_add_calculated_field(api: APIWrapper, list_fixture):
     domain, options = api.domain.get_domain_details(LISTS_SCHEMA, LIST_NAME)
-    domain.add_field({"name": "calcDouble", "conceptURI": "http://www.labkey.org/exp/xml#calculated", "valueExpression": "rowId * 2"})
-    domain.add_field({"name": "calcCube", "conceptURI": "http://www.labkey.org/exp/xml#calculated", "valueExpression": "power(rowId, 3)"})
+    domain.add_field(
+        {
+            "name": "calcDouble",
+            "conceptURI": "http://www.labkey.org/exp/xml#calculated",
+            "valueExpression": "rowId * 2",
+        }
+    )
+    domain.add_field(
+        {
+            "name": "calcCube",
+            "conceptURI": "http://www.labkey.org/exp/xml#calculated",
+            "valueExpression": "power(rowId, 3)",
+        }
+    )
 
     api.domain.save(LISTS_SCHEMA, LIST_NAME, domain, options=options)
     saved_domain = api.domain.get(LISTS_SCHEMA, LIST_NAME)
