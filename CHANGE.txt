@@ -5,7 +5,7 @@ LabKey Python Client API News
 What's New in the LabKey 3.4.0 package
 ==============================
 
-*Release date: TBD*
+*Release date: 04/22/2025*
 - Add "valueExpression" to PropertyDescriptor class
     - needed for creating/adding domain calculated fields
     - update Domain class to append calculatedFields to the domain's fields
