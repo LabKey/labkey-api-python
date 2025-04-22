@@ -34,7 +34,7 @@ long_desc = "Python client API for LabKey Server. Supports query and experiment 
 
 tests_require = ["pytest", "requests", "mock", "pytest-cov"]
 dev_require = ["pytest", "requests", "mock", "pytest-cov", "black"]
-build_require = ["setuptools", "build", "twine", "wheel"]
+build_require = ["setuptools", "build", "twine", "wheel", "packaging"]
 
 setup(
     name="labkey",
