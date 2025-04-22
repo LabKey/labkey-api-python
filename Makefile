@@ -17,3 +17,8 @@ install:
 .PHONY: uninstall
 uninstall:
 	pip uninstall -y labkey
+
+.PHONY: clean
+clean:
+	rm -rf ./dist/
+	rm -rf ./labkey.egg-info
