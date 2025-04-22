@@ -164,7 +164,12 @@ class ServerContext:
         return client
 
     def handle_request_exception(self, exception):
-        if type(exception) in [RequestAuthorizationError, QueryNotFoundError, ServerNotFoundError]:
+        if type(exception) in [
+            RequestAuthorizationError,
+            QueryNotFoundError,
+            ServerNotFoundError,
+            UnexpectedRedirectError,
+        ]:
             raise exception
 
         raise ServerContextError(self, exception)

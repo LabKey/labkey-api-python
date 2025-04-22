@@ -158,6 +158,7 @@ def test_cannot_delete_qc_state_in_use(api: APIWrapper, qc_states, study, datase
     dataset_row_to_remove = [{"lsid": inserted_lsid}]
     api.query.delete_rows(SCHEMA_NAME, QUERY_NAME, dataset_row_to_remove)
 
+
 LISTS_SCHEMA = "lists"
 PARENT_LIST_NAME = "parent_list"
 PARENT_LIST_DEFINITION = {
@@ -214,6 +215,7 @@ child_two,parent_two
 child_three,parent_three
 """
 
+
 @pytest.fixture
 def parent_list_fixture(api: APIWrapper):
     api.domain.create(PARENT_LIST_DEFINITION)
@@ -251,11 +253,16 @@ def test_import_rows(api: APIWrapper, parent_list_fixture, child_list_fixture, t
     child_file.close()
     assert resp["success"] == False
     assert resp["errorCount"] == 1
-    assert resp["errors"][0]["exception"] == "Could not convert value 'parent_one' (String) for Integer field 'parent'"
+    assert (
+        resp["errors"][0]["exception"]
+        == "Could not convert value 'parent_one' (String) for Integer field 'parent'"
+    )
 
     # Should pass, because import_lookup_by_alternate_key is True
     child_file = child_data_path.open()
-    resp = api.query.import_rows("lists", CHILD_LIST_NAME, data_file=child_file, import_lookup_by_alternate_key=True)
+    resp = api.query.import_rows(
+        "lists", CHILD_LIST_NAME, data_file=child_file, import_lookup_by_alternate_key=True
+    )
     child_file.close()
     assert resp["success"] == True
     assert resp["rowCount"] == 3
