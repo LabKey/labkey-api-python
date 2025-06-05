@@ -10,67 +10,128 @@ api = APIWrapper(labkey_server, container_path, use_ssl=False)
 ###################
 # Create a data class domain
 ###################
-simple_molecules_domain = api.domain.create({
-    "kind": "DataClass",
-    "domainDesign": {
-        "name": "SimpleMolecules",
-        "fields": [
-            {"name": "formula", "label": "Chemical Formula", "rangeURI": "string"},
-            {"name": "molarMass", "label": "Molar Mass (g/mol)", "rangeURI": "double"},
-        ]
+simple_molecules_domain = api.domain.create(
+    {
+        "kind": "DataClass",
+        "domainDesign": {
+            "name": "SimpleMolecules",
+            "fields": [
+                {"name": "formula", "label": "Chemical Formula", "rangeURI": "string"},
+                {"name": "molarMass", "label": "Molar Mass (g/mol)", "rangeURI": "double"},
+            ],
+        },
     }
-})
+)
 
-api.query.insert_rows("exp.data", "SimpleMolecules", [
-    {"name": "Water", "formula": "H20", "molarMass": 18.01528},
-    {"name": "Salt", "formula": "NaCl", "molarMass": 58.443}
-])
+api.query.insert_rows(
+    "exp.data",
+    "SimpleMolecules",
+    [
+        {"name": "Water", "formula": "H20", "molarMass": 18.01528},
+        {"name": "Salt", "formula": "NaCl", "molarMass": 58.443},
+    ],
+)
 
 ###################
 # Create a second data class domain
 ###################
-substances_domain = api.domain.create({
-    "kind": "DataClass",
-    "domainDesign": {
-        "name": "Substances",
-        "fields": [
-            {"name": "type", "rangeURI": "string"},
-            {"name": "fromNature", "rangeURI": "boolean"},
-        ]
+substances_domain = api.domain.create(
+    {
+        "kind": "DataClass",
+        "domainDesign": {
+            "name": "Substances",
+            "fields": [
+                {"name": "type", "rangeURI": "string"},
+                {"name": "fromNature", "rangeURI": "boolean"},
+            ],
+        },
     }
-})
+)
 
-api.query.insert_rows("exp.data", "Substances", [
-    {"name": "Ocean Water", "type": "liquid", "fromNature": True, "DataInputs/SimpleMolecules": "Water, Salt"},
-    {"name": "Bath Water", "type": "liquid", "fromNature": False, "DataInputs/SimpleMolecules": "Water"}
-])
+api.query.insert_rows(
+    "exp.data",
+    "Substances",
+    [
+        {
+            "name": "Ocean Water",
+            "type": "liquid",
+            "fromNature": True,
+            "DataInputs/SimpleMolecules": "Water, Salt",
+        },
+        {
+            "name": "Bath Water",
+            "type": "liquid",
+            "fromNature": False,
+            "DataInputs/SimpleMolecules": "Water",
+        },
+    ],
+)
 
 ###################
 # Create a sample type domain
 ###################
-field_samples_domain = api.domain.create({
-    "kind": "SampleSet",
-    "domainDesign": {
-        "name": "FieldSamples",
-        "fields": [
-            {"name": "name", "rangeURI": "string"},
-            {"name": "receivedDate", "rangeURI": "dateTime"},
-            {"name": "volume_mL", "rangeURI": "int"},
-        ]
+field_samples_domain = api.domain.create(
+    {
+        "kind": "SampleSet",
+        "domainDesign": {
+            "name": "FieldSamples",
+            "fields": [
+                {"name": "name", "rangeURI": "string"},
+                {"name": "receivedDate", "rangeURI": "dateTime"},
+                {"name": "volume_mL", "rangeURI": "int"},
+            ],
+        },
     }
-})
+)
 
-api.query.insert_rows("samples", "FieldSamples", [
-    {"name": "OC-1", "receivedDate": "05/12/2025", "volume_mL": 400, "DataInputs/Substances": "Ocean Water"},
-    {"name": "OC-2", "receivedDate": "05/13/2025", "volume_mL": 600, "DataInputs/Substances": "Ocean Water"},
-    {"name": "OC-3", "receivedDate": "05/14/2025", "volume_mL": 800, "DataInputs/Substances": "Ocean Water"},
-
-    {"name": "BW-1", "receivedDate": "05/12/2025", "volume_mL": 400, "DataInputs/Substances": "Bath Water"},
-    {"name": "BW-2", "receivedDate": "05/13/2025", "volume_mL": 600, "DataInputs/Substances": "Bath Water"},
-    {"name": "BW-3", "receivedDate": "05/14/2025", "volume_mL": 800, "DataInputs/Substances": "Bath Water"},
-
-    {"name": "Mixed-1", "receivedDate": "05/18/2025", "volume_mL": 50, "DataInputs/Substances": "\"Bath Water\", \"Ocean Water\""},
-])
+api.query.insert_rows(
+    "samples",
+    "FieldSamples",
+    [
+        {
+            "name": "OC-1",
+            "receivedDate": "05/12/2025",
+            "volume_mL": 400,
+            "DataInputs/Substances": "Ocean Water",
+        },
+        {
+            "name": "OC-2",
+            "receivedDate": "05/13/2025",
+            "volume_mL": 600,
+            "DataInputs/Substances": "Ocean Water",
+        },
+        {
+            "name": "OC-3",
+            "receivedDate": "05/14/2025",
+            "volume_mL": 800,
+            "DataInputs/Substances": "Ocean Water",
+        },
+        {
+            "name": "BW-1",
+            "receivedDate": "05/12/2025",
+            "volume_mL": 400,
+            "DataInputs/Substances": "Bath Water",
+        },
+        {
+            "name": "BW-2",
+            "receivedDate": "05/13/2025",
+            "volume_mL": 600,
+            "DataInputs/Substances": "Bath Water",
+        },
+        {
+            "name": "BW-3",
+            "receivedDate": "05/14/2025",
+            "volume_mL": 800,
+            "DataInputs/Substances": "Bath Water",
+        },
+        {
+            "name": "Mixed-1",
+            "receivedDate": "05/18/2025",
+            "volume_mL": 50,
+            "DataInputs/Substances": '"Bath Water", "Ocean Water"',
+        },
+    ],
+)
 
 ###################
 # Query the lineage
@@ -82,7 +143,9 @@ query_name = "Substances"
 entity_name = "Ocean Water"
 
 # Fetch the LSID of the "seed" for the lineage request. In this case, we'll query for the "Ocean Water" entity in Substances.
-result = api.query.select_rows(schema_name, query_name, columns="Name, LSID", filter_array=[QueryFilter("name", entity_name)])
+result = api.query.select_rows(
+    schema_name, query_name, columns="Name, LSID", filter_array=[QueryFilter("name", entity_name)]
+)
 seed_lsid = result["rows"][0]["LSID"]
 
 # Lineage results includes the following:
@@ -93,6 +156,7 @@ seed_lsid = result["rows"][0]["LSID"]
 # "parents": An array of objects representing edges in the graph from nodes that refer to this node.
 # "children": An aray of objects representing edges in the graph to nodes to which this node refers.
 lineage_result = api.experiment.lineage([seed_lsid], depth=10)
+
 
 ###################
 # Traverse the lineage
@@ -114,9 +178,11 @@ def traverse_lineage(node_lsid, lineage_result, depth=0, visited=None, nodes_by_
         for edge in edges:
             related_lsid = edge["lsid"]
             related_node = lineage_result["nodes"][related_lsid]
-            nodes_by_depth[new_depth].add(related_node['name'])
+            nodes_by_depth[new_depth].add(related_node["name"])
 
-            traverse_lineage(related_lsid, lineage_result, new_depth, visited.copy(), nodes_by_depth)
+            traverse_lineage(
+                related_lsid, lineage_result, new_depth, visited.copy(), nodes_by_depth
+            )
 
     process_edges(node.get("parents", []), -1)
     process_edges(node.get("children", []), 1)
