@@ -1,3 +1,61 @@
+# LabKey Experiment Lineage API
+
+The LabKey Experiment Lineage API provides a powerful way to track and visualize relationships between 
+different entities in your experimental data. This API allows you to:
+
+1. **Query lineage relationships** between samples, materials, data, and other experimental entities
+1. **Traverse lineage graphs** in both upstream (parent) and downstream (child) directions
+
+The lineage API represents relationships as a directed graph where:
+
+- **Nodes** represent individual entities (samples, data objects, etc.)
+- **Edges** represent parent-child relationships between entities
+- Each node is uniquely identified by its **LSID** (Life Science Identifier)
+
+### API Parameters
+
+The Lineage API accepts the following parameters to control the scope and content of lineage queries:
+
+#### Core Parameters
+
+| Parameter  | Type        | Description                                                                                                                              |
+|------------|-------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| `lsids`    | `List[str]` | List of Life Science Identifiers (LSIDs) for which to retrieve lineage information. These are the "seed" entities for the lineage query. |
+| `depth`    | `int`       | Maximum number of generations to traverse in the lineage graph. Default maximum is 100.                                                  |
+| `parents`  | `bool`      | Whether to include parent (upstream) relationships in the lineage query. Default is `True`.                                              |
+| `children` | `bool`      | Whether to include child (downstream) relationships in the lineage query. Default is `True`.                                             |
+
+#### Filtering Parameters
+The following filter parameters filter nodes in graph to only match against the corresponding filter(s). NOTE: Using
+these filters can produce **disconnected graphs**.
+
+| Parameter           | Type  | Description                                                                                               |
+|---------------------|-------|-----------------------------------------------------------------------------------------------------------|
+| `exp_type`          | `str` | Filter lineage by experiment type. Possible values: `ALL`, `Data`, `Material`, `ExperimentRun`, `Object`. |
+| `cpas_type`         | `str` | Filter lineage by CPAS type (optional).                                                                   |
+| `run_protocol_lsid` | `str` | Filter lineage to only include entities associated with a specific protocol (optional).                   |
+
+#### Data Inclusion Parameters
+
+| Parameter                    | Type   | Description                                                                                   |
+|------------------------------|--------|-----------------------------------------------------------------------------------------------|
+| `include_properties`         | `bool` | Whether to include entity properties in the response. Default is `False`.                     |
+| `include_inputs_and_outputs` | `bool` | Whether to include detailed input and output information for each entity. Default is `False`. |
+| `include_run_steps`          | `bool` | Whether to include experiment run step information. Default is `False`.                       |
+
+## Response Structure
+The Lineage API response includes:
+- **seed**: The LSID(s) of the provided seed node(s)
+- **nodes**: A dictionary of all nodes in the lineage graph, keyed by LSID
+- Each node contains:
+    - **name**: Display name of the entity
+    - **parents**: Array of objects representing parent relationships
+    - **children**: Array of objects representing child relationships
+    - Additional properties when requested via inclusion parameters
+
+### Examples
+
+```python
 from collections import defaultdict
 
 from labkey.api_wrapper import APIWrapper
@@ -142,21 +200,13 @@ schema_name = "exp.data"
 query_name = "Substances"
 entity_name = "Ocean Water"
 
-# Fetch the LSID of the "seed" for the lineage request. In this case, we'll query for the "Ocean Water" entity in Substances.
+# Fetch the LSID of the "seed" for the lineage request
 result = api.query.select_rows(
     schema_name, query_name, columns="Name, LSID", filter_array=[QueryFilter("name", entity_name)]
 )
 seed_lsid = result["rows"][0]["LSID"]
 
-# Lineage results includes the following:
-# "seed": The LSID of all furnished seed nodes. A string if only a single seed, otherwise, an array of strings.
-# "nodes": A dictionary of lineage node objects keyed by each node's LSID. Nodes are linked together by their "parents" and "children" edges.
-#
-# On each node the following properties allow for traversal of the flattened graph structure.
-# "parents": An array of objects representing edges in the graph from nodes that refer to this node.
-# "children": An aray of objects representing edges in the graph to nodes to which this node refers.
 lineage_result = api.experiment.lineage([seed_lsid], depth=10)
-
 
 ###################
 # Traverse the lineage
@@ -231,3 +281,4 @@ for depth in range(1, max(nodes_by_depth.keys()) + 1):
 # 	OC-2
 # 	OC-3
 ###################
+```
