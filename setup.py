@@ -49,6 +49,7 @@ setup(
     url="https://github.com/LabKey/labkey-api-python",
     packages=packages,
     package_data={},
+    python_requires=">=3.10", # Note: update README.md supported versions if you change this
     install_requires=["requests"],
     extras_require={"test": tests_require, "dev": dev_require, "build": build_require},
     keywords="labkey api client",

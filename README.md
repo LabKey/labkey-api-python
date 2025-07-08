@@ -113,7 +113,8 @@ else:
 ```
 
 ## Supported Versions
-Python 3.7+ is fully supported.
+# Note: update setup.py python_requires if you change this
+Python 3.10+ is fully supported.
 LabKey Server v15.1 and later.
 
 ## Contributing
