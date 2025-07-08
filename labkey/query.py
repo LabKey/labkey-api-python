@@ -15,15 +15,15 @@
 #
 """
 ############################################################################
-NAME: 
-LabKey Query API 
+NAME:
+LabKey Query API
 
-SUMMARY:  
+SUMMARY:
 This module provides functions for interacting with data on a LabKey Server.
 
 DESCRIPTION:
-This module is designed to simplify querying and manipulating data in LabKey Server.  
-Its APIs are modeled after the LabKey Server JavaScript APIs of the same names. 
+This module is designed to simplify querying and manipulating data in LabKey Server.
+Its APIs are modeled after the LabKey Server JavaScript APIs of the same names.
 
 Installation and Setup for the LabKey Python API:
 https://github.com/LabKey/labkey-api-python/blob/master/README.md
@@ -41,7 +41,7 @@ https://www.labkey.org/home/developer/forum/project-start.view
 ############################################################################
 """
 import functools
-from typing import List, TextIO
+from typing import List, Literal, NotRequired, TextIO, TypedDict
 
 from .server_context import ServerContext
 from .utils import waf_encode
@@ -196,7 +196,7 @@ def delete_rows(
     :param transacted: whether all of the updates should be done in a single transaction
     :param audit_behavior: used to override the audit behavior for the update. See class query.AuditBehavior
     :param audit_user_comment: used to provide a comment that will be attached to certain detailed audit log records
-    :param timeout: timeout of request in seconds (defaults to 30s)
+    :param timeout: timeout of request in seconds (defaults to 300s)
     :return:
     """
     url = server_context.build_url("query", "deleteRows.api", container_path=container_path)
@@ -232,7 +232,7 @@ def truncate_table(
     :param schema_name: schema of table
     :param query_name: table name to delete from
     :param container_path: labkey container path if not already set in context
-    :param timeout: timeout of request in seconds (defaults to 30s)
+    :param timeout: timeout of request in seconds (defaults to 300s)
     :return:
     """
     url = server_context.build_url("query", "truncateTable.api", container_path=container_path)
@@ -275,7 +275,7 @@ def execute_sql(
     :param save_in_session: save query result as a named view to the session
     :param parameters: parameter values to pass through to a parameterized query
     :param required_version: Api version of response
-    :param timeout: timeout of request in seconds (defaults to 30s)
+    :param timeout: timeout of request in seconds (defaults to 300s)
     :param waf_encode_sql: WAF encode sql in request (defaults to True)
     :return:
     """
@@ -331,7 +331,7 @@ def insert_rows(
     :param transacted: whether all of the updates should be done in a single transaction
     :param audit_behavior: used to override the audit behavior for the update. See class query.AuditBehavior
     :param audit_user_comment: used to provide a comment that will be attached to certain detailed audit log records
-    :param timeout: timeout of request in seconds (defaults to 30s)
+    :param timeout: timeout of request in seconds (defaults to 300s)
     :return:
     """
     url = server_context.build_url("query", "insertRows.api", container_path=container_path)
@@ -407,6 +407,93 @@ def import_rows(
     return server_context.make_request(url, payload, method="POST", file_payload=file_payload)
 
 
+class Command(TypedDict):
+    """
+    TypedDict representing a command for saveRows API.
+    """
+
+    audit_behavior: NotRequired[AuditBehavior]
+    audit_user_comment: NotRequired[str]
+    command: Literal["insert", "update", "delete"]
+    container_path: NotRequired[str]
+    extra_context: NotRequired[dict]
+    query_name: str
+    rows: List[any]
+    schema_name: str
+    skip_reselect_rows: NotRequired[bool]
+
+
+def save_rows(
+    server_context: ServerContext,
+    commands: List[Command],
+    api_version: float = None,
+    container_path: str = None,
+    extra_context: dict = None,
+    timeout: int = _default_timeout,
+    transacted: bool = None,
+    validate_only: bool = None,
+):
+    """
+    Save inserts, updates, and/or deletes to potentially multiple tables with a single request.
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param commands: A List of the update/insert/delete operations to be performed.
+    :param api_version: decimal value that indicates the response version of the api. If this is 13.2 or higher, a
+    request that fails validation will be returned as a successful response. Use the 'errorCount' and 'committed'
+    properties in the response to tell if it committed or not.
+    :param container_path: folder path if not already part of server_context
+    :param extra_context: Extra context object passed into the transformation/validation script environment.
+    :param timeout: Request timeout in seconds (defaults to 300s)
+    :param transacted: Whether all the commands should be done in a single transaction, so they all succeed or all
+    fail. Defaults to true.
+    :param validate_only: Whether the server should attempt to proceed through all the commands but not commit them to
+    the database. Useful for scenarios like giving incremental validation feedback as a user fills out a UI form but
+    does not save anything until they explicitly request a save.
+    """
+    url = server_context.build_url("query", "saveRows.api", container_path=container_path)
+
+    json_commands = []
+    for command in commands:
+        json_command = {
+            "command": command["command"],
+            "queryName": command["query_name"],
+            "schemaName": command["schema_name"],
+            "rows": command["rows"],
+        }
+
+        if command.get("audit_behavior") is not None:
+            json_command["auditBehavior"] = command["audit_behavior"]
+
+        if command.get("audit_user_comment") is not None:
+            json_command["auditUserComment"] = command["audit_user_comment"]
+
+        if command.get("container_path") is not None:
+            json_command["containerPath"] = command["container_path"]
+
+        if command.get("extra_context") is not None:
+            json_command["extraContext"] = command["extra_context"]
+
+        if command.get("skip_reselect_rows") is not None:
+            json_command["skipReselectRows"] = command["skip_reselect_rows"]
+
+        json_commands.append(json_command)
+
+    payload = {"commands": json_commands}
+
+    if api_version is not None:
+        payload["apiVersion"] = api_version
+
+    if extra_context is not None:
+        payload["extraContext"] = extra_context
+
+    if transacted is not None:
+        payload["transacted"] = transacted
+
+    if validate_only is not None:
+        payload["validateOnly"] = validate_only
+
+    return server_context.make_request(url, json=payload, timeout=timeout)
+
+
 def select_rows(
     server_context: ServerContext,
     schema_name: str,
@@ -450,7 +537,7 @@ def select_rows(
     :param include_update_column: Boolean value that indicates whether to include an Update link column in results
     :param selection_key:
     :param required_version: decimal value that indicates the response version of the api
-    :param timeout: Request timeout in seconds (defaults to 30s)
+    :param timeout: Request timeout in seconds (defaults to 300s)
     :param ignore_filter: Boolean, if true, the command will ignore any filter that may be part of the chosen view.
     :return:
     """
@@ -534,7 +621,7 @@ def update_rows(
     :param transacted: whether all of the updates should be done in a single transaction
     :param audit_behavior: used to override the audit behavior for the update. See class query.AuditBehavior
     :param audit_user_comment: used to provide a comment that will be attached to certain detailed audit log records
-    :param timeout: timeout of request in seconds (defaults to 30s)
+    :param timeout: timeout of request in seconds (defaults to 300s)
     :return:
     """
     url = server_context.build_url("query", "updateRows.api", container_path=container_path)
@@ -580,7 +667,7 @@ def move_rows(
     :param transacted: whether all of the updates should be done in a single transaction
     :param audit_behavior: used to override the audit behavior for the update. See class query.AuditBehavior
     :param audit_user_comment: used to provide a comment that will be attached to certain detailed audit log records
-    :param timeout: timeout of request in seconds (defaults to 30s)
+    :param timeout: timeout of request in seconds (defaults to 300s)
     :return:
     """
     url = server_context.build_url("query", "moveRows.api", container_path=container_path)
@@ -724,6 +811,28 @@ class QueryWrapper:
             insert_option,
             audit_behavior,
             import_lookup_by_alternate_key,
+        )
+
+    @functools.wraps(save_rows)
+    def save_rows(
+        self,
+        commands: List[Command],
+        api_version: float = None,
+        container_path: str = None,
+        extra_context: dict = None,
+        timeout: int = _default_timeout,
+        transacted: bool = None,
+        validate_only: bool = None,
+    ):
+        return save_rows(
+            self.server_context,
+            commands,
+            api_version,
+            container_path,
+            extra_context,
+            timeout,
+            transacted,
+            validate_only,
         )
 
     @functools.wraps(select_rows)
