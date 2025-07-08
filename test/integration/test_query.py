@@ -242,14 +242,14 @@ def test_import_rows(api: APIWrapper, parent_list_fixture, child_list_fixture, t
 
     # Should succeed
     parent_file = parent_data_path.open()
-    resp = api.query.import_rows("lists", PARENT_LIST_NAME, data_file=parent_file)
+    resp = api.query.import_rows(LISTS_SCHEMA, PARENT_LIST_NAME, data_file=parent_file)
     parent_file.close()
     assert resp["success"] == True
     assert resp["rowCount"] == 3
 
     # Should fail, because data doesn't use rowIds and import_lookup_by_alternate_key defaults to False
     child_file = child_data_path.open()
-    resp = api.query.import_rows("lists", CHILD_LIST_NAME, data_file=child_file)
+    resp = api.query.import_rows(LISTS_SCHEMA, CHILD_LIST_NAME, data_file=child_file)
     child_file.close()
     assert resp["success"] == False
     assert resp["errorCount"] == 1
@@ -261,8 +261,152 @@ def test_import_rows(api: APIWrapper, parent_list_fixture, child_list_fixture, t
     # Should pass, because import_lookup_by_alternate_key is True
     child_file = child_data_path.open()
     resp = api.query.import_rows(
-        "lists", CHILD_LIST_NAME, data_file=child_file, import_lookup_by_alternate_key=True
+        LISTS_SCHEMA, CHILD_LIST_NAME, data_file=child_file, import_lookup_by_alternate_key=True
     )
     child_file.close()
     assert resp["success"] == True
     assert resp["rowCount"] == 3
+
+
+SAMPLES_SCHEMA = "samples"
+BLOOD_SAMPLE_TYPE = "Blood"
+TISSUE_SAMPLE_TYPE = "Tissues"
+
+
+@pytest.fixture
+def blood_sample_type_fixture(api: APIWrapper):
+    api.domain.create(
+        {
+            "kind": "SampleSet",
+            "domainDesign": {
+                "name": BLOOD_SAMPLE_TYPE,
+                "description": "Blood samples.",
+                "fields": [
+                    {"name": "Name", "rangeURI": "string"},
+                    {"name": "volume_mL", "rangeURI": "int"},
+                    {"name": "DrawDate", "rangeURI": "dateTime"},
+                    {"name": "ReceivedDate", "rangeURI": "dateTime"},
+                    {"name": "ProblemWithTube", "rangeURI": "boolean"},
+                ],
+            },
+        }
+    )
+    created_sample_type = api.domain.get(SAMPLES_SCHEMA, BLOOD_SAMPLE_TYPE)
+    yield created_sample_type
+    # clean up
+    api.domain.drop(SAMPLES_SCHEMA, BLOOD_SAMPLE_TYPE)
+
+
+@pytest.fixture
+def tissue_sample_type_fixture(api: APIWrapper):
+    api.domain.create(
+        {
+            "kind": "SampleSet",
+            "domainDesign": {
+                "name": TISSUE_SAMPLE_TYPE,
+                "description": "Tissue samples.",
+                "fields": [
+                    {"name": "Name", "rangeURI": "string"},
+                    {"name": "mass_mg", "rangeURI": "int"},
+                    {"name": "ReceivedDate", "rangeURI": "dateTime"},
+                ],
+            },
+        }
+    )
+    created_sample_type = api.domain.get(SAMPLES_SCHEMA, TISSUE_SAMPLE_TYPE)
+    yield created_sample_type
+    # clean up
+    api.domain.drop(SAMPLES_SCHEMA, TISSUE_SAMPLE_TYPE)
+
+
+def test_api_save_rows(api: APIWrapper, blood_sample_type_fixture, tissue_sample_type_fixture):
+    commands = [
+        {
+            "command": "insert",
+            "schema_name": SAMPLES_SCHEMA,
+            "query_name": BLOOD_SAMPLE_TYPE,
+            "rows": [{"name": "BL-1"}, {"description": "Should be BL-2 but I forgot to name it"}],
+        },
+        {
+            "command": "insert",
+            "schema_name": SAMPLES_SCHEMA,
+            "query_name": TISSUE_SAMPLE_TYPE,
+            "rows": [{"name": "T-1"}],
+        },
+    ]
+
+    # Expect to fail this request since the sample name was not specified for one of the rows
+    with pytest.raises(ServerContextError) as e:
+        api.query.save_rows(commands=commands)
+    assert e.value.message == "400: SampleID or Name is required for sample on row 2"
+
+    # Attempt the same request but with a 13.2 api version
+    resp = api.query.save_rows(api_version=13.2, commands=commands)
+    assert resp["committed"] == False
+    assert resp["errorCount"] == 1
+    assert (
+        resp["result"][0]["errors"]["exception"]
+        == "SampleID or Name is required for sample on row 2"
+    )
+
+    # Fix the first command by specifying a name for the sample
+    commands[0]["rows"][1]["name"] = "BL-2"
+
+    resp = api.query.save_rows(commands=commands)
+    assert resp["committed"] == True
+    assert resp["errorCount"] == 0
+    assert len(resp["result"][0]["rows"]) == 2
+    assert len(resp["result"][1]["rows"]) == 1
+
+    first_blood_row_id = resp["result"][0]["rows"][0]["rowid"]
+    assert first_blood_row_id > 0
+
+    first_tissue_row_id = resp["result"][1]["rows"][0]["rowid"]
+    assert first_tissue_row_id > 0
+
+    # Perform an insert, update, and delete all in the same request
+    commands = [
+        {
+            "command": "insert",
+            "schema_name": SAMPLES_SCHEMA,
+            "query_name": BLOOD_SAMPLE_TYPE,
+            "rows": [
+                {"name": "BL-3", "MaterialInputs/Tissues": "T-1"},
+                {"name": "BL-4", "MaterialInputs/Blood": "BL-2"},
+            ],
+        },
+        {
+            "command": "delete",
+            "schema_name": SAMPLES_SCHEMA,
+            "query_name": BLOOD_SAMPLE_TYPE,
+            "rows": [
+                {"rowId": first_blood_row_id},
+            ],
+        },
+        {
+            "command": "update",
+            "schema_name": SAMPLES_SCHEMA,
+            "query_name": TISSUE_SAMPLE_TYPE,
+            "rows": [
+                {"rowId": first_tissue_row_id, "ReceivedDate": "2025-07-07 12:34:56"},
+            ],
+        },
+    ]
+
+    resp = api.query.save_rows(commands=commands)
+    assert resp["committed"] == True
+    assert resp["errorCount"] == 0
+
+    # Verify insert
+    assert resp["result"][0]["rowsAffected"] == 2
+    assert resp["result"][0]["rows"][0]["name"] == "BL-3"
+    assert resp["result"][0]["rows"][1]["name"] == "BL-4"
+
+    # Verify delete
+    assert resp["result"][1]["rowsAffected"] == 1
+    assert resp["result"][1]["rows"][0]["rowid"] == first_blood_row_id
+
+    # Verify update
+    assert resp["result"][2]["rowsAffected"] == 1
+    assert resp["result"][2]["rows"][0]["rowid"] == first_tissue_row_id
+    assert resp["result"][2]["rows"][0]["receiveddate"] == "2025-07-07 12:34:56.000"

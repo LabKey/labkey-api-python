@@ -2,6 +2,14 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 4.0.0 package
+==============================
+
+*Release date: 07/08/2025*
+- Add save_rows API to query module
+    - Accessible via API wrappers e.g. api.query.save_rows
+- Update the minimum required version of Python to 3.10
+
 What's New in the LabKey 3.4.0 package
 ==============================
 
