@@ -110,6 +110,7 @@ class PropertyDescriptor:
         self.type_editable = kwargs.pop("type_editable", kwargs.pop("typeEditable", None))
         self.url = kwargs.pop("url", None)
         self.value_expression = kwargs.pop("value_expression", kwargs.pop("valueExpression", None))
+        self.derivationDataScope = kwargs.pop("derivation_datascope", kwargs.pop("derivationDataScope", None))
 
     def to_json(self, strip_none=True):
         # TODO: Likely only want to include those that are not None
@@ -120,6 +121,7 @@ class PropertyDescriptor:
             "defaultScale": self.default_scale,
             "defaultValue": self.default_value,
             "defaultValueType": self.default_value_type,
+            "derivationDataScope": self.derivationDataScope,
             "description": self.description,
             "dimension": self.dimension,
             "disableEditing": self.disable_editing,
