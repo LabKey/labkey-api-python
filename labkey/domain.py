@@ -48,6 +48,9 @@ class PropertyDescriptor:
         self.default_value_type = kwargs.pop(
             "default_value_type", kwargs.pop("defaultValueType", None)
         )
+        self.derivation_data_scope = kwargs.pop(
+            "derivation_data_scope", kwargs.pop("derivationDataScope", None)
+        )
         self.description = kwargs.pop("description", None)
         self.dimension = kwargs.pop("dimension", None)
         self.disable_editing = kwargs.pop("disable_editing", kwargs.pop("disableEditing", None))
@@ -120,6 +123,7 @@ class PropertyDescriptor:
             "defaultScale": self.default_scale,
             "defaultValue": self.default_value,
             "defaultValueType": self.default_value_type,
+            "derivationDataScope": self.derivation_data_scope,
             "description": self.description,
             "dimension": self.dimension,
             "disableEditing": self.disable_editing,
