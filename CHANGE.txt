@@ -5,7 +5,7 @@ LabKey Python Client API News
 What's New in the LabKey 4.0.1 package
 ==============================
 
-*Release date: 09/19/2025*
+*Release date: 09/22/2025*
 - Update the minimum required version of Python to 3.11. Correction from the 4.0.0 release.
 
 What's New in the LabKey 4.0.0 package
