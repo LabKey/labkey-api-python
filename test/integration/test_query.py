@@ -338,7 +338,7 @@ def test_api_save_rows(api: APIWrapper, blood_sample_type_fixture, tissue_sample
     # Expect to fail this request since the sample name was not specified for one of the rows
     with pytest.raises(ServerContextError) as e:
         api.query.save_rows(commands=commands)
-    assert e.value.message == "400: SampleID or Name is required for sample on row 2"
+    assert e.value.message == "400: SampleID or Name is required for sample on row 2."
 
     # Attempt the same request but with a 13.2 api version
     resp = api.query.save_rows(api_version=13.2, commands=commands)
@@ -346,7 +346,7 @@ def test_api_save_rows(api: APIWrapper, blood_sample_type_fixture, tissue_sample
     assert resp["errorCount"] == 1
     assert (
         resp["result"][0]["errors"]["exception"]
-        == "SampleID or Name is required for sample on row 2"
+        == "SampleID or Name is required for sample on row 2."
     )
 
     # Fix the first command by specifying a name for the sample
