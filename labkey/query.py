@@ -60,7 +60,6 @@ class Pagination:
     ALL = "all"
     NONE = "none"
 
-
 # TODO: Provide filter generators.
 #
 # There are some inconsistencies between the different filter types with multiple values,
@@ -114,6 +113,12 @@ class QueryFilter:
         CONTAINS_ONE_OF = "containsoneof"
         CONTAINS_NONE_OF = "containsnoneof"
 
+        ARRAY_CONTAINS_ALL = "arraycontainsall"
+        ARRAY_CONTAINS_ANY = "arraycontainsany"
+        ARRAY_CONTAINS_NONE = "arraycontainsnone"
+        ARRAY_CONTAINS_EXACT = "arraymatches"
+        ARRAY_CONTAINS_NOT_EXACT = "arraynotmatches"
+
         IN = "in"
 
         EQUALS_ONE_OF = "in"
@@ -134,6 +139,10 @@ class QueryFilter:
 
         HAS_MISSING_VALUE = "hasmvvalue"
         DOES_NOT_HAVE_MISSING_VALUE = "nomvvalue"
+
+        ARRAY_ISEMPTY = "arrayisempty"
+        ARRAY_ISNOTEMPTY = "arrayisnotempty"
+
 
         # Table/Query-wise operators
         Q = "q"
