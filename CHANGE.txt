@@ -2,6 +2,12 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 4.0.2 package
+==============================
+
+*Release date: 02/24/2026*
+- Add array filter types
+
 What's New in the LabKey 4.0.1 package
 ==============================
 
