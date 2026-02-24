@@ -4,8 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name="labkey"
+version = "4.1.0"
 description = "Python client API for LabKey Server"
 dependencies = ["requests>=2.32.5"]
+readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 license-files = ["LICENSE.txt"]
@@ -25,7 +27,6 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering",
 ]
-version = "4.0.2"
 
 [tool.hatch.build.targets.sdist]
 only-include = ["labkey"]
