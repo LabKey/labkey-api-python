@@ -1,7 +1,7 @@
 from typing import Dict, TextIO
 from labkey.utils import json_dumps
-from . import __version__
 import requests
+import importlib.metadata
 from requests.exceptions import RequestException
 from labkey.exceptions import (
     RequestError,
@@ -14,6 +14,7 @@ from labkey.exceptions import (
 
 API_KEY_TOKEN = "apikey"
 CSRF_TOKEN = "X-LABKEY-CSRF"
+client_version = importlib.metadata.version("labkey")
 
 
 def handle_response(response, non_json_response=False):
@@ -76,7 +77,9 @@ class ServerContext:
         self._disable_csrf = disable_csrf
         self.allow_redirects = allow_redirects
         self._session = requests.Session()
-        self._session.headers.update({"User-Agent": f"LabKey Python API/{__version__}"})
+        self._session.headers.update({"User-Agent": f"LabKey Python API/{client_version}"})
+
+        print(f"User Agent header: LabKey Python API/{client_version}")
 
         if self._use_ssl:
             self._scheme = "https://"

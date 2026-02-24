@@ -121,10 +121,13 @@ This package is maintained by [LabKey](http://www.labkey.com/). If you have any 
 [LabKey Server developer support forum](https://www.labkey.org/home/developer/forum/project-start.view).
 
 ### Setup
+We use the Just command runner to simplify setup and development with this package. You'll want to install just to work
+on this package. Installation instructions can be found here: https://just.systems/man/en/packages.html
+
 To install the necessary dependencies for local development you can run the following command:
 
 ```bash
-pip install -e '.[dev]'
+just install
 ```
 
 
@@ -135,20 +138,27 @@ When contributing changes please use `Black` to format your code. To run Black y
 black .
 ```
 
-After black has run it may have formatted some files, commit the changed files before opening a PR.
+After black has run, it may have formatted some files, commit the changed files before opening a PR.
 
 ### Testing
-If you are looking to contribute please run the tests before issuing a PR. The tests can be run with:
+If you are looking to contribute please run the tests before issuing a PR.
+
+To run only the unit tests, run the following command:
 
 ```bash
-$ pytest .
+just test-unit
 ```
 
-The integration tests do not run by default. If you want to run the integration tests make sure you have a live server
-running, a netrc file, and run the following command:
+To run the integration tests, make sure you have a live server running, a netrc file, and run the following command:
 
 ```bash
-$ pytest . -m "integration"
+just test-integration
+```
+
+To run all tests, run the following command:
+
+```bash
+just test
 ```
 
 ### Maintainers
@@ -158,13 +168,13 @@ releases.
 To build the package before releasing you will need to install the build dependencies. This can be done by running:
 
 ```bash
-pip install -e '.[build]'
+just install-build
 ```
 
 To build the package you can run:
 
 ```bash
-python -m build
+just build
 ```
 
 You should now have a `dist/` folder with two files:
