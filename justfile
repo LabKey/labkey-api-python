@@ -8,7 +8,7 @@ release:
 	hatch publish
 
 install:
-	pip install -e '.[dev,tests]'
+	pip install -e '.[dev,test]'
 
 install-build:
     pip install -e '.[build]'

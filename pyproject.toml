@@ -32,7 +32,7 @@ classifiers = [
 only-include = ["labkey"]
 
 [project.optional-dependencies]
-tests = ["pytest>=9.0.2", "mock>=5.2.0", "pytest-cov>=7.0.0"]
+test = ["pytest>=9.0.2", "mock>=5.2.0", "pytest-cov>=7.0.0"]
 dev = ["black>=26.1.0", "pytest>=9.0.2", "mock>=5.2.0", "pytest-cov>=7.0.0", "hatch>=1.16.4"]
 
 [project.urls]
