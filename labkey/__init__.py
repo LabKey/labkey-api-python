@@ -13,7 +13,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-__title__ = "labkey"
-__version__ = "4.0.2"
-__author__ = "LabKey"
-__license__ = "Apache License 2.0"
