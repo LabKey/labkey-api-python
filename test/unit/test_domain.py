@@ -42,7 +42,6 @@ from .utilities import (
     throws_error_test_get,
 )
 
-
 domain_controller = "property"
 
 
@@ -83,7 +82,7 @@ class TestCreate(unittest.TestCase):
             create,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -94,7 +93,7 @@ class TestCreate(unittest.TestCase):
             self.service.get_unauthorized_response(),
             create,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -134,7 +133,7 @@ class TestDrop(unittest.TestCase):
             drop,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -145,7 +144,7 @@ class TestDrop(unittest.TestCase):
             self.service.get_unauthorized_response(),
             drop,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -183,7 +182,7 @@ class TestGet(unittest.TestCase):
             get,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -194,7 +193,7 @@ class TestGet(unittest.TestCase):
             self.service.get_unauthorized_response(),
             get,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -234,7 +233,7 @@ class TestInferFields(unittest.TestCase):
             infer_fields,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -245,7 +244,7 @@ class TestInferFields(unittest.TestCase):
             self.service.get_unauthorized_response(),
             infer_fields,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -297,7 +296,7 @@ class TestSave(unittest.TestCase):
             save,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -308,7 +307,7 @@ class TestSave(unittest.TestCase):
             self.service.get_unauthorized_response(),
             save,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -365,7 +364,7 @@ class TestConditionalFormatCreate(unittest.TestCase):
             create,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -376,7 +375,7 @@ class TestConditionalFormatCreate(unittest.TestCase):
             self.service.get_unauthorized_response(),
             create,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -455,7 +454,7 @@ class TestConditionalFormatSave(unittest.TestCase):
             save,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -466,7 +465,7 @@ class TestConditionalFormatSave(unittest.TestCase):
             self.service.get_unauthorized_response(),
             save,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 

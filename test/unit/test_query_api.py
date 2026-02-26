@@ -95,7 +95,7 @@ class TestDeleteRows(unittest.TestCase):
             delete_rows,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -106,7 +106,7 @@ class TestDeleteRows(unittest.TestCase):
             self.service.get_unauthorized_response(),
             delete_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -117,7 +117,7 @@ class TestDeleteRows(unittest.TestCase):
             self.service.get_query_not_found_response(),
             delete_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -128,7 +128,7 @@ class TestDeleteRows(unittest.TestCase):
             self.service.get_server_not_found_response(),
             delete_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -139,7 +139,7 @@ class TestDeleteRows(unittest.TestCase):
             self.service.get_general_error_response(),
             delete_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -173,7 +173,7 @@ class TestUpdateRows(unittest.TestCase):
             update_rows,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -184,7 +184,7 @@ class TestUpdateRows(unittest.TestCase):
             self.service.get_unauthorized_response(),
             update_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -195,7 +195,7 @@ class TestUpdateRows(unittest.TestCase):
             self.service.get_query_not_found_response(),
             update_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -206,7 +206,7 @@ class TestUpdateRows(unittest.TestCase):
             self.service.get_server_not_found_response(),
             update_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -217,7 +217,7 @@ class TestUpdateRows(unittest.TestCase):
             self.service.get_general_error_response(),
             update_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -251,7 +251,7 @@ class TestInsertRows(unittest.TestCase):
             insert_rows,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -262,7 +262,7 @@ class TestInsertRows(unittest.TestCase):
             self.service.get_unauthorized_response(),
             insert_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -273,7 +273,7 @@ class TestInsertRows(unittest.TestCase):
             self.service.get_query_not_found_response(),
             insert_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -284,7 +284,7 @@ class TestInsertRows(unittest.TestCase):
             self.service.get_server_not_found_response(),
             insert_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -295,7 +295,7 @@ class TestInsertRows(unittest.TestCase):
             self.service.get_general_error_response(),
             insert_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -321,7 +321,7 @@ class TestExecuteSQL(unittest.TestCase):
             execute_sql,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -332,7 +332,7 @@ class TestExecuteSQL(unittest.TestCase):
             self.service.get_unauthorized_response(),
             execute_sql,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -343,7 +343,7 @@ class TestExecuteSQL(unittest.TestCase):
             self.service.get_query_not_found_response(),
             execute_sql,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -354,7 +354,7 @@ class TestExecuteSQL(unittest.TestCase):
             self.service.get_server_not_found_response(),
             execute_sql,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -365,7 +365,7 @@ class TestExecuteSQL(unittest.TestCase):
             self.service.get_general_error_response(),
             execute_sql,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -390,7 +390,7 @@ class TestSelectRows(unittest.TestCase):
             select_rows,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_filter(self):
@@ -416,7 +416,7 @@ class TestSelectRows(unittest.TestCase):
             select_rows,
             True,
             *args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -427,7 +427,7 @@ class TestSelectRows(unittest.TestCase):
             self.service.get_unauthorized_response(),
             select_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -438,7 +438,7 @@ class TestSelectRows(unittest.TestCase):
             self.service.get_query_not_found_response(),
             select_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -449,7 +449,7 @@ class TestSelectRows(unittest.TestCase):
             self.service.get_server_not_found_response(),
             select_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -460,7 +460,7 @@ class TestSelectRows(unittest.TestCase):
             self.service.get_general_error_response(),
             select_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -505,7 +505,7 @@ class TestSaveRows(unittest.TestCase):
             save_rows,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -516,7 +516,7 @@ class TestSaveRows(unittest.TestCase):
             self.service.get_unauthorized_response(),
             save_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -527,7 +527,7 @@ class TestSaveRows(unittest.TestCase):
             self.service.get_query_not_found_response(),
             save_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -538,7 +538,7 @@ class TestSaveRows(unittest.TestCase):
             self.service.get_server_not_found_response(),
             save_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -549,7 +549,7 @@ class TestSaveRows(unittest.TestCase):
             self.service.get_general_error_response(),
             save_rows,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_with_optional_command_fields(self):

@@ -221,7 +221,7 @@ class TestLoadBatch(unittest.TestCase):
             load_batch,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -232,7 +232,7 @@ class TestLoadBatch(unittest.TestCase):
             self.service.get_unauthorized_response(),
             load_batch,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -243,7 +243,7 @@ class TestLoadBatch(unittest.TestCase):
             self.service.get_query_not_found_response(),
             load_batch,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -254,7 +254,7 @@ class TestLoadBatch(unittest.TestCase):
             self.service.get_server_not_found_response(),
             load_batch,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -265,7 +265,7 @@ class TestLoadBatch(unittest.TestCase):
             self.service.get_general_error_response(),
             load_batch,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -304,7 +304,7 @@ class TestSaveBatch(unittest.TestCase):
             save_batch,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -315,7 +315,7 @@ class TestSaveBatch(unittest.TestCase):
             self.service.get_unauthorized_response(),
             save_batch,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -326,7 +326,7 @@ class TestSaveBatch(unittest.TestCase):
             self.service.get_query_not_found_response(),
             save_batch,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -337,7 +337,7 @@ class TestSaveBatch(unittest.TestCase):
             self.service.get_server_not_found_response(),
             save_batch,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -348,7 +348,7 @@ class TestSaveBatch(unittest.TestCase):
             self.service.get_general_error_response(),
             save_batch,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 

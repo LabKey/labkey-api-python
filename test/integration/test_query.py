@@ -346,8 +346,8 @@ def test_api_save_rows(api: APIWrapper, blood_sample_type_fixture, tissue_sample
     assert resp["committed"] == False
     assert resp["errorCount"] == 1
     assert (
-        "SampleID or Name is required for sample on row 2" in
-        resp["result"][0]["errors"]["exception"]
+        "SampleID or Name is required for sample on row 2"
+        in resp["result"][0]["errors"]["exception"]
     )
 
     # Fix the first command by specifying a name for the sample

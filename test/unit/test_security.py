@@ -78,7 +78,7 @@ class TestCreateUser(unittest.TestCase):
             create_user,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -89,7 +89,7 @@ class TestCreateUser(unittest.TestCase):
             self.service.get_unauthorized_response(),
             create_user,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -100,7 +100,7 @@ class TestCreateUser(unittest.TestCase):
             self.service.get_query_not_found_response(),
             create_user,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -111,7 +111,7 @@ class TestCreateUser(unittest.TestCase):
             self.service.get_server_not_found_response(),
             create_user,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -122,7 +122,7 @@ class TestCreateUser(unittest.TestCase):
             self.service.get_general_error_response(),
             create_user,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -152,7 +152,7 @@ class TestResetPassword(unittest.TestCase):
             reset_password,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -163,7 +163,7 @@ class TestResetPassword(unittest.TestCase):
             self.service.get_unauthorized_response(),
             reset_password,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -174,7 +174,7 @@ class TestResetPassword(unittest.TestCase):
             self.service.get_query_not_found_response(),
             reset_password,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -185,7 +185,7 @@ class TestResetPassword(unittest.TestCase):
             self.service.get_server_not_found_response(),
             reset_password,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -196,7 +196,7 @@ class TestResetPassword(unittest.TestCase):
             self.service.get_general_error_response(),
             reset_password,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -226,7 +226,7 @@ class TestActivateUsers(unittest.TestCase):
             activate_users,
             True,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -237,7 +237,7 @@ class TestActivateUsers(unittest.TestCase):
             self.service.get_unauthorized_response(),
             activate_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -248,7 +248,7 @@ class TestActivateUsers(unittest.TestCase):
             self.service.get_query_not_found_response(),
             activate_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -259,7 +259,7 @@ class TestActivateUsers(unittest.TestCase):
             self.service.get_server_not_found_response(),
             activate_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -270,7 +270,7 @@ class TestActivateUsers(unittest.TestCase):
             self.service.get_general_error_response(),
             activate_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -300,7 +300,7 @@ class TestDeactivateUsers(unittest.TestCase):
             deactivate_users,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -311,7 +311,7 @@ class TestDeactivateUsers(unittest.TestCase):
             self.service.get_unauthorized_response(),
             deactivate_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -322,7 +322,7 @@ class TestDeactivateUsers(unittest.TestCase):
             self.service.get_query_not_found_response(),
             deactivate_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -333,7 +333,7 @@ class TestDeactivateUsers(unittest.TestCase):
             self.service.get_server_not_found_response(),
             deactivate_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -344,7 +344,7 @@ class TestDeactivateUsers(unittest.TestCase):
             self.service.get_general_error_response(),
             deactivate_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -374,7 +374,7 @@ class TestDeleteUsers(unittest.TestCase):
             delete_users,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -385,7 +385,7 @@ class TestDeleteUsers(unittest.TestCase):
             self.service.get_unauthorized_response(),
             delete_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -396,7 +396,7 @@ class TestDeleteUsers(unittest.TestCase):
             self.service.get_query_not_found_response(),
             delete_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -407,7 +407,7 @@ class TestDeleteUsers(unittest.TestCase):
             self.service.get_server_not_found_response(),
             delete_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -418,7 +418,7 @@ class TestDeleteUsers(unittest.TestCase):
             self.service.get_general_error_response(),
             delete_users,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -449,7 +449,7 @@ class TestAddToGroup(unittest.TestCase):
             add_to_group,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -460,7 +460,7 @@ class TestAddToGroup(unittest.TestCase):
             self.service.get_unauthorized_response(),
             add_to_group,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -471,7 +471,7 @@ class TestAddToGroup(unittest.TestCase):
             self.service.get_query_not_found_response(),
             add_to_group,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -482,7 +482,7 @@ class TestAddToGroup(unittest.TestCase):
             self.service.get_server_not_found_response(),
             add_to_group,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -493,7 +493,7 @@ class TestAddToGroup(unittest.TestCase):
             self.service.get_general_error_response(),
             add_to_group,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -524,7 +524,7 @@ class TestRemoveFromGroup(unittest.TestCase):
             remove_from_group,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -535,7 +535,7 @@ class TestRemoveFromGroup(unittest.TestCase):
             self.service.get_unauthorized_response(),
             remove_from_group,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -546,7 +546,7 @@ class TestRemoveFromGroup(unittest.TestCase):
             self.service.get_query_not_found_response(),
             remove_from_group,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -557,7 +557,7 @@ class TestRemoveFromGroup(unittest.TestCase):
             self.service.get_server_not_found_response(),
             remove_from_group,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -568,7 +568,7 @@ class TestRemoveFromGroup(unittest.TestCase):
             self.service.get_general_error_response(),
             remove_from_group,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -609,7 +609,7 @@ class TestRemoveFromRole(unittest.TestCase):
             remove_from_role,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -620,7 +620,7 @@ class TestRemoveFromRole(unittest.TestCase):
             self.service.get_unauthorized_response(),
             remove_from_role,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -631,7 +631,7 @@ class TestRemoveFromRole(unittest.TestCase):
             self.service.get_query_not_found_response(),
             remove_from_role,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -642,7 +642,7 @@ class TestRemoveFromRole(unittest.TestCase):
             self.service.get_server_not_found_response(),
             remove_from_role,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -653,7 +653,7 @@ class TestRemoveFromRole(unittest.TestCase):
             self.service.get_general_error_response(),
             remove_from_role,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -694,7 +694,7 @@ class TestAddToRole(unittest.TestCase):
             add_to_role,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -705,7 +705,7 @@ class TestAddToRole(unittest.TestCase):
             self.service.get_unauthorized_response(),
             add_to_role,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -716,7 +716,7 @@ class TestAddToRole(unittest.TestCase):
             self.service.get_query_not_found_response(),
             add_to_role,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -727,7 +727,7 @@ class TestAddToRole(unittest.TestCase):
             self.service.get_server_not_found_response(),
             add_to_role,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -738,7 +738,7 @@ class TestAddToRole(unittest.TestCase):
             self.service.get_general_error_response(),
             add_to_role,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -766,7 +766,7 @@ class TestGetRoles(unittest.TestCase):
             get_roles,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -777,7 +777,7 @@ class TestGetRoles(unittest.TestCase):
             self.service.get_unauthorized_response(),
             get_roles,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -788,7 +788,7 @@ class TestGetRoles(unittest.TestCase):
             self.service.get_query_not_found_response(),
             get_roles,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -799,7 +799,7 @@ class TestGetRoles(unittest.TestCase):
             self.service.get_server_not_found_response(),
             get_roles,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -810,7 +810,7 @@ class TestGetRoles(unittest.TestCase):
             self.service.get_general_error_response(),
             get_roles,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
@@ -838,7 +838,7 @@ class TestListGroups(unittest.TestCase):
             list_groups,
             False,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_unauthorized(self):
@@ -849,7 +849,7 @@ class TestListGroups(unittest.TestCase):
             self.service.get_unauthorized_response(),
             list_groups,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_query_not_found(self):
@@ -860,7 +860,7 @@ class TestListGroups(unittest.TestCase):
             self.service.get_query_not_found_response(),
             list_groups,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_server_not_found(self):
@@ -871,7 +871,7 @@ class TestListGroups(unittest.TestCase):
             self.service.get_server_not_found_response(),
             list_groups,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
     def test_general_error(self):
@@ -882,7 +882,7 @@ class TestListGroups(unittest.TestCase):
             self.service.get_general_error_response(),
             list_groups,
             *self.args,
-            **self.expected_kwargs
+            **self.expected_kwargs,
         )
 
 
