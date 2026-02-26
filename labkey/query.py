@@ -40,6 +40,8 @@ https://www.labkey.org/home/developer/forum/project-start.view
 
 ############################################################################
 """
+
+from dataclasses import dataclass, asdict
 import functools
 from typing import List, Literal, NotRequired, TextIO, TypedDict
 
@@ -59,6 +61,7 @@ class Pagination:
     UNSELECTED = "unselected"
     ALL = "all"
     NONE = "none"
+
 
 # TODO: Provide filter generators.
 #
@@ -142,7 +145,6 @@ class QueryFilter:
 
         ARRAY_ISEMPTY = "arrayisempty"
         ARRAY_ISNOTEMPTY = "arrayisnotempty"
-
 
         # Table/Query-wise operators
         Q = "q"
@@ -704,6 +706,32 @@ def move_rows(
     )
 
 
+@dataclass
+class GetQueriesOptions:
+    include_columns: bool
+    include_system_queries: bool
+    include_title: bool
+    include_user_queries: bool
+    include_view_data_url: bool
+    query_detail_columns: bool
+
+
+def get_queries(
+    server_context: ServerContext,
+    schema_name: str,
+    container_path: str = None,
+    options: GetQueriesOptions = None,
+    timeout=_default_timeout,
+) -> dict:
+    url = server_context.build_url("query", "getQueries.api", container_path=container_path)
+    payload = {"schemaName": schema_name}
+
+    if options is not None:
+        payload = {*payload, *asdict(options)}
+
+    return server_context.make_request(url, payload, timeout=timeout)
+
+
 class QueryWrapper:
     """
     Wrapper for all of the API methods exposed in the query module. Used by the APIWrapper class.
@@ -939,3 +967,13 @@ class QueryWrapper:
             audit_user_comment,
             timeout,
         )
+
+    @functools.wraps(get_queries)
+    def get_queries(
+        self,
+        schema_name: str,
+        container_path: str = None,
+        options: GetQueriesOptions = None,
+        timeout=_default_timeout,
+    ):
+        return get_queries(self.server_context, schema_name, container_path, options, timeout)

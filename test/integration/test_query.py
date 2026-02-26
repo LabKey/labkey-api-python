@@ -411,3 +411,30 @@ def test_api_save_rows(api: APIWrapper, blood_sample_type_fixture, tissue_sample
     assert resp["result"][2]["rowsAffected"] == 1
     assert resp["result"][2]["rows"][0]["rowid"] == first_tissue_row_id
     assert resp["result"][2]["rows"][0]["receiveddate"] == "2025-07-07 12:34:56.000"
+
+
+expected_fields = {
+    "canEdit",
+    "canEditSharedViews",
+    "columns",
+    "hidden",
+    "inherit",
+    "isIncludedForLookups",
+    "isInherited",
+    "isMetadataOverrideable",
+    "isUserDefined",
+    "moduleName",
+    "name",
+    "snapshot",
+    "title",
+    "viewDataUrl",
+}
+
+
+def test_get_queries(api: APIWrapper):
+    resp = api.query.get_queries("core")
+
+    assert set(resp.keys()) == {"schemaName", "queries"}
+    assert resp["schemaName"] == "core"
+    assert len(resp["queries"]) > 0
+    assert set(resp["queries"][0].keys()) == set(expected_fields)
