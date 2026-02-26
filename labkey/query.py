@@ -41,7 +41,7 @@ https://www.labkey.org/home/developer/forum/project-start.view
 ############################################################################
 """
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 import functools
 from typing import List, Literal, NotRequired, TextIO, TypedDict
 
@@ -715,6 +715,16 @@ class GetQueriesOptions:
     include_view_data_url: bool
     query_detail_columns: bool
 
+    def as_dict(self):
+        return {
+            "includeColumns": self.include_columns,
+            "includeSystemQueries": self.include_system_queries,
+            "includeTitle": self.include_title,
+            "includeUserQueries": self.include_user_queries,
+            "includeViewDataUrl": self.include_view_data_url,
+            "queryDetailColumns": self.query_detail_columns,
+        }
+
 
 def get_queries(
     server_context: ServerContext,
@@ -727,7 +737,7 @@ def get_queries(
     payload = {"schemaName": schema_name}
 
     if options is not None:
-        payload = {*payload, *asdict(options)}
+        payload = {*payload, *options.as_dict()}
 
     return server_context.make_request(url, payload, timeout=timeout)
 
