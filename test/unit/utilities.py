@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import pytest
 import requests
 
 from labkey.server_context import ServerContext
@@ -33,41 +34,37 @@ def mock_server_context(mock_action):
         )
 
 
-def success_test(test, expected_response, api_method, compare_response, *args, **expected_kwargs):
+def success_test(expected_response, api_method, compare_response, *args, **expected_kwargs):
     with mock.patch("labkey.server_context.requests.Session.post") as mock_post:
         mock_post.return_value = expected_response
         resp = api_method(*args)
 
         # validate response is as expected
         if compare_response:
-            test.assertEqual(resp, expected_response.text)
+            assert resp == expected_response.text
 
         # validate call is made as expected
         expected_args = expected_kwargs.pop("expected_args")
         mock_post.assert_called_once_with(*expected_args, **expected_kwargs)
 
 
-def success_test_get(
-    test, expected_response, api_method, compare_response, *args, **expected_kwargs
-):
+def success_test_get(expected_response, api_method, compare_response, *args, **expected_kwargs):
     with mock.patch("labkey.server_context.requests.Session.get") as mock_get:
         mock_get.return_value = expected_response
         resp = api_method(*args)
 
         # validate response is as expected
         if compare_response:
-            test.assertEqual(resp, expected_response.text)
+            assert resp == expected_response.text
 
         # validate call is made as expected
         expected_args = expected_kwargs.pop("expected_args")
         mock_get.assert_called_once_with(*expected_args, **expected_kwargs)
 
 
-def throws_error_test(
-    test, expected_error, expected_response, api_method, *args, **expected_kwargs
-):
+def throws_error_test(expected_error, expected_response, api_method, *args, **expected_kwargs):
     with mock.patch("labkey.server_context.requests.Session.post") as mock_post:
-        with test.assertRaises(expected_error):
+        with pytest.raises(expected_error):
             mock_post.return_value = expected_response
             api_method(*args)
 
@@ -76,11 +73,9 @@ def throws_error_test(
         mock_post.assert_called_once_with(*expected_args, **expected_kwargs)
 
 
-def throws_error_test_get(
-    test, expected_error, expected_response, api_method, *args, **expected_kwargs
-):
+def throws_error_test_get(expected_error, expected_response, api_method, *args, **expected_kwargs):
     with mock.patch("labkey.server_context.requests.Session.get") as mock_get:
-        with test.assertRaises(expected_error):
+        with pytest.raises(expected_error):
             mock_get.return_value = expected_response
             api_method(*args)
 
