@@ -79,8 +79,6 @@ class ServerContext:
         self._session = requests.Session()
         self._session.headers.update({"User-Agent": f"LabKey Python API/{client_version}"})
 
-        print(f"User Agent header: LabKey Python API/{client_version}")
-
         if self._use_ssl:
             self._scheme = "https://"
             if not self._verify_ssl:
