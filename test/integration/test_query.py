@@ -434,7 +434,22 @@ expected_fields = {
 def test_get_queries(api: APIWrapper):
     resp = api.query.get_queries("core")
 
+    all_queries_count = len(resp["queries"])
     assert set(resp.keys()) == {"schemaName", "queries"}
     assert resp["schemaName"] == "core"
-    assert len(resp["queries"]) > 0
+    assert all_queries_count > 0
     assert set(resp["queries"][0].keys()) == set(expected_fields)
+
+    resp = api.query.get_queries("core", include_system_queries=False, include_user_queries=False)
+
+    assert set(resp.keys()) == {"schemaName", "queries"}
+    assert resp["schemaName"] == "core"
+    # By excluding system queries, and user queries, we should have no queries
+    assert len(resp["queries"]) == 0
+
+    resp = api.query.get_queries("core", include_columns=False, include_view_data_url=False)
+
+    assert set(resp["queries"][0].keys()) == expected_fields - {
+        "columns",
+        "viewDataUrl",
+    }

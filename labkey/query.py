@@ -46,7 +46,7 @@ import functools
 from typing import List, Literal, NotRequired, TextIO, TypedDict
 
 from .server_context import ServerContext
-from .utils import waf_encode
+from .utils import waf_encode, transform_options
 
 _default_timeout = 60 * 5  # 5 minutes
 
@@ -706,38 +706,49 @@ def move_rows(
     )
 
 
-@dataclass
-class GetQueriesOptions:
-    include_columns: bool
-    include_system_queries: bool
-    include_title: bool
-    include_user_queries: bool
-    include_view_data_url: bool
-    query_detail_columns: bool
-
-    def as_dict(self):
-        return {
-            "includeColumns": self.include_columns,
-            "includeSystemQueries": self.include_system_queries,
-            "includeTitle": self.include_title,
-            "includeUserQueries": self.include_user_queries,
-            "includeViewDataUrl": self.include_view_data_url,
-            "queryDetailColumns": self.query_detail_columns,
-        }
+get_queries_fields = [
+    "schema_name",
+    "include_columns",
+    "include_system_queries",
+    "include_title",
+    "include_user_queries",
+    "include_view_data_url",
+    "query_detail_columns",
+]
 
 
 def get_queries(
     server_context: ServerContext,
     schema_name: str,
     container_path: str = None,
-    options: GetQueriesOptions = None,
     timeout=_default_timeout,
+    **kwargs,
 ) -> dict:
+    """
+    :param server_context: A LabKey server context. See utils.create_server_context.
+    :param schema_name: schema of table
+    :param container_path: folder path if not already part of server_context
+    :param timeout: Request timeout in seconds (defaults to 300s)
+    :param kwargs: Optional parameters supported by this API:
+        include_columns: boolean, if set to False, information about the available columns in this query will not be
+            included in the results. Default is True.
+        include_system_queries: boolean, if set to false, system-defined queries will not be included in the results.
+            Default is True.
+        include_title: boolean, if set to False, no custom query titles will be included. Instead, titles will be
+            identical to names. Default is True.
+        include_user_queries: boolean, if set to False, user-defined queries will not be included in the results.
+            Default is True.
+        include_view_data_url: boolean, if set to False, view data URLs will not be included in the results.
+            Default is True.
+        query_detail_columns: boolean, if set to True, and includeColumns is set to True, information about the
+            available columns will be the same details as specified by getQueryDetails for columns. Defaults to False.
+    :return: dict
+    """
     url = server_context.build_url("query", "getQueries.api", container_path=container_path)
     payload = {"schemaName": schema_name}
 
-    if options is not None:
-        payload = {*payload, *options.as_dict()}
+    if len(kwargs) > 0:
+        payload = {**payload, **transform_options(kwargs, get_queries_fields)}
 
     return server_context.make_request(url, payload, timeout=timeout)
 
@@ -983,7 +994,23 @@ class QueryWrapper:
         self,
         schema_name: str,
         container_path: str = None,
-        options: GetQueriesOptions = None,
+        include_columns: bool = None,
+        include_system_queries: bool = None,
+        include_title: bool = None,
+        include_user_queries: bool = None,
+        include_view_data_url: bool = None,
+        query_detail_columns: bool = None,
         timeout=_default_timeout,
     ):
-        return get_queries(self.server_context, schema_name, container_path, options, timeout)
+        return get_queries(
+            self.server_context,
+            schema_name,
+            container_path,
+            timeout,
+            include_columns=include_columns,
+            include_system_queries=include_system_queries,
+            include_title=include_title,
+            include_user_queries=include_user_queries,
+            include_view_data_url=include_view_data_url,
+            query_detail_columns=query_detail_columns,
+        )
