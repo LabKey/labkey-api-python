@@ -16,6 +16,7 @@
 """
 Examples using the Query.py API
 """
+
 from labkey.api_wrapper import APIWrapper
 from labkey.exceptions import (
     RequestError,

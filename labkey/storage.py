@@ -46,6 +46,7 @@ https://www.labkey.org/SampleManagerHelp/wiki-page.view?name=freezerLocation
 
 ############################################################################
 """
+
 import functools
 from dataclasses import dataclass
 

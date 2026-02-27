@@ -2,6 +2,13 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 4.2.0 package
+==============================
+
+*Release date: 02/26/2026*
+- Add get_queries to query module
+    - Accessible via API wrapper as api.query.get_queries
+
 What's New in the LabKey 4.1.0 package
 ==============================
 

@@ -17,6 +17,7 @@ import json
 from functools import wraps
 from datetime import date, datetime
 from base64 import b64encode
+from typing import List
 from urllib import parse
 
 
@@ -91,3 +92,34 @@ def waf_encode(value: str) -> str:
     if value:
         return "/*{{base64/x-www-form-urlencoded/wafText}}*/" + btoa(encode_uri_component(value))
     return value
+
+
+def snake_to_camel(value: str):
+    """
+    Converts a snake_case string to camelCase
+    """
+    if not value:
+        return value
+
+    if "_" not in value:
+        return value
+
+    parts = [part for part in value.split("_") if part]
+
+    if len(parts) == 0:
+        return ""
+
+    return parts[0].lower() + "".join([part.title() for part in parts[1:]])
+
+
+def transform_options(options: dict, expected_keys: List[str]) -> dict:
+    """
+    Converts a dict with snake_case keys to a new dict with camelCase keys, only copying keys from expected_keys
+    """
+    transformed_options = {}
+
+    for key, item in options.items():
+        if key in expected_keys:
+            transformed_options[snake_to_camel(key)] = item
+
+    return transformed_options

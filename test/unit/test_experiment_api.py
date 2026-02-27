@@ -13,9 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import unittest
-
-import unittest.mock as mock
+import pytest
 
 from labkey.experiment import load_batch, save_batch, Batch, Run
 from labkey.exceptions import (
@@ -200,162 +198,132 @@ assay_id = 12345
 batch_id = 54321
 
 
-class TestLoadBatch(unittest.TestCase):
-    def setUp(self):
-        self.service = MockLoadBatch()
-        self.expected_kwargs = {
-            "expected_args": [self.service.get_server_url()],
-            "data": '{"assayId": 12345, "batchId": 54321}',
-            "headers": {"Content-Type": "application/json"},
-            "timeout": 300,
-            "allow_redirects": False,
-        }
-
-        self.args = [mock_server_context(self.service), assay_id, batch_id]
-
-    def test_success(self):
-        test = self
-        success_test(
-            test,
-            self.service.get_successful_response(),
-            load_batch,
-            False,
-            *self.args,
-            **self.expected_kwargs
-        )
-
-    def test_unauthorized(self):
-        test = self
-        throws_error_test(
-            test,
-            RequestAuthorizationError,
-            self.service.get_unauthorized_response(),
-            load_batch,
-            *self.args,
-            **self.expected_kwargs
-        )
-
-    def test_query_not_found(self):
-        test = self
-        throws_error_test(
-            test,
-            QueryNotFoundError,
-            self.service.get_query_not_found_response(),
-            load_batch,
-            *self.args,
-            **self.expected_kwargs
-        )
-
-    def test_server_not_found(self):
-        test = self
-        throws_error_test(
-            test,
-            ServerNotFoundError,
-            self.service.get_server_not_found_response(),
-            load_batch,
-            *self.args,
-            **self.expected_kwargs
-        )
-
-    def test_general_error(self):
-        test = self
-        throws_error_test(
-            test,
-            RequestError,
-            self.service.get_general_error_response(),
-            load_batch,
-            *self.args,
-            **self.expected_kwargs
-        )
+@pytest.fixture
+def load_batch_setup():
+    service = MockLoadBatch()
+    expected_kwargs = {
+        "expected_args": [service.get_server_url()],
+        "data": '{"assayId": 12345, "batchId": 54321}',
+        "headers": {"Content-Type": "application/json"},
+        "timeout": 300,
+        "allow_redirects": False,
+    }
+    args = [mock_server_context(service), assay_id, batch_id]
+    return service, args, expected_kwargs
 
 
-class TestSaveBatch(unittest.TestCase):
-    def setUp(self):
-
-        data_rows = []
-
-        # Generate the Run object(s)
-        run = Run()
-        run.name = "python upload"
-        run.data_rows = data_rows
-        run.properties["RunFieldName"] = "Run Field Value"
-
-        # Generate the Batch object(s)
-        batch = Batch()
-        batch.runs = [run]
-        batch.properties["PropertyName"] = "Property Value"
-
-        self.service = MockSaveBatch()
-        self.expected_kwargs = {
-            "expected_args": [self.service.get_server_url()],
-            "data": '{"assayId": 12345, "batches": [{"batchProtocolId": null, "comment": null, "created": null, "createdBy": null, "modified": null, "modifiedBy": null, "name": null, "properties": {"PropertyName": "Property Value"}, "runs": [{"name": "python upload", "properties": {"RunFieldName": "Run Field Value"}}]}]}',
-            "headers": {"Content-Type": "application/json"},
-            "timeout": 300,
-            "allow_redirects": False,
-        }
-
-        self.args = [mock_server_context(self.service), assay_id, batch]
-
-    def test_success(self):
-        test = self
-        success_test(
-            test,
-            self.service.get_successful_response(),
-            save_batch,
-            False,
-            *self.args,
-            **self.expected_kwargs
-        )
-
-    def test_unauthorized(self):
-        test = self
-        throws_error_test(
-            test,
-            RequestAuthorizationError,
-            self.service.get_unauthorized_response(),
-            save_batch,
-            *self.args,
-            **self.expected_kwargs
-        )
-
-    def test_query_not_found(self):
-        test = self
-        throws_error_test(
-            test,
-            QueryNotFoundError,
-            self.service.get_query_not_found_response(),
-            save_batch,
-            *self.args,
-            **self.expected_kwargs
-        )
-
-    def test_server_not_found(self):
-        test = self
-        throws_error_test(
-            test,
-            ServerNotFoundError,
-            self.service.get_server_not_found_response(),
-            save_batch,
-            *self.args,
-            **self.expected_kwargs
-        )
-
-    def test_general_error(self):
-        test = self
-        throws_error_test(
-            test,
-            RequestError,
-            self.service.get_general_error_response(),
-            save_batch,
-            *self.args,
-            **self.expected_kwargs
-        )
+def test_load_batch_success(load_batch_setup):
+    service, args, expected_kwargs = load_batch_setup
+    success_test(service.get_successful_response(), load_batch, False, *args, **expected_kwargs)
 
 
-def suite():
-    load_tests = unittest.TestLoader().loadTestsFromTestCase
-    return unittest.TestSuite([load_tests(TestLoadBatch), load_tests(TestSaveBatch)])
+def test_load_batch_unauthorized(load_batch_setup):
+    service, args, expected_kwargs = load_batch_setup
+    throws_error_test(
+        RequestAuthorizationError,
+        service.get_unauthorized_response(),
+        load_batch,
+        *args,
+        **expected_kwargs,
+    )
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_load_batch_query_not_found(load_batch_setup):
+    service, args, expected_kwargs = load_batch_setup
+    throws_error_test(
+        QueryNotFoundError,
+        service.get_query_not_found_response(),
+        load_batch,
+        *args,
+        **expected_kwargs,
+    )
+
+
+def test_load_batch_server_not_found(load_batch_setup):
+    service, args, expected_kwargs = load_batch_setup
+    throws_error_test(
+        ServerNotFoundError,
+        service.get_server_not_found_response(),
+        load_batch,
+        *args,
+        **expected_kwargs,
+    )
+
+
+def test_load_batch_general_error(load_batch_setup):
+    service, args, expected_kwargs = load_batch_setup
+    throws_error_test(
+        RequestError, service.get_general_error_response(), load_batch, *args, **expected_kwargs
+    )
+
+
+@pytest.fixture
+def save_batch_setup():
+    data_rows = []
+
+    # Generate the Run object(s)
+    run = Run()
+    run.name = "python upload"
+    run.data_rows = data_rows
+    run.properties["RunFieldName"] = "Run Field Value"
+
+    # Generate the Batch object(s)
+    batch = Batch()
+    batch.runs = [run]
+    batch.properties["PropertyName"] = "Property Value"
+
+    service = MockSaveBatch()
+    expected_kwargs = {
+        "expected_args": [service.get_server_url()],
+        "data": '{"assayId": 12345, "batches": [{"batchProtocolId": null, "comment": null, "created": null, "createdBy": null, "modified": null, "modifiedBy": null, "name": null, "properties": {"PropertyName": "Property Value"}, "runs": [{"name": "python upload", "properties": {"RunFieldName": "Run Field Value"}}]}]}',
+        "headers": {"Content-Type": "application/json"},
+        "timeout": 300,
+        "allow_redirects": False,
+    }
+    args = [mock_server_context(service), assay_id, batch]
+    return service, args, expected_kwargs
+
+
+def test_save_batch_success(save_batch_setup):
+    service, args, expected_kwargs = save_batch_setup
+    success_test(service.get_successful_response(), save_batch, False, *args, **expected_kwargs)
+
+
+def test_save_batch_unauthorized(save_batch_setup):
+    service, args, expected_kwargs = save_batch_setup
+    throws_error_test(
+        RequestAuthorizationError,
+        service.get_unauthorized_response(),
+        save_batch,
+        *args,
+        **expected_kwargs,
+    )
+
+
+def test_save_batch_query_not_found(save_batch_setup):
+    service, args, expected_kwargs = save_batch_setup
+    throws_error_test(
+        QueryNotFoundError,
+        service.get_query_not_found_response(),
+        save_batch,
+        *args,
+        **expected_kwargs,
+    )
+
+
+def test_save_batch_server_not_found(save_batch_setup):
+    service, args, expected_kwargs = save_batch_setup
+    throws_error_test(
+        ServerNotFoundError,
+        service.get_server_not_found_response(),
+        save_batch,
+        *args,
+        **expected_kwargs,
+    )
+
+
+def test_save_batch_general_error(save_batch_setup):
+    service, args, expected_kwargs = save_batch_setup
+    throws_error_test(
+        RequestError, service.get_general_error_response(), save_batch, *args, **expected_kwargs
+    )

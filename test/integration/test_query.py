@@ -346,8 +346,8 @@ def test_api_save_rows(api: APIWrapper, blood_sample_type_fixture, tissue_sample
     assert resp["committed"] == False
     assert resp["errorCount"] == 1
     assert (
-        "SampleID or Name is required for sample on row 2" in
-        resp["result"][0]["errors"]["exception"]
+        "SampleID or Name is required for sample on row 2"
+        in resp["result"][0]["errors"]["exception"]
     )
 
     # Fix the first command by specifying a name for the sample
@@ -411,3 +411,45 @@ def test_api_save_rows(api: APIWrapper, blood_sample_type_fixture, tissue_sample
     assert resp["result"][2]["rowsAffected"] == 1
     assert resp["result"][2]["rows"][0]["rowid"] == first_tissue_row_id
     assert resp["result"][2]["rows"][0]["receiveddate"] == "2025-07-07 12:34:56.000"
+
+
+expected_fields = {
+    "canEdit",
+    "canEditSharedViews",
+    "columns",
+    "hidden",
+    "inherit",
+    "isIncludedForLookups",
+    "isInherited",
+    "isMetadataOverrideable",
+    "isUserDefined",
+    "moduleName",
+    "name",
+    "snapshot",
+    "title",
+    "viewDataUrl",
+}
+
+
+def test_get_queries(api: APIWrapper):
+    resp = api.query.get_queries("core")
+
+    all_queries_count = len(resp["queries"])
+    assert set(resp.keys()) == {"schemaName", "queries"}
+    assert resp["schemaName"] == "core"
+    assert all_queries_count > 0
+    assert set(resp["queries"][0].keys()) == set(expected_fields)
+
+    resp = api.query.get_queries("core", include_system_queries=False, include_user_queries=False)
+
+    assert set(resp.keys()) == {"schemaName", "queries"}
+    assert resp["schemaName"] == "core"
+    # By excluding system queries, and user queries, we should have no queries
+    assert len(resp["queries"]) == 0
+
+    resp = api.query.get_queries("core", include_columns=False, include_view_data_url=False)
+
+    assert set(resp["queries"][0].keys()) == expected_fields - {
+        "columns",
+        "viewDataUrl",
+    }
