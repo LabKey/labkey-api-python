@@ -58,7 +58,7 @@ STORAGE_CONTROLLER = "storage"
 
 
 def create_storage_item(
-    server_context: ServerContext, type: str, props: dict, container_path: str = None
+    server_context: ServerContext, type: str, props: dict, container_path: str = None, audit_user_comment: str = None
 ):
     """
     Create a new LabKey Freezer Manager storage item that can be used in the creation of a storage hierarchy.
@@ -66,16 +66,19 @@ def create_storage_item(
     :param type:
     :param props:
     :param container_path:
+    :param audit_user_comment: optional comment that will be attached to the audit log record for this storage change.
     :return:
     """
     url = server_context.build_url(STORAGE_CONTROLLER, "create.api", container_path)
     payload = {"type": type, "props": props}
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
 
     return server_context.make_request(url, json=payload)
 
 
 def update_storage_item(
-    server_context: ServerContext, type: str, props: dict, container_path: str = None
+    server_context: ServerContext, type: str, props: dict, container_path: str = None, audit_user_comment: str = None
 ):
     """
     Update an existing LabKey Freezer Manager storage item to change its properties or location within the storage hierarchy.
@@ -84,16 +87,19 @@ def update_storage_item(
     :param type:
     :param props:
     :param container_path:
+    :param audit_user_comment: optional comment that will be attached to the audit log record for this storage change.
     :return:
     """
     url = server_context.build_url(STORAGE_CONTROLLER, "update.api", container_path)
     payload = {"type": type, "props": props}
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
 
     return server_context.make_request(url, json=payload)
 
 
 def delete_storage_item(
-    server_context: ServerContext, type: str, row_id: int, container_path: str = None
+    server_context: ServerContext, type: str, row_id: int, container_path: str = None, audit_user_comment: str = None
 ):
     """
     Delete an existing LabKey Freezer Manager storage item. Note that deletion of freezers, primary storage, or locations
@@ -103,10 +109,13 @@ def delete_storage_item(
     :param type:
     :param row_id:
     :param container_path:
+    :param audit_user_comment: optional comment that will be attached to the audit log record for this storage change.
     :return:
     """
     url = server_context.build_url(STORAGE_CONTROLLER, "delete.api", container_path)
     payload = {"type": type, "props": {"rowId": row_id}}
+    if audit_user_comment is not None:
+        payload["auditUserComment"] = audit_user_comment
 
     return server_context.make_request(url, json=payload)
 
@@ -120,13 +129,13 @@ class StorageWrapper:
         self.server_context = server_context
 
     @functools.wraps(create_storage_item)
-    def create_storage_item(self, type: str, props: dict, container_path: str = None):
-        return create_storage_item(self.server_context, type, props, container_path)
+    def create_storage_item(self, type: str, props: dict, container_path: str = None, audit_user_comment: str = None):
+        return create_storage_item(self.server_context, type, props, container_path, audit_user_comment)
 
     @functools.wraps(update_storage_item)
-    def update_storage_item(self, type: str, props: dict, container_path: str = None):
-        return update_storage_item(self.server_context, type, props, container_path)
+    def update_storage_item(self, type: str, props: dict, container_path: str = None, audit_user_comment: str = None):
+        return update_storage_item(self.server_context, type, props, container_path, audit_user_comment)
 
     @functools.wraps(delete_storage_item)
-    def delete_storage_item(self, type: str, row_id: int, container_path: str = None):
-        return delete_storage_item(self.server_context, type, row_id, container_path)
+    def delete_storage_item(self, type: str, row_id: int, container_path: str = None, audit_user_comment: str = None):
+        return delete_storage_item(self.server_context, type, row_id, container_path, audit_user_comment)
