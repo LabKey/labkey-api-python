@@ -64,7 +64,8 @@ def create_storage_item(
     Create a new LabKey Freezer Manager storage item that can be used in the creation of a storage hierarchy.
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param type:
-    :param props:
+    :param props: a dict of property values for the storage item. Any storage item type also accepts an optional
+        "auditUserComment" (string) entry, which is recorded as the "Reason" on the resulting audit event.
     :param container_path:
     :return:
     """
@@ -82,7 +83,8 @@ def update_storage_item(
     For update_storage_item, the "rowId" primary key value is required to be set within the props.
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param type:
-    :param props:
+    :param props: a dict of property values for the storage item. Any storage item type also accepts an optional
+        "auditUserComment" (string) entry, which is recorded as the "Reason" on the resulting audit event.
     :param container_path:
     :return:
     """
@@ -93,7 +95,7 @@ def update_storage_item(
 
 
 def delete_storage_item(
-    server_context: ServerContext, type: str, row_id: int, container_path: str = None
+    server_context: ServerContext, type: str, row_id: int, container_path: str = None, audit_user_comment: str = None
 ):
     """
     Delete an existing LabKey Freezer Manager storage item. Note that deletion of freezers, primary storage, or locations
@@ -103,10 +105,14 @@ def delete_storage_item(
     :param type:
     :param row_id:
     :param container_path:
+    :param audit_user_comment: optional reason text recorded as the "Reason" on the resulting audit event.
     :return:
     """
     url = server_context.build_url(STORAGE_CONTROLLER, "delete.api", container_path)
-    payload = {"type": type, "props": {"rowId": row_id}}
+    props = {"rowId": row_id}
+    if audit_user_comment is not None:
+        props["auditUserComment"] = audit_user_comment
+    payload = {"type": type, "props": props}
 
     return server_context.make_request(url, json=payload)
 
@@ -128,5 +134,5 @@ class StorageWrapper:
         return update_storage_item(self.server_context, type, props, container_path)
 
     @functools.wraps(delete_storage_item)
-    def delete_storage_item(self, type: str, row_id: int, container_path: str = None):
-        return delete_storage_item(self.server_context, type, row_id, container_path)
+    def delete_storage_item(self, type: str, row_id: int, container_path: str = None, audit_user_comment: str = None):
+        return delete_storage_item(self.server_context, type, row_id, container_path, audit_user_comment)

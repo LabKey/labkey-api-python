@@ -110,10 +110,17 @@ else:
 box_id = result["data"]["rowId"]
 
 ###############
-# Update the location of a box in the freezer
+# Update the location of a box in the freezer. An optional "auditUserComment"
+# property may be included in the props dict; it is recorded as the "Reason"
+# on the resulting audit event.
 ###############
 result = api.storage.update_storage_item(
-    "Terminal Storage Location", {"rowId": box_id, "locationId": shelf2_row_id}
+    "Terminal Storage Location",
+    {
+        "rowId": box_id,
+        "locationId": shelf2_row_id,
+        "auditUserComment": "Relocated to make room for incoming samples from Lab B.",
+    },
 )
 if result is not None:
     print(result)
@@ -122,9 +129,14 @@ else:
     exit()
 
 ###############
-# Delete the freezer, which will delete the full hierarchy of non-terminal and terminal storage locations
+# Delete the freezer, which will delete the full hierarchy of non-terminal and terminal
+# storage locations. An optional audit_user_comment is supplied here for the audit log.
 ###############
-result = api.storage.delete_storage_item("Freezer", freezer_row_id)
+result = api.storage.delete_storage_item(
+    "Freezer",
+    freezer_row_id,
+    audit_user_comment="Decommissioning Freezer #1 per facilities request.",
+)
 if result is not None:
     print(result)
 else:
