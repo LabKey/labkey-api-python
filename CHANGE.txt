@@ -5,7 +5,7 @@ LabKey Python Client API News
 What's New in the LabKey 4.3.0 package
 ==============================
 
-*Release date: XX/2026*
+*Release date: 06/29/2026*
 - Freezer Manager API - add `auditUserComment` to create/update/delete_storage_item
 
 What's New in the LabKey 4.2.0 package
