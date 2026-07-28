@@ -95,7 +95,11 @@ def update_storage_item(
 
 
 def delete_storage_item(
-    server_context: ServerContext, type: str, row_id: int, container_path: str = None, audit_user_comment: str = None
+    server_context: ServerContext,
+    type: str,
+    row_id: int,
+    container_path: str = None,
+    audit_user_comment: str = None,
 ):
     """
     Delete an existing LabKey Freezer Manager storage item. Note that deletion of freezers, primary storage, or locations
@@ -134,5 +138,9 @@ class StorageWrapper:
         return update_storage_item(self.server_context, type, props, container_path)
 
     @functools.wraps(delete_storage_item)
-    def delete_storage_item(self, type: str, row_id: int, container_path: str = None, audit_user_comment: str = None):
-        return delete_storage_item(self.server_context, type, row_id, container_path, audit_user_comment)
+    def delete_storage_item(
+        self, type: str, row_id: int, container_path: str = None, audit_user_comment: str = None
+    ):
+        return delete_storage_item(
+            self.server_context, type, row_id, container_path, audit_user_comment
+        )
