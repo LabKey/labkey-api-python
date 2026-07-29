@@ -85,10 +85,10 @@ class Run(ExpObject):
         self.material_outputs = kwargs.pop("material_outputs", kwargs.pop("materialOutputs", []))
         self.object_properties = kwargs.pop("object_properties", kwargs.pop("objectProperties", []))
         self.plate_metadata = kwargs.pop("plate_metadata", None)
+        self.workflow_task = kwargs.pop("workflow_task", None)
 
         # TODO: initialize protocol
         # self._protocol = None
-
         data_inputs = kwargs.pop("data_inputs", kwargs.pop("dataInputs", []))
         self.data_inputs = [Data(**input_) for input_ in data_inputs]
 
@@ -101,6 +101,7 @@ class Run(ExpObject):
         data["materialInputs"] = self.material_inputs
         data["materialOutputs"] = self.material_outputs
         data["plateMetadata"] = self.plate_metadata
+        data["workflowTask"] = self.workflow_task
 
         # Issue 2489: Drop empty values. Server supplies default values for missing keys,
         # and will throw exception if a null value is supplied
@@ -217,6 +218,12 @@ def save_batches(
 
     return None
 
+def import_run(server_context: ServerContext, assay_id: int, run: Run):
+    url = server_context.build_url("assay", "importRun.api")
+    payload = run.to_json()
+    payload['saveDataAsFile'] = True
+    payload['assayId'] = assay_id
+    return server_context.make_request(url, json=payload, method="POST")
 
 def lineage(
     server_context: ServerContext,
@@ -331,3 +338,7 @@ class ExperimentWrapper:
             include_run_steps,
             run_protocol_lsid,
         )
+
+    @functools.wraps(import_run)
+    def import_run(self, assay_id: int, run: Run):
+        return import_run(self.server_context, assay_id, run)
