@@ -32,6 +32,9 @@ Experiment API - [sample code](samples/experiment_example.py)
 
 - **load_batch()** - Retrieve assay data (batch level).
 - **save_batch()** - Save assay data (batch level).
+- **save_batches()** - Save assay data for multiple batches in one request.
+- **import_run()** - Import a single assay run from data rows or a file.
+- **lineage()** - Query the experiment lineage graph. See [docs](docs/lineage.md).
 
 Security API - [sample code](samples/security_example.py) 
 
