@@ -376,7 +376,7 @@ def import_rows(
     insert_option: str = None,
     audit_behavior: str = None,
     import_lookup_by_alternate_key: bool = False,
-    timeout: int = _default_timeout
+    timeout: int = _default_timeout,
 ):
     """
     Import row(s) into a table
@@ -416,7 +416,9 @@ def import_rows(
     if import_lookup_by_alternate_key is not None:
         payload["importLookupByAlternateKey"] = import_lookup_by_alternate_key
 
-    return server_context.make_request(url, payload, method="POST", file_payload=file_payload, timeout=timeout)
+    return server_context.make_request(
+        url, payload, method="POST", file_payload=file_payload, timeout=timeout
+    )
 
 
 class Command(TypedDict):
@@ -860,6 +862,7 @@ class QueryWrapper:
         insert_option: str = None,
         audit_behavior: str = None,
         import_lookup_by_alternate_key: bool = False,
+        timeout: int = _default_timeout,
     ):
         return import_rows(
             self.server_context,
@@ -870,6 +873,7 @@ class QueryWrapper:
             insert_option,
             audit_behavior,
             import_lookup_by_alternate_key,
+            timeout,
         )
 
     @functools.wraps(save_rows)
