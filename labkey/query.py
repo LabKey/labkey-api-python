@@ -376,6 +376,7 @@ def import_rows(
     insert_option: str = None,
     audit_behavior: str = None,
     import_lookup_by_alternate_key: bool = False,
+    timeout: int = _default_timeout
 ):
     """
     Import row(s) into a table
@@ -396,6 +397,7 @@ def import_rows(
     the setting as specified by the LabKey query.
     :param import_lookup_by_alternate_key: Allows lookup target rows to be resolved by values rather than the target's
     primary key. This option will only be available for lookups that are configured with unique column information
+    :param timeout: Request timeout in seconds (defaults to 300s)
     :return:
     """
     url = server_context.build_url("query", "import.api", container_path=container_path)
@@ -414,7 +416,7 @@ def import_rows(
     if import_lookup_by_alternate_key is not None:
         payload["importLookupByAlternateKey"] = import_lookup_by_alternate_key
 
-    return server_context.make_request(url, payload, method="POST", file_payload=file_payload)
+    return server_context.make_request(url, payload, method="POST", file_payload=file_payload, timeout=timeout)
 
 
 class Command(TypedDict):
