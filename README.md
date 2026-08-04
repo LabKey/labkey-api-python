@@ -9,14 +9,17 @@ Lets you query, insert, and update data on a [LabKey Server](https://www.labkey.
 
 The following APIs can be used against a LabKey Server instance.
 
-Query API - [sample code](samples/query_examples.py)
+Query API - [docs](docs/query.md)
 
 - **delete_rows()** - Delete records in a table.
 - **execute_sql()** - Execute SQL (LabKey SQL dialect) through the query module.
+- **get_queries()** - List the queries available in a schema.
+- **import_rows()** - Bulk insert or merge rows into a table from a file.
 - **insert_rows()** - Insert rows into a table.
+- **save_rows()** - Insert, update, and delete rows across multiple tables in one request.
 - **select_rows()** - Query and get results sets.
 - **update_rows()** - Update rows in a table.
-- **move_rows()()** - Move rows in a table.
+- **move_rows()** - Move rows to another container.
 - **truncate_table()** - Delete all rows from a table.
 
 Domain API - [sample code](samples/domain_example.py)
