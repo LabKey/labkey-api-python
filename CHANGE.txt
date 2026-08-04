@@ -5,9 +5,11 @@ LabKey Python Client API News
 What's New in the LabKey 4.4.0 package
 ==============================
 
-*Release date: 07/29/2026*
+*Release date: 08/05/2026*
+- Add import_run method to ExperimentWrapper
 - Add workflow_task to Run class
-- Add import_run method to experiment wrapper
+- Add docs for ExperimentWrapper
+- Add docs for QueryWrapper
 
 What's New in the LabKey 4.3.0 package
 ==============================
