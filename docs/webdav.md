@@ -2,6 +2,10 @@
 
 Our Python API includes some convenience methods for creating "webdavclient3" clients, and building webdav file paths.
 
+The examples below use an `APIWrapper` instance to make their requests. See [api_wrapper.md](api_wrapper.md) for the
+full set of `APIWrapper` arguments, including how to configure the container path, context path, SSL, and
+authentication.
+
 ### Creating a WebDav client
 First, make sure you have the [webdavclient3](https://github.com/ezhov-evgeny/webdav-client-python-3) library installed:
 
