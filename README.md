@@ -28,7 +28,7 @@ Domain API - [sample code](samples/domain_example.py)
 - **save()** - Save changes to a domain design.
 - **conditional_format()** - Create a conditional format on a field.
 
-Experiment API - [sample code](samples/experiment_example.py)
+Experiment API - [docs](docs/experiment.md)
 
 - **load_batch()** - Retrieve assay data (batch level).
 - **save_batch()** - Save assay data (batch level).
