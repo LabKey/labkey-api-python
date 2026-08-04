@@ -81,6 +81,7 @@ class Run(ExpObject):
         self.protocol = kwargs.pop("protocol", None)
         self.data_outputs = kwargs.pop("data_outputs", kwargs.pop("dataOutputs", []))
         self.data_rows = kwargs.pop("data_rows", kwargs.pop("dataRows", []))
+        self.data_file = kwargs.pop("data_file", None)  # Note: data_file is only supported by import_run
         self.material_inputs = kwargs.pop("material_inputs", kwargs.pop("materialInputs", []))
         self.material_outputs = kwargs.pop("material_outputs", kwargs.pop("materialOutputs", []))
         self.object_properties = kwargs.pop("object_properties", kwargs.pop("objectProperties", []))
@@ -223,6 +224,11 @@ def import_run(server_context: ServerContext, assay_id: int, run: Run):
     payload = run.to_json()
     payload['saveDataAsFile'] = True
     payload['assayId'] = assay_id
+
+    if run.data_file is not None:
+        file_payload = {"file": run.data_file}
+        return server_context.make_request(url, payload=payload, file_payload=file_payload, method="POST")
+
     return server_context.make_request(url, json=payload, method="POST")
 
 def lineage(
