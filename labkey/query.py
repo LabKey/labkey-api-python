@@ -45,7 +45,7 @@ import functools
 from typing import List, Literal, NotRequired, TextIO, TypedDict
 
 from .server_context import ServerContext
-from .utils import waf_encode, transform_options
+from .utils import json_dumps, waf_encode, transform_options, clean_payload
 
 _default_timeout = 60 * 5  # 5 minutes
 
@@ -183,6 +183,21 @@ class AuditBehavior:
     DETAILED = "DETAILED"
     NONE = "NONE"
     SUMMARY = "SUMMARY"
+
+
+class InsertOption:
+    """
+    Enum of the ways import_rows can apply the rows it reads. Not every table supports every option; the server
+    rejects an unsupported combination with an error.
+    """
+
+    IMPORT = "IMPORT"  # bulk insert, the default for import_rows
+    IMPORT_IDENTITY = "IMPORT_IDENTITY"  # bulk insert that preserves the primary keys in the data
+    INSERT = "INSERT"  # insert one row at a time, reselecting each inserted row
+    MERGE = "MERGE"  # insert new rows, update the columns supplied for rows that already exist
+    REPLACE = "REPLACE"  # like MERGE, but nulls the columns of an existing row that the data omits
+    UPDATE = "UPDATE"  # update existing rows only, failing if a row does not exist
+    UPSERT = "UPSERT"  # like MERGE, but reselects the affected rows
 
 
 def delete_rows(
@@ -371,50 +386,93 @@ def import_rows(
     server_context: ServerContext,
     schema_name: str,
     query_name: str,
-    data_file: TextIO,
+    data_file: TextIO = None,
     container_path: str = None,
-    insert_option: str = None,
-    audit_behavior: str = None,
-    import_lookup_by_alternate_key: bool = False,
+    insert_option: InsertOption = None,
+    audit_behavior: AuditBehavior = None,
+    import_lookup_by_alternate_key: bool = None,
     timeout: int = _default_timeout,
+    audit_details: dict = None,
+    audit_user_comment: str = None,
+    format: Literal["csv", "tsv"] = None,
+    import_identity: bool = None,
+    import_url: str = None,
+    module: str = None,
+    module_resource: str = None,
+    path: str = None,
+    save_to_pipeline: bool = None,
+    text: str = None,
+    use_async: bool = None,
 ):
     """
-    Import row(s) into a table
+    Import row(s) into a table.
+
+    The rows may come from one of four sources, and the server uses the first one supplied in this order: text, path,
+    module_resource, data_file. Supplying more than one silently ignores the others. The column names in the data must
+    match the column names from the LabKey server.
+
     :param server_context: A LabKey server context. See utils.create_server_context.
     :param schema_name: schema of table
     :param query_name: table name to import into
-    :param data_file: the file containing the rows to import. The column names in the file must match the column names
-    from the LabKey server.
+    :param data_file: an open file object holding the rows to import, uploaded as multipart form data
     :param container_path: labkey container path if not already set in context
-    :param insert_option: Whether the import action should be done as an insert, creating new rows for each provided row
-    of the data frame, or a merge. When merging during import, any data you provide for the rows representing records
-    that already exist will replace the previous values. Note that when updating an existing record, you only need to
-    provide the columns you wish to update, existing data for other columns will be left as is. Available options are
-    "INSERT" and "MERGE". Defaults to "INSERT".
+    :param insert_option: How the rows are applied. See class query.InsertOption. Defaults to "IMPORT", a bulk insert
+    that creates a new row for each row of data. "MERGE" instead updates the rows that already exist and inserts the
+    rest; when merging you only need to provide the columns you wish to update, existing data for other columns will
+    be left as is.
     :param audit_behavior: Set the level of auditing details for this import action. Available options are "SUMMARY" and
     "DETAILED". SUMMARY - Audit log reflects that a change was made, but does not mention the nature of the change.
     DETAILED - Provides full details on what change was made, including values before and after the change. Defaults to
     the setting as specified by the LabKey query.
     :param import_lookup_by_alternate_key: Allows lookup target rows to be resolved by values rather than the target's
-    primary key. This option will only be available for lookups that are configured with unique column information
+    primary key. This option will only be available for lookups that are configured with unique column information.
+    Defaults to False.
     :param timeout: Request timeout in seconds (defaults to 300s)
+    :param audit_details: Additional detail to record on the transaction audit event for this import, serialized to
+    JSON for the request. Keys are matched case insensitively against the server's transaction detail names
+    ("Product", "EditMethod", "RequestSource", etc.); unrecognized keys are ignored.
+    :param audit_user_comment: used to provide a comment that will be attached to certain detailed audit log records
+    :param format: Delimiter of the text option, either "csv" or "tsv". Defaults to "tsv". Ignored by the other
+    sources, whose format is determined by the file itself.
+    :param import_identity: Insert the primary key values present in the data rather than letting the server assign
+    them. Requires an administrator, and is only supported for tables with an auto incrementing primary key.
+    :param import_url: Full URL of an alternate import action to post to, replacing the default query-import.api. Use
+    it to reach an import action of another controller that accepts the same parameters.
+    :param module: Name of the module to resolve module_resource against. Defaults to the module owning the target
+    table's schema. Only used together with module_resource.
+    :param module_resource: Path of a TSV resource within the module to import, relative to the module root. A value
+    with no "/" is resolved under the module's "schemas/dbscripts" directory.
+    :param path: Path of a file already on the server to import, resolved against the WebDAV root (for example
+    "_webdav/MyProject/@files/data.tsv"). The current user must be able to read it.
+    :param save_to_pipeline: Copy the uploaded file into a QueryImportFiles directory under the container's pipeline
+    root instead of discarding it once the import completes. Requires a pipeline root. Defaults to False.
+    :param text: The rows to import, as inline delimited text, including the header row. See the format option.
+    :param use_async: Run the import in a background pipeline job, which also saves the file to the pipeline root.
+    The response holds "jobId" rather than a row count, and not every table supports it. Defaults to False.
     :return:
     """
-    url = server_context.build_url("query", "import.api", container_path=container_path)
-    file_payload = {"file": data_file}
-    payload = {
-        "schemaName": schema_name,
+    url = import_url or server_context.build_url(
+        "query", "import.api", container_path=container_path
+    )
+    file_payload = {"file": data_file} if data_file is not None else None
+    # every option the server accepts, omitted from the request when left unset
+    payload = clean_payload({
+        "auditBehavior": audit_behavior,
+        "auditDetails": None if audit_details is None else json_dumps(audit_details),
+        "auditUserComment": audit_user_comment,
+        "format": format,
+        "importIdentity": import_identity,
+        "importLookupByAlternateKey": import_lookup_by_alternate_key,
+        "insertOption": insert_option,
+        "module": module,
+        "moduleResource": module_resource,
+        "path": path,
+        "saveToPipeline": save_to_pipeline,
         "queryName": query_name,
-    }
-
-    if insert_option is not None:
-        payload["insertOption"] = insert_option
-
-    if audit_behavior is not None:
-        payload["auditBehavior"] = audit_behavior
-
-    if import_lookup_by_alternate_key is not None:
-        payload["importLookupByAlternateKey"] = import_lookup_by_alternate_key
+        "schemaName": schema_name,
+        "text": text,
+        "useAsync": use_async,
+    })
 
     return server_context.make_request(
         url, payload, method="POST", file_payload=file_payload, timeout=timeout
@@ -857,12 +915,23 @@ class QueryWrapper:
         self,
         schema_name: str,
         query_name: str,
-        data_file,
+        data_file: TextIO = None,
         container_path: str = None,
-        insert_option: str = None,
-        audit_behavior: str = None,
-        import_lookup_by_alternate_key: bool = False,
+        insert_option: InsertOption = None,
+        audit_behavior: AuditBehavior = None,
+        import_lookup_by_alternate_key: bool = None,
         timeout: int = _default_timeout,
+        audit_details: dict = None,
+        audit_user_comment: str = None,
+        format: Literal["csv", "tsv"] = None,
+        import_identity: bool = None,
+        import_url: str = None,
+        module: str = None,
+        module_resource: str = None,
+        path: str = None,
+        save_to_pipeline: bool = None,
+        text: str = None,
+        use_async: bool = None,
     ):
         return import_rows(
             self.server_context,
@@ -874,6 +943,17 @@ class QueryWrapper:
             audit_behavior,
             import_lookup_by_alternate_key,
             timeout,
+            audit_details,
+            audit_user_comment,
+            format,
+            import_identity,
+            import_url,
+            module,
+            module_resource,
+            path,
+            save_to_pipeline,
+            text,
+            use_async,
         )
 
     @functools.wraps(save_rows)

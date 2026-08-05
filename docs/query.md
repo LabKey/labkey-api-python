@@ -16,7 +16,7 @@ correspond closely to their JavaScript counterparts.
 The classes below are imported from `labkey.query`:
 
 ```python
-from labkey.query import AuditBehavior, Pagination, QueryFilter
+from labkey.query import AuditBehavior, InsertOption, Pagination, QueryFilter
 ```
 
 ### `QueryFilter`
@@ -61,6 +61,21 @@ Overrides the audit detail level of a write operation: `DETAILED`, `SUMMARY`, `N
 values before and after the change, `SUMMARY` records only that a change occurred. When omitted, the table's
 configured behavior applies.
 
+### `InsertOption`
+
+How `import_rows` applies the rows it reads. Not every table supports every option — the server rejects an
+unsupported combination with an error.
+
+| Value             | Effect                                                                                     |
+|-------------------|--------------------------------------------------------------------------------------------|
+| `IMPORT`          | Bulk insert, creating a new row for every row of data. The default.                         |
+| `INSERT`          | Insert one row at a time, reselecting each inserted row.                                   |
+| `MERGE`           | Insert new rows; for rows that already exist, update only the columns present in the data.  |
+| `REPLACE`         | Like `MERGE`, but also nulls the columns of an existing row that the data omits.            |
+| `UPSERT`          | Like `MERGE`, but reselects the affected rows.                                              |
+| `UPDATE`          | Update existing rows only, failing if a row does not exist.                                 |
+| `IMPORT_IDENTITY` | Bulk insert that preserves the primary key values supplied in the data.                     |
+
 ### `Command`
 
 A `TypedDict` describing one operation in a `save_rows` request. Keys use Python style names and are converted to
@@ -91,7 +106,7 @@ All methods are available on the `query` member of an `APIWrapper` instance.
 | `delete_rows(schema_name, query_name, rows, ...)`               | Delete rows. Each row need only carry its primary key.                          |
 | `move_rows(target_container_path, schema_name, query_name, rows, ...)` | Move rows to another container.                                           |
 | `truncate_table(schema_name, query_name, ...)`                  | Delete every row in a table.                                                    |
-| `import_rows(schema_name, query_name, data_file, ...)`          | Bulk insert or merge rows from a file.                                          |
+| `import_rows(schema_name, query_name, data_file, ...)`          | Bulk insert or merge rows from a file, inline text, or a file already on the server. |
 | `save_rows(commands, ...)`                                      | Perform inserts, updates, and deletes across several tables in one request.      |
 | `get_queries(schema_name, ...)`                                 | List the queries available in a schema.                                         |
 
@@ -107,6 +122,8 @@ All methods are available on the `query` member of an `APIWrapper` instance.
 
 `container_path`, `transacted`, `audit_behavior`, and `audit_user_comment` apply to the write methods
 (`insert_rows`, `update_rows`, `delete_rows`, `move_rows`); read methods accept `container_path` and `timeout`.
+`import_rows` accepts `container_path`, `audit_behavior`, `audit_user_comment`, and `timeout`, but not `transacted`
+— an import is always transacted.
 
 ### Notable per-method arguments
 
@@ -138,12 +155,31 @@ All methods are available on the `query` member of an `APIWrapper` instance.
 
 `import_rows`
 
-| Argument                        | Default    | Description                                                                                                   |
-|---------------------------------|------------|---------------------------------------------------------------------------------------------------------------|
-| `data_file`                     | required   | An open file handle. Its column headers must match the LabKey column names.                                     |
-| `insert_option`                 | `"INSERT"` | `"INSERT"` creates a new row for every row in the file; `"MERGE"` updates rows that already exist and inserts the rest. When merging you only need to supply the columns you want to change. |
-| `audit_behavior`                | `None`     | `"SUMMARY"` or `"DETAILED"`. Defaults to the setting on the LabKey query.                                       |
-| `import_lookup_by_alternate_key`| `False`    | Resolve lookup targets by value rather than by primary key. Only works for lookups configured with unique column information. |
+The rows come from one of four sources. The server uses the first one supplied in this order — `text`, `path`,
+`module_resource`, `data_file` — and ignores the others, so pass exactly one.
+
+| Argument          | Default  | Description                                                                                                              |
+|-------------------|----------|--------------------------------------------------------------------------------------------------------------------------|
+| `data_file`       | `None`   | An open file handle, uploaded as multipart form data. Its column headers must match the LabKey column names.               |
+| `text`            | `None`   | The rows as inline delimited text, including the header row.                                                              |
+| `path`            | `None`   | Path of a file already on the server, resolved against the WebDAV root, e.g. `"_webdav/MyProject/@files/data.tsv"`. The current user must be able to read it. |
+| `module_resource` | `None`   | Path of a TSV resource inside a module, relative to the module root. A value with no `/` is resolved under the module's `schemas/dbscripts` directory. |
+| `module`          | `None`   | Name of the module to resolve `module_resource` against. Only used with `module_resource`; defaults to the module owning the target table's schema. |
+
+The remaining arguments control how the rows are applied:
+
+| Argument                         | Default    | Description                                                                                                   |
+|----------------------------------|------------|---------------------------------------------------------------------------------------------------------------|
+| `insert_option`                  | `"IMPORT"` | An [`InsertOption`](#insertoption) value. `"IMPORT"` creates a new row for every row of data; `"MERGE"` updates rows that already exist and inserts the rest. When merging you only need to supply the columns you want to change. |
+| `audit_behavior`                 | `None`     | `"SUMMARY"` or `"DETAILED"`. Defaults to the setting on the LabKey query.                                       |
+| `audit_user_comment`             | `None`     | Comment attached to certain detailed audit log records.                                                        |
+| `audit_details`                  | `None`     | A dict of extra detail to record on the import's transaction audit event, serialized to JSON for you. Keys are matched case insensitively against the server's transaction detail names (`"Product"`, `"EditMethod"`, `"RequestSource"`, …); unrecognized keys are ignored. |
+| `import_lookup_by_alternate_key` | `False`    | Resolve lookup targets by value rather than by primary key. Only works for lookups configured with unique column information. |
+| `import_identity`                | `False`    | Insert the primary key values present in the data instead of letting the server assign them. Requires an administrator, and only applies to tables with an auto incrementing primary key. |
+| `format`                         | `"tsv"`    | Delimiter of `text`, either `"csv"` or `"tsv"`. Ignored by the other sources, whose format comes from the file itself. |
+| `save_to_pipeline`               | `False`    | Copy the uploaded file into a `QueryImportFiles` directory under the container's pipeline root rather than discarding it once the import completes. Requires a pipeline root. |
+| `use_async`                      | `False`    | Run the import in a background pipeline job, which also saves the file to the pipeline root. The response holds `jobId` instead of a row count, and not every table supports it. |
+| `import_url`                     | `None`     | Full URL of an alternate import action to post to, replacing the default `query-import.api`. Use it to reach an import action on another controller that accepts the same parameters. |
 
 `save_rows`
 
@@ -177,7 +213,8 @@ All methods return the decoded JSON response as a dict.
 `insert_rows`, `update_rows`, `delete_rows`, and `move_rows` return `rowsAffected` and a `rows` list holding the
 affected rows as they exist after the operation. `truncate_table` returns `deletedRows`. `import_rows` returns
 `success` and `rowCount`, or `success: False` with `errorCount` and `errors` — it reports validation failures in the
-response rather than raising. `save_rows` returns `committed`, `errorCount`, and `result`, a list parallel to
+response rather than raising. With `use_async=True` it returns `success` and `jobId` instead, since the rows are
+loaded after the response is sent. `save_rows` returns `committed`, `errorCount`, and `result`, a list parallel to
 `commands` where each entry has its own `rowsAffected` and `rows`. `get_queries` returns `schemaName` and `queries`.
 
 Note that keys in write responses are lower cased by the server, so a `RowId` column is read back as `rowid`.
@@ -412,7 +449,7 @@ if not result["committed"]:
             print(command_result["errors"]["exception"])
 ```
 
-#### Import rows from a file
+#### Import rows from a file, from text, or from the server
 
 `import_rows` is the efficient way to load a large number of rows. Unlike the other write methods it reports
 validation problems in its response rather than raising.
@@ -438,14 +475,58 @@ by name rather than by row id — a `parent` column holding `parent_one` instead
 `import_lookup_by_alternate_key` so the server resolves them.
 
 ```python
+from labkey.query import InsertOption
+
 with open("child_data.csv", "r") as data_file:
     result = api.query.import_rows(
         "lists",
         "child_list",
         data_file=data_file,
-        insert_option="MERGE",
+        insert_option=InsertOption.MERGE,
         import_lookup_by_alternate_key=True,
     )
+```
+
+A small set of rows can be passed inline as `text` instead of a file. `format` selects the delimiter; it applies only
+to `text`.
+
+```python
+result = api.query.import_rows(
+    "lists",
+    "Demographics",
+    text="Participant ID,Country\n2001,Antarctica\n2002,Pangea\n",
+    format="csv",
+)
+```
+
+A file that is already on the server does not have to be uploaded at all. Pass its WebDAV `path` — the same path the
+file browser shows — and the server reads it in place.
+
+```python
+result = api.query.import_rows(
+    "lists",
+    "Demographics",
+    path="_webdav/Tutorials/HIV Study/@files/demographics.tsv",
+)
+```
+
+For an import large enough that the request would time out, use `use_async` to hand it to a pipeline job. The
+response carries a `jobId` rather than a row count, and progress and errors show up in the container's pipeline
+status. `save_to_pipeline` keeps the uploaded file under the pipeline root without moving the import itself into the
+background. Both require a pipeline root to be configured for the container.
+
+```python
+with open("large_demographics.tsv", "r") as data_file:
+    result = api.query.import_rows(
+        "lists",
+        "Demographics",
+        data_file=data_file,
+        use_async=True,
+        audit_user_comment="Nightly load of the demographics extract.",
+        audit_details={"Product": "python", "RequestSource": "nightly_etl.py"},
+    )
+
+print("import_rows: queued pipeline job [ " + str(result["jobId"]) + " ]")
 ```
 
 #### Move rows to another container
