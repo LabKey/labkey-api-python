@@ -306,29 +306,22 @@ def execute_sql(
     """
     url = server_context.build_url("query", "executeSql.api", container_path=container_path)
 
-    payload = {"schemaName": schema_name, "sql": waf_encode(sql) if waf_encode_sql else sql}
-
-    if container_filter is not None:
-        payload["containerFilter"] = container_filter
-
-    if max_rows is not None:
-        payload["maxRows"] = max_rows
-
-    if offset is not None:
-        payload["offset"] = offset
-
-    if sort is not None:
-        payload["query.sort"] = sort
-
-    if save_in_session is not None:
-        payload["saveInSession"] = save_in_session
+    payload = clean_payload(
+        {
+            "schemaName": schema_name,
+            "sql": waf_encode(sql) if waf_encode_sql else sql,
+            "query.sort": sort,
+            "containerFilter": container_filter,
+            "maxRows": max_rows,
+            "offset": offset,
+            "saveInSession": save_in_session,
+            "apiVersion": required_version,
+        }
+    )
 
     if parameters is not None:
         for key, value in parameters.items():
             payload["query.param." + key] = value
-
-    if required_version is not None:
-        payload["apiVersion"] = required_version
 
     return server_context.make_request(url, payload, timeout=timeout)
 
@@ -456,27 +449,38 @@ def import_rows(
     )
     file_payload = {"file": data_file} if data_file is not None else None
     # every option the server accepts, omitted from the request when left unset
-    payload = clean_payload({
-        "auditBehavior": audit_behavior,
-        "auditDetails": None if audit_details is None else json_dumps(audit_details),
-        "auditUserComment": audit_user_comment,
-        "format": format,
-        "importIdentity": import_identity,
-        "importLookupByAlternateKey": import_lookup_by_alternate_key,
-        "insertOption": insert_option,
-        "module": module,
-        "moduleResource": module_resource,
-        "path": path,
-        "saveToPipeline": save_to_pipeline,
-        "queryName": query_name,
-        "schemaName": schema_name,
-        "text": text,
-        "useAsync": use_async,
-    })
+    payload = clean_payload(
+        {
+            "auditBehavior": audit_behavior,
+            "auditDetails": None if audit_details is None else json_dumps(audit_details),
+            "auditUserComment": audit_user_comment,
+            "format": format,
+            "importIdentity": import_identity,
+            "importLookupByAlternateKey": import_lookup_by_alternate_key,
+            "insertOption": insert_option,
+            "module": module,
+            "moduleResource": module_resource,
+            "path": path,
+            "saveToPipeline": save_to_pipeline,
+            "queryName": query_name,
+            "schemaName": schema_name,
+            "text": text,
+            "useAsync": use_async,
+        }
+    )
 
     return server_context.make_request(
         url, payload, method="POST", file_payload=file_payload, timeout=timeout
     )
+
+
+command_option_fields = [
+    "audit_behavior",
+    "audit_user_comment",
+    "container_path",
+    "extra_context",
+    "skip_reselect_rows",
+]
 
 
 class Command(TypedDict):
@@ -523,45 +527,27 @@ def save_rows(
     """
     url = server_context.build_url("query", "saveRows.api", container_path=container_path)
 
-    json_commands = []
-    for command in commands:
-        json_command = {
+    # the required keys are read directly so a malformed Command still raises a KeyError naming it
+    json_commands = [
+        {
             "command": command["command"],
             "queryName": command["query_name"],
             "schemaName": command["schema_name"],
             "rows": command["rows"],
+            **clean_payload(transform_options(command, command_option_fields)),
         }
+        for command in commands
+    ]
 
-        if command.get("audit_behavior") is not None:
-            json_command["auditBehavior"] = command["audit_behavior"]
-
-        if command.get("audit_user_comment") is not None:
-            json_command["auditUserComment"] = command["audit_user_comment"]
-
-        if command.get("container_path") is not None:
-            json_command["containerPath"] = command["container_path"]
-
-        if command.get("extra_context") is not None:
-            json_command["extraContext"] = command["extra_context"]
-
-        if command.get("skip_reselect_rows") is not None:
-            json_command["skipReselectRows"] = command["skip_reselect_rows"]
-
-        json_commands.append(json_command)
-
-    payload = {"commands": json_commands}
-
-    if api_version is not None:
-        payload["apiVersion"] = api_version
-
-    if extra_context is not None:
-        payload["extraContext"] = extra_context
-
-    if transacted is not None:
-        payload["transacted"] = transacted
-
-    if validate_only is not None:
-        payload["validateOnly"] = validate_only
+    payload = clean_payload(
+        {
+            "commands": json_commands,
+            "apiVersion": api_version,
+            "extraContext": extra_context,
+            "transacted": transacted,
+            "validateOnly": validate_only,
+        }
+    )
 
     return server_context.make_request(url, json=payload, timeout=timeout)
 
@@ -614,10 +600,25 @@ def select_rows(
     :return:
     """
     url = server_context.build_url("query", "getQuery.api", container_path=container_path)
-    payload = {"schemaName": schema_name, "query.queryName": query_name}
-
-    if view_name is not None:
-        payload["query.viewName"] = view_name
+    payload = clean_payload(
+        {
+            "schemaName": schema_name,
+            "query.queryName": query_name,
+            "query.viewName": view_name,
+            "query.columns": columns,
+            "query.maxRows": max_rows,
+            "query.sort": sort,
+            "query.offset": offset,
+            "query.showRows": show_rows,
+            "query.selectionKey": selection_key,
+            "query.ignoreFilter": 1 if ignore_filter else None,
+            "containerFilter": container_filter,
+            "includeTotalCount": include_total_count,
+            "includeDetailsColumn": include_details_column,
+            "includeUpdateColumn": include_update_column,
+            "apiVersion": required_version,
+        }
+    )
 
     if filter_array is not None:
         for query_filter in filter_array:
@@ -628,45 +629,9 @@ def select_rows(
             filters.append(query_filter.get_url_parameter_value())
             payload[prefix] = filters
 
-    if columns is not None:
-        payload["query.columns"] = columns
-
-    if max_rows is not None:
-        payload["query.maxRows"] = max_rows
-
-    if sort is not None:
-        payload["query.sort"] = sort
-
-    if offset is not None:
-        payload["query.offset"] = offset
-
-    if container_filter is not None:
-        payload["containerFilter"] = container_filter
-
     if parameters is not None:
         for key, value in parameters.items():
             payload["query.param." + key] = value
-
-    if show_rows is not None:
-        payload["query.showRows"] = show_rows
-
-    if include_total_count is not None:
-        payload["includeTotalCount"] = include_total_count
-
-    if include_details_column is not None:
-        payload["includeDetailsColumn"] = include_details_column
-
-    if include_update_column is not None:
-        payload["includeUpdateColumn"] = include_update_column
-
-    if selection_key is not None:
-        payload["query.selectionKey"] = selection_key
-
-    if required_version is not None:
-        payload["apiVersion"] = required_version
-
-    if ignore_filter is not None and ignore_filter is True:
-        payload["query.ignoreFilter"] = 1
 
     return server_context.make_request(url, payload, timeout=timeout)
 
