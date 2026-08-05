@@ -80,7 +80,6 @@ class Run(ExpObject):
         self.data_file = kwargs.pop("data_file", None)
         self.material_inputs = kwargs.pop("material_inputs", kwargs.pop("materialInputs", []))
         self.material_outputs = kwargs.pop("material_outputs", kwargs.pop("materialOutputs", []))
-        self.object_properties = kwargs.pop("object_properties", kwargs.pop("objectProperties", []))
         self.plate_metadata = kwargs.pop("plate_metadata", None)
         self.workflow_task = kwargs.pop("workflow_task", None)
 

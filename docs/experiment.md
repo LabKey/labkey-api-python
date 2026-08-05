@@ -66,7 +66,6 @@ A single data import. Extends `ExpObject`.
 | `experiments`      | `List[dict]`       | Experiments (run groups) the run belongs to.                                                        |
 | `file_path_root`   | `str`              | Server side root path for the run's files.                                                          |
 | `protocol`         | `dict`             | The run's protocol.                                                                                 |
-| `object_properties`| `List[dict]`       | Additional object level properties.                                                                 |
 | `plate_metadata`   | `dict`             | Well group property values for plate based assays. See [Plate based assays](#plate-based-assays).   |
 | `workflow_task`    | `int`              | Row id of a workflow (Sample Manager / LIMS) task to associate the run with.                        |
 
