@@ -17,6 +17,7 @@ import functools
 from typing import List, Optional
 
 from .server_context import ServerContext
+from .utils import clean_payload
 
 
 class ExpObject:
@@ -33,8 +34,7 @@ class ExpObject:
         self.properties = kwargs.pop("properties", {})
 
     def to_json(self):
-        data = {
-            # 'id': self.id,
+        return {
             "comment": self.comment,
             "name": self.name,
             "created": self.created,
@@ -42,15 +42,10 @@ class ExpObject:
             "modified": self.modified,
             "modifiedBy": self.modified_by,
             "properties": self.properties,
+            # unlike the keys above, which the server expects even when null, id and lsid are
+            # omitted entirely when unset
+            **clean_payload({"id": self.id, "lsid": self.lsid}),
         }
-
-        if self.id is not None:
-            data.update({"id": self.id})
-
-        if self.lsid is not None:
-            data.update({"lsid": self.lsid})
-
-        return data
 
 
 class Batch(ExpObject):
@@ -267,34 +262,20 @@ def lineage(
     lineage_url = server_context.build_url(
         "experiment", "lineage.api", container_path=container_path
     )
-    payload = {"lsids": lsids}
-
-    if children is not None:
-        payload["children"] = children
-
-    if cpas_type is not None:
-        payload["cpasType"] = cpas_type
-
-    if depth is not None:
-        payload["depth"] = depth
-
-    if exp_type is not None:
-        payload["expType"] = exp_type
-
-    if include_inputs_and_outputs is not None:
-        payload["includeInputsAndOutputs"] = include_inputs_and_outputs
-
-    if include_properties is not None:
-        payload["includeProperties"] = include_properties
-
-    if include_run_steps is not None:
-        payload["includeRunSteps"] = include_run_steps
-
-    if parents is not None:
-        payload["parents"] = parents
-
-    if run_protocol_lsid is not None:
-        payload["runProtocolLsid"] = run_protocol_lsid
+    payload = clean_payload(
+        {
+            "lsids": lsids,
+            "children": children,
+            "cpasType": cpas_type,
+            "depth": depth,
+            "expType": exp_type,
+            "includeInputsAndOutputs": include_inputs_and_outputs,
+            "includeProperties": include_properties,
+            "includeRunSteps": include_run_steps,
+            "parents": parents,
+            "runProtocolLsid": run_protocol_lsid,
+        }
+    )
 
     return server_context.make_request(lineage_url, payload=payload, method="POST")
 
