@@ -226,16 +226,17 @@ def delete_rows(
     """
     url = server_context.build_url("query", "deleteRows.api", container_path=container_path)
 
-    payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
-
-    if transacted is False:
-        payload["transacted"] = transacted
-
-    if audit_behavior is not None:
-        payload["auditBehavior"] = audit_behavior
-
-    if audit_user_comment is not None:
-        payload["auditUserComment"] = audit_user_comment
+    payload = clean_payload(
+        {
+            "schemaName": schema_name,
+            "queryName": query_name,
+            "rows": rows,
+            # transacted is only sent when it differs from the server's default of True
+            "transacted": False if transacted is False else None,
+            "auditBehavior": audit_behavior,
+            "auditUserComment": audit_user_comment,
+        }
+    )
 
     return server_context.make_request(
         url,
@@ -354,19 +355,18 @@ def insert_rows(
     """
     url = server_context.build_url("query", "insertRows.api", container_path=container_path)
 
-    payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
-
-    if skip_reselect_rows is True:
-        payload["skipReselectRows"] = skip_reselect_rows
-
-    if transacted is False:
-        payload["transacted"] = transacted
-
-    if audit_behavior is not None:
-        payload["auditBehavior"] = audit_behavior
-
-    if audit_user_comment is not None:
-        payload["auditUserComment"] = audit_user_comment
+    payload = clean_payload(
+        {
+            "schemaName": schema_name,
+            "queryName": query_name,
+            "rows": rows,
+            # these two are only sent when they differ from the server's defaults
+            "skipReselectRows": True if skip_reselect_rows is True else None,
+            "transacted": False if transacted is False else None,
+            "auditBehavior": audit_behavior,
+            "auditUserComment": audit_user_comment,
+        }
+    )
 
     return server_context.make_request(
         url,
@@ -663,16 +663,17 @@ def update_rows(
     """
     url = server_context.build_url("query", "updateRows.api", container_path=container_path)
 
-    payload = {"schemaName": schema_name, "queryName": query_name, "rows": rows}
-
-    if transacted is False:
-        payload["transacted"] = transacted
-
-    if audit_behavior is not None:
-        payload["auditBehavior"] = audit_behavior
-
-    if audit_user_comment is not None:
-        payload["auditUserComment"] = audit_user_comment
+    payload = clean_payload(
+        {
+            "schemaName": schema_name,
+            "queryName": query_name,
+            "rows": rows,
+            # transacted is only sent when it differs from the server's default of True
+            "transacted": False if transacted is False else None,
+            "auditBehavior": audit_behavior,
+            "auditUserComment": audit_user_comment,
+        }
+    )
 
     return server_context.make_request(
         url,
@@ -709,21 +710,18 @@ def move_rows(
     """
     url = server_context.build_url("query", "moveRows.api", container_path=container_path)
 
-    payload = {
-        "targetContainerPath": target_container_path,
-        "schemaName": schema_name,
-        "queryName": query_name,
-        "rows": rows,
-    }
-
-    if transacted is False:
-        payload["transacted"] = transacted
-
-    if audit_behavior is not None:
-        payload["auditBehavior"] = audit_behavior
-
-    if audit_user_comment is not None:
-        payload["auditUserComment"] = audit_user_comment
+    payload = clean_payload(
+        {
+            "targetContainerPath": target_container_path,
+            "schemaName": schema_name,
+            "queryName": query_name,
+            "rows": rows,
+            # transacted is only sent when it differs from the server's default of True
+            "transacted": False if transacted is False else None,
+            "auditBehavior": audit_behavior,
+            "auditUserComment": audit_user_comment,
+        }
+    )
 
     return server_context.make_request(
         url,
@@ -771,10 +769,12 @@ def get_queries(
     :return: dict
     """
     url = server_context.build_url("query", "getQueries.api", container_path=container_path)
-    payload = {"schemaName": schema_name}
-
-    if len(kwargs) > 0:
-        payload = {**payload, **transform_options(kwargs, get_queries_fields)}
+    payload = clean_payload(
+        {
+            "schemaName": schema_name,
+            **transform_options(kwargs, get_queries_fields),
+        }
+    )
 
     return server_context.make_request(url, payload, timeout=timeout)
 
