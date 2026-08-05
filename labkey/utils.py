@@ -123,3 +123,12 @@ def transform_options(options: dict, expected_keys: List[str]) -> dict:
             transformed_options[snake_to_camel(key)] = item
 
     return transformed_options
+
+
+def clean_payload(payload: dict):
+    """
+    Removes all keys with None values from a payload.
+    :param payload: the payload to clean
+    :return: the payload with all None values removed
+    """
+    return {key: value for key, value in payload.items() if value is not None}
