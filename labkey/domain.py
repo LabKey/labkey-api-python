@@ -17,15 +17,8 @@ import functools
 from typing import Dict, List, Union, Tuple, TextIO
 
 from .server_context import ServerContext
+from .utils import clean_payload
 from labkey.query import QueryFilter
-
-
-def strip_none_values(data: dict, do_strip: bool = True):
-    if do_strip:
-        for k in list(data.keys()):
-            if data[k] is None:
-                del data[k]
-    return data
 
 
 # modeled on org.labkey.api.gwt.client.model.GWTPropertyDescriptor
@@ -115,7 +108,6 @@ class PropertyDescriptor:
         self.value_expression = kwargs.pop("value_expression", kwargs.pop("valueExpression", None))
 
     def to_json(self, strip_none=True):
-        # TODO: Likely only want to include those that are not None
         data = {
             "conceptURI": self.concept_uri,
             "container": self.container,
@@ -161,19 +153,11 @@ class PropertyDescriptor:
             "typeEditable": self.type_editable,
             "url": self.url,
             "valueExpression": self.value_expression,
+            "conditionalFormats": [f.to_json() for f in self.conditional_formats],
+            "propertyValidators": [p.to_json() for p in self.property_validators],
         }
 
-        json_formats = []
-        for f in self.conditional_formats:
-            json_formats.append(f.to_json())
-        data["conditionalFormats"] = json_formats
-
-        json_validators = []
-        for p in self.property_validators:
-            json_validators.append(p.to_json())
-        data["propertyValidators"] = json_validators
-
-        return strip_none_values(data, strip_none)
+        return clean_payload(data) if strip_none else data
 
 
 class PropertyValidator:
@@ -199,7 +183,7 @@ class PropertyValidator:
             "type": self.type,
         }
 
-        return strip_none_values(data, strip_none)
+        return clean_payload(data) if strip_none else data
 
 
 class ConditionalFormat:
@@ -212,7 +196,9 @@ class ConditionalFormat:
         self.text_color = kwargs.pop("text_color", kwargs.pop("textColor", None))
 
     def to_json(self):
-        data = {
+        # Note: unlike the other to_json methods here, this one keeps its None values, and the keys
+        # are all lower case rather than camelCase.
+        return {
             "backgroundcolor": self.background_color,
             "bold": self.bold,
             "filter": self.filter,
@@ -220,8 +206,6 @@ class ConditionalFormat:
             "strikethrough": self.strike_through,
             "textcolor": self.text_color,
         }
-
-        return data
 
 
 # modeled on org.labkey.api.gwt.client.model.GWTDomain
@@ -277,19 +261,11 @@ class Domain:
             "queryName": self.query_name,
             "schemaName": self.schema_name,
             "templateDescription": self.template_description,
+            "fields": [field.to_json() for field in self.fields],
+            "indices": [index.to_json() for index in self.indices],
         }
 
-        json_fields = []
-        for field in self.fields:
-            json_fields.append(field.to_json())
-        data["fields"] = json_fields
-
-        json_indices = []
-        for index in self.indices:
-            json_indices.append(index.to_json())
-        data["indices"] = json_indices
-
-        return strip_none_values(data, strip_none)
+        return clean_payload(data) if strip_none else data
 
 
 # TODO: Determine if this can be used when initializing domain.create
@@ -314,7 +290,7 @@ class FieldIndex:
     def to_json(self, strip_none=True):
         data = {"columnNames": self.column_names, "unique": self.unique}
 
-        return strip_none_values(data, strip_none)
+        return clean_payload(data) if strip_none else data
 
 
 def conditional_format(
@@ -473,12 +449,14 @@ def get_domain_details(
     url = server_context.build_url(
         "property", "getDomainDetails.api", container_path=container_path
     )
-    payload = {
-        "schemaName": schema_name,
-        "queryName": query_name,
-        "domainId": domain_id,
-        "domainKind": domain_kind,
-    }
+    payload = clean_payload(
+        {
+            "schemaName": schema_name,
+            "queryName": query_name,
+            "domainId": domain_id,
+            "domainKind": domain_kind,
+        }
+    )
     response = server_context.make_request(url, payload, method="GET")
     raw_domain = response.get("domainDesign", None)
     domain = None
@@ -531,14 +509,14 @@ def save(
     :return:
     """
     url = server_context.build_url("property", "saveDomain.api", container_path=container_path)
-    payload = {
-        "domainDesign": domain.to_json(),
-        "queryName": query_name,
-        "schemaName": schema_name,
-    }
-
-    if options is not None:
-        payload["options"] = options
+    payload = clean_payload(
+        {
+            "domainDesign": domain.to_json(),
+            "queryName": query_name,
+            "schemaName": schema_name,
+            "options": options,
+        }
+    )
 
     return server_context.make_request(url, json=payload)
 

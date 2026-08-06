@@ -2,6 +2,21 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 4.4.0 package
+==============================
+
+*Release date: 08/06/2026*
+- Add import_run method to ExperimentWrapper
+- Add workflow_task to Run class
+- Add docs for ExperimentWrapper
+- Add docs for QueryWrapper
+- query.import_rows: add the params that were missing from the server's import action
+    - audit_details, audit_user_comment, format, import_identity, import_url, module, module_resource, path, save_to_pipeline, text, use_async
+    - data_file is now optional, the rows may instead come from text, path, or module_resource
+    - Add InsertOption class enumerating the values accepted by insert_option
+- Add clean_payload to utils
+- Remove object_properties from Run, it was never sent to the server
+
 What's New in the LabKey 4.3.0 package
 ==============================
 

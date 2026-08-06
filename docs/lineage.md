@@ -55,15 +55,19 @@ The Lineage API response includes:
 
 ### Examples
 
+The example below uses an `APIWrapper` instance to make its requests. See [api_wrapper.md](api_wrapper.md) for the
+full set of `APIWrapper` arguments, including how to configure the container path, context path, SSL, and
+authentication.
+
 ```python
 from collections import defaultdict
 
 from labkey.api_wrapper import APIWrapper
 from labkey.query import QueryFilter
 
-labkey_server = "localhost:8080"
+labkey_server = "www.example.com"
 container_path = "Tutorials/HIV Study"  # Full project/folder container path
-api = APIWrapper(labkey_server, container_path, use_ssl=False)
+api = APIWrapper(labkey_server, container_path)
 
 ###################
 # Create a data class domain

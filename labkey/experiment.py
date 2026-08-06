@@ -17,6 +17,7 @@ import functools
 from typing import List, Optional
 
 from .server_context import ServerContext
+from .utils import clean_payload
 
 
 class ExpObject:
@@ -33,8 +34,7 @@ class ExpObject:
         self.properties = kwargs.pop("properties", {})
 
     def to_json(self):
-        data = {
-            # 'id': self.id,
+        return {
             "comment": self.comment,
             "name": self.name,
             "created": self.created,
@@ -42,15 +42,10 @@ class ExpObject:
             "modified": self.modified,
             "modifiedBy": self.modified_by,
             "properties": self.properties,
+            # unlike the keys above, which the server expects even when null, id and lsid are
+            # omitted entirely when unset
+            **clean_payload({"id": self.id, "lsid": self.lsid}),
         }
-
-        if self.id is not None:
-            data.update({"id": self.id})
-
-        if self.lsid is not None:
-            data.update({"lsid": self.lsid})
-
-        return data
 
 
 class Batch(ExpObject):
@@ -81,14 +76,15 @@ class Run(ExpObject):
         self.protocol = kwargs.pop("protocol", None)
         self.data_outputs = kwargs.pop("data_outputs", kwargs.pop("dataOutputs", []))
         self.data_rows = kwargs.pop("data_rows", kwargs.pop("dataRows", []))
+        # Note: data_file is only supported by import_run
+        self.data_file = kwargs.pop("data_file", None)
         self.material_inputs = kwargs.pop("material_inputs", kwargs.pop("materialInputs", []))
         self.material_outputs = kwargs.pop("material_outputs", kwargs.pop("materialOutputs", []))
-        self.object_properties = kwargs.pop("object_properties", kwargs.pop("objectProperties", []))
         self.plate_metadata = kwargs.pop("plate_metadata", None)
+        self.workflow_task = kwargs.pop("workflow_task", None)
 
         # TODO: initialize protocol
         # self._protocol = None
-
         data_inputs = kwargs.pop("data_inputs", kwargs.pop("dataInputs", []))
         self.data_inputs = [Data(**input_) for input_ in data_inputs]
 
@@ -101,6 +97,7 @@ class Run(ExpObject):
         data["materialInputs"] = self.material_inputs
         data["materialOutputs"] = self.material_outputs
         data["plateMetadata"] = self.plate_metadata
+        data["workflowTask"] = self.workflow_task
 
         # Issue 2489: Drop empty values. Server supplies default values for missing keys,
         # and will throw exception if a null value is supplied
@@ -218,6 +215,20 @@ def save_batches(
     return None
 
 
+def import_run(server_context: ServerContext, assay_id: int, run: Run):
+    url = server_context.build_url("assay", "importRun.api")
+    payload = run.to_json()
+    payload["assayId"] = assay_id
+
+    if run.data_file is not None:
+        file_payload = {"file": run.data_file}
+        return server_context.make_request(
+            url, payload=payload, file_payload=file_payload, method="POST"
+        )
+
+    return server_context.make_request(url, json=payload, method="POST")
+
+
 def lineage(
     server_context: ServerContext,
     lsids: List[str],
@@ -250,34 +261,20 @@ def lineage(
     lineage_url = server_context.build_url(
         "experiment", "lineage.api", container_path=container_path
     )
-    payload = {"lsids": lsids}
-
-    if children is not None:
-        payload["children"] = children
-
-    if cpas_type is not None:
-        payload["cpasType"] = cpas_type
-
-    if depth is not None:
-        payload["depth"] = depth
-
-    if exp_type is not None:
-        payload["expType"] = exp_type
-
-    if include_inputs_and_outputs is not None:
-        payload["includeInputsAndOutputs"] = include_inputs_and_outputs
-
-    if include_properties is not None:
-        payload["includeProperties"] = include_properties
-
-    if include_run_steps is not None:
-        payload["includeRunSteps"] = include_run_steps
-
-    if parents is not None:
-        payload["parents"] = parents
-
-    if run_protocol_lsid is not None:
-        payload["runProtocolLsid"] = run_protocol_lsid
+    payload = clean_payload(
+        {
+            "lsids": lsids,
+            "children": children,
+            "cpasType": cpas_type,
+            "depth": depth,
+            "expType": exp_type,
+            "includeInputsAndOutputs": include_inputs_and_outputs,
+            "includeProperties": include_properties,
+            "includeRunSteps": include_run_steps,
+            "parents": parents,
+            "runProtocolLsid": run_protocol_lsid,
+        }
+    )
 
     return server_context.make_request(lineage_url, payload=payload, method="POST")
 
@@ -309,25 +306,29 @@ class ExperimentWrapper:
         children: bool = None,
         container_path: str = None,
         cpas_type: str = None,
-        exp_type: str = None,
         depth: int = None,
-        include_properties: bool = None,
+        exp_type: str = None,
         include_inputs_and_outputs: bool = None,
+        include_properties: bool = None,
         include_run_steps: bool = None,
         parents: bool = None,
         run_protocol_lsid: str = None,
     ):
         return lineage(
             self.server_context,
-            lsids,
-            children,
-            container_path,
-            cpas_type,
-            depth,
-            exp_type,
-            parents,
-            include_inputs_and_outputs,
-            include_properties,
-            include_run_steps,
-            run_protocol_lsid,
+            lsids=lsids,
+            children=children,
+            container_path=container_path,
+            cpas_type=cpas_type,
+            depth=depth,
+            exp_type=exp_type,
+            parents=parents,
+            include_inputs_and_outputs=include_inputs_and_outputs,
+            include_properties=include_properties,
+            include_run_steps=include_run_steps,
+            run_protocol_lsid=run_protocol_lsid,
         )
+
+    @functools.wraps(import_run)
+    def import_run(self, assay_id: int, run: Run):
+        return import_run(self.server_context, assay_id, run)

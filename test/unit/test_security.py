@@ -304,7 +304,11 @@ def test_deactivate_users_server_not_found(deactivate_users_setup):
 def test_deactivate_users_general_error(deactivate_users_setup):
     service, args, expected_kwargs = deactivate_users_setup
     throws_error_test(
-        RequestError, service.get_general_error_response(), deactivate_users, *args, **expected_kwargs
+        RequestError,
+        service.get_general_error_response(),
+        deactivate_users,
+        *args,
+        **expected_kwargs,
     )
 
 

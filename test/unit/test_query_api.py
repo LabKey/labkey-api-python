@@ -76,7 +76,13 @@ def delete_rows_setup():
     rows = "{id:1234}"
     expected_kwargs = {
         "expected_args": [service.get_server_url()],
-        "data": '{"queryName": "' + query + '", "rows": "' + rows + '", "schemaName": "' + schema + '"}',
+        "data": '{"queryName": "'
+        + query
+        + '", "rows": "'
+        + rows
+        + '", "schemaName": "'
+        + schema
+        + '"}',
         "headers": {"Content-Type": "application/json"},
         "timeout": 300,
         "allow_redirects": False,
@@ -136,7 +142,13 @@ def update_rows_setup():
     rows = "{id:1234}"
     expected_kwargs = {
         "expected_args": [service.get_server_url()],
-        "data": '{"queryName": "' + query + '", "rows": "' + rows + '", "schemaName": "' + schema + '"}',
+        "data": '{"queryName": "'
+        + query
+        + '", "rows": "'
+        + rows
+        + '", "schemaName": "'
+        + schema
+        + '"}',
         "headers": {"Content-Type": "application/json"},
         "timeout": 300,
         "allow_redirects": False,
@@ -196,7 +208,13 @@ def insert_rows_setup():
     rows = "{id:1234}"
     expected_kwargs = {
         "expected_args": [service.get_server_url()],
-        "data": '{"queryName": "' + query + '", "rows": "' + rows + '", "schemaName": "' + schema + '"}',
+        "data": '{"queryName": "'
+        + query
+        + '", "rows": "'
+        + rows
+        + '", "schemaName": "'
+        + schema
+        + '"}',
         "headers": {"Content-Type": "application/json"},
         "timeout": 300,
         "allow_redirects": False,

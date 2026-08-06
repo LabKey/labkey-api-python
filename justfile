@@ -1,3 +1,7 @@
+[private]
+default:
+    just --list
+
 build:
 	python -m build
 
@@ -25,9 +29,13 @@ test-unit:
 
 test-integration:
     pytest . -m "integration"
+alias ti := test-integration
 
 test: test-unit test-integration
+alias t := test
 
+# Runs clea, buld, release-test
 brt: clean build release-test
 
+# Runs clean, build, release
 br: clean build release
