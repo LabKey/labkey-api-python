@@ -2,6 +2,15 @@
 LabKey Python Client API News
 +++++++++++
 
+What's New in the LabKey 4.4.1 package
+==============================
+
+*Release date: 10/13/2026*
+- ServerContext: normalize container and context paths
+    - Leading and trailing slashes are stripped, so "/MyProject/" and "MyProject" build the same URLs
+    - A container path of "/" or "" now targets the root container, including when passed to build_url or webdav_path to override the default container
+    - Fix double slashes in URLs and webdav paths built for the root container or context path
+
 What's New in the LabKey 4.4.0 package
 ==============================
 
