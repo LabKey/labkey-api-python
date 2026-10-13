@@ -57,6 +57,16 @@ BASE = "https://example.com/test_context_path"
             "https://example.com",
             id="empty",
         ),
+        pytest.param(
+            {"container_path": "test_container", "context_path": "//test_context_path//"},
+            BASE,
+            id="repeated-slashes",
+        ),
+        pytest.param(
+            {"container_path": "test_container", "context_path": "///"},
+            "https://example.com",
+            id="only-slashes",
+        ),
     ],
 )
 def test_base_url(context, expected):
@@ -117,6 +127,20 @@ def test_base_url(context, expected):
         ),
         pytest.param(
             {"container_path": "", "context_path": ""}, None, "https://example.com", id="empty"
+        ),
+        pytest.param(DEFAULT_CONTEXT, "//other//", f"{BASE}/other", id="override-repeated-slashes"),
+        pytest.param(DEFAULT_CONTEXT, "///", BASE, id="override-only-slashes"),
+        pytest.param(
+            {"container_path": "//test_container//", "context_path": "//test_context_path//"},
+            None,
+            f"{BASE}/test_container",
+            id="context-repeated-slashes",
+        ),
+        pytest.param(
+            {"container_path": "///", "context_path": "///"},
+            None,
+            "https://example.com",
+            id="only-slashes",
         ),
     ],
 )
@@ -250,6 +274,35 @@ def test_build_url(context, container_path, expected):
             "/_webdav/@files/test.jpg",
             id="root-file",
         ),
+        pytest.param(
+            DEFAULT_CONTEXT,
+            None,
+            "//test.jpg",
+            "/_webdav/test_container/@files/test.jpg",
+            id="file-repeated-leading-slashes",
+        ),
+        pytest.param(
+            DEFAULT_CONTEXT,
+            None,
+            "//some_folder//",
+            "/_webdav/test_container/@files/some_folder//",
+            id="folder-repeated-slashes",
+        ),
+        pytest.param(
+            DEFAULT_CONTEXT,
+            "//parent/child//",
+            "data.txt",
+            "/_webdav/parent/child/@files/data.txt",
+            id="override-repeated-slashes",
+        ),
+        pytest.param(DEFAULT_CONTEXT, "///", None, "/_webdav/@files", id="override-only-slashes"),
+        pytest.param(
+            {"container_path": "//test_container//", "context_path": "test_context_path"},
+            None,
+            None,
+            "/_webdav/test_container/@files",
+            id="context-repeated-slashes",
+        ),
     ],
 )
 def test_webdav_path(context, container_path, file_name, expected):
@@ -262,8 +315,11 @@ def test_strip_slashes():
     assert strip_slashes("/") is None
     assert strip_slashes("") is None
     assert strip_slashes("//") is None
+    assert strip_slashes("///") is None
     assert strip_slashes("stuff") == "stuff"
     assert strip_slashes("/stuff") == "stuff"
     assert strip_slashes("stuff/") == "stuff"
     assert strip_slashes("/stuff/") == "stuff"
     assert strip_slashes("/parent/child/") == "parent/child"
+    assert strip_slashes("//stuff//") == "stuff"
+    assert strip_slashes("//parent//child//") == "parent//child"

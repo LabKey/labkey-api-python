@@ -32,28 +32,11 @@ CSRF_TOKEN = "X-LABKEY-CSRF"
 client_version = importlib.metadata.version("labkey")
 
 
-def strip_leading_slash(value: Optional[str]) -> Optional[str]:
-    if value is None:
-        return value
-
-    if value.startswith("/"):
-        return value[1:]
-
-    return value
-
-
-def strip_trailing_slash(value: Optional[str]) -> Optional[str]:
-    if value is None:
-        return value
-
-    if value.endswith("/"):
-        return value[0:-1]
-
-    return value
-
-
 def strip_slashes(value: Optional[str]) -> Optional[str]:
-    stripped = strip_trailing_slash(strip_leading_slash(value))
+    if value is None:
+        return value
+
+    stripped = value.strip("/")
 
     if stripped == "":
         return None
@@ -146,7 +129,7 @@ class ServerContext:
 
         return "/".join(parts)
 
-    def _get_stripped_container_path(self, container_path: str = None) -> str:
+    def _get_stripped_container_path(self, container_path: str = None) -> Optional[str]:
         if container_path is not None:
             return strip_slashes(container_path)
 
@@ -173,7 +156,7 @@ class ServerContext:
         parts.append("@files")
 
         if file_name is not None:
-            parts.append(strip_leading_slash(file_name))
+            parts.append(file_name.lstrip("/"))
 
         path = "/".join(parts)
         return f"/{path}"
