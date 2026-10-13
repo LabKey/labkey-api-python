@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from typing import Dict, TextIO
+from typing import Dict, TextIO, Optional
 from labkey.utils import json_dumps
 import requests
 import importlib.metadata
@@ -30,6 +30,35 @@ from labkey.exceptions import (
 API_KEY_TOKEN = "apikey"
 CSRF_TOKEN = "X-LABKEY-CSRF"
 client_version = importlib.metadata.version("labkey")
+
+
+def strip_leading_slash(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return value
+
+    if value.startswith("/"):
+        return value[1:]
+
+    return value
+
+
+def strip_trailing_slash(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return value
+
+    if value.endswith("/"):
+        return value[0:-1]
+
+    return value
+
+
+def strip_slashes(value: Optional[str]) -> Optional[str]:
+    stripped = strip_trailing_slash(strip_leading_slash(value))
+
+    if stripped == "":
+        return None
+
+    return stripped
 
 
 def handle_response(response, non_json_response=False):
@@ -83,8 +112,8 @@ class ServerContext:
         disable_csrf=False,
         allow_redirects=False,
     ):
-        self._container_path = container_path
-        self._context_path = context_path
+        self._container_path = strip_slashes(container_path)
+        self._context_path = strip_slashes(context_path)
         self._domain = domain
         self._use_ssl = use_ssl
         self._verify_ssl = verify_ssl
@@ -110,48 +139,44 @@ class ServerContext:
 
     @property
     def base_url(self) -> str:
-        base_url = self.hostname
+        parts = [self.hostname]
 
         if self._context_path is not None:
-            base_url += "/" + self._context_path
+            parts.append(self._context_path)
 
-        return base_url
+        return "/".join(parts)
+
+    def _get_stripped_container_path(self, container_path: str = None) -> str:
+        if container_path is not None:
+            return strip_slashes(container_path)
+
+        return self._container_path
 
     def build_url(self, controller: str, action: str, container_path: str = None) -> str:
-        url = self.base_url
+        parts = [self.base_url]
+        stripped_container = self._get_stripped_container_path(container_path)
 
-        if container_path is not None:
-            url += "/" + container_path
-        elif self._container_path is not None:
-            url += "/" + self._container_path
+        if stripped_container is not None:
+            parts.append(stripped_container)
 
-        url += "/" + controller + "-" + action
+        parts.append(f"{controller}-{action}")
 
-        return url
+        return "/".join(parts)
 
     def webdav_path(self, container_path: str = None, file_name: str = None):
-        path = "/_webdav"
-        container_path = container_path or self._container_path
+        parts = ["_webdav"]
+        stripped_container = self._get_stripped_container_path(container_path)
 
-        if container_path is not None:
-            if container_path.endswith("/"):
-                # trim the slash
-                container_path = container_path[0:-1]
+        if stripped_container is not None:
+            parts.append(stripped_container)
 
-            if not container_path.startswith("/"):
-                path += "/"
-
-            path += container_path
-
-        path += "/@files"
+        parts.append("@files")
 
         if file_name is not None:
-            if not file_name.startswith("/"):
-                path += "/"
+            parts.append(strip_leading_slash(file_name))
 
-            path += file_name
-
-        return path
+        path = "/".join(parts)
+        return f"/{path}"
 
     def webdav_client(self, webdav_options: dict = None):
         # We localize the import of webdav3 here so it is an optional dependency. Only users who want to use webdav will
