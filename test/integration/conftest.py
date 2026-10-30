@@ -31,10 +31,28 @@ DEFAULT_CONTEXT_PATH = ""
 PROJECT_NAME = "PythonIntegrationTests"
 
 
-# TeamCity writes Java .properties, which escape ':' and '=' with a backslash; ConfigParser keeps the backslash
+# TeamCity writes Java .properties, which escape ':' and '=' with a backslash; ConfigParser keeps the backslash.
+# Blank parameters are treated as unset.
 def get_property(config, name, default):
-    value = config.get(name, default)
+    value = config.get(name)
+    if not value:
+        return default
     return re.sub(r"\\(.)", r"\1", value)
+
+
+def validate_server(protocol, host, port):
+    url = f"{protocol}://{host}:{port}"
+    error = f'Invalid integration server URL "{url}" built from protocol "{protocol}", host "{host}", port "{port}"'
+
+    if protocol.lower() not in ("http", "https"):
+        raise ValueError(f"{error}: protocol must be http or https")
+
+    # A hostname, IPv4 address, or bracketed IPv6 address
+    if not re.fullmatch(r"[A-Za-z0-9.-]+|\[[0-9A-Fa-f:.]+\]", host):
+        raise ValueError(f"{error}: host must be a hostname or IP address without a protocol, port, or path")
+
+    if not port.isdigit() or not 0 < int(port) < 65536:
+        raise ValueError(f"{error}: port must be a number between 1 and 65535")
 
 
 @pytest.fixture(scope="session")
@@ -53,12 +71,11 @@ def server_context_vars():
             parser = ConfigParser()
             parser.read_string(contents)
             parsed_config = parser["config"]
-            host = get_property(parsed_config, "labkey.server", DEFAULT_HOST)
+            # Missing or blank parameters fall back to the environment variables or defaults
+            host = get_property(parsed_config, "labkey.server", host)
             # labkey.port takes precedence over tomcat.port, which is set on TeamCity build agents
-            port = get_property(
-                parsed_config, "labkey.port", get_property(parsed_config, "tomcat.port", DEFAULT_PORT)
-            )
-            context_path = get_property(parsed_config, "labkey.contextpath", DEFAULT_CONTEXT_PATH)
+            port = get_property(parsed_config, "labkey.port", get_property(parsed_config, "tomcat.port", port))
+            context_path = get_property(parsed_config, "labkey.contextpath", context_path)
 
             if "://" in host:
                 protocol, host = host.split("://", 1)
@@ -66,6 +83,7 @@ def server_context_vars():
             if context_path.startswith("/"):
                 context_path = context_path[1:]
 
+    validate_server(protocol, host, port)
     use_ssl = protocol.lower() == "https"
     return f"{host}:{port}", context_path, use_ssl
 
