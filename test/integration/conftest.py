@@ -48,7 +48,7 @@ def validate_server(protocol, host, port):
         raise ValueError(f"{error}: protocol must be http or https")
 
     # A hostname, IPv4 address, or bracketed IPv6 address
-    if not re.fullmatch(r"[A-Za-z0-9.-]+|\[[0-9A-Fa-f:.]+\]", host):
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+|\[[0-9A-Fa-f:.]+\]", host):
         raise ValueError(f"{error}: host must be a hostname or IP address without a protocol, port, or path")
 
     if not port.isdigit() or not 0 < int(port) < 65536:
