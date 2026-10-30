@@ -62,6 +62,8 @@ def server_context_vars():
     host = os.getenv("HOST", DEFAULT_HOST)
     port = os.getenv("PORT", DEFAULT_PORT)
     context_path = os.getenv("CONTEXT_PATH", DEFAULT_CONTEXT_PATH)
+    # Off by default so tests can run against servers with self-signed certificates
+    verify_ssl = os.getenv("VERIFY_SSL", "false").lower() in ("true", "1", "yes")
 
     if properties_file_path is not None:
         with open(properties_file_path) as f:
@@ -85,21 +87,21 @@ def server_context_vars():
 
     validate_server(protocol, host, port)
     use_ssl = protocol.lower() == "https"
-    return f"{host}:{port}", context_path, use_ssl
+    return f"{host}:{port}", context_path, use_ssl, verify_ssl
 
 
 @pytest.fixture(scope="session")
 def api(server_context_vars):
-    server, context_path, use_ssl = server_context_vars
-    api = APIWrapper(server, PROJECT_NAME, context_path, use_ssl=use_ssl)
+    server, context_path, use_ssl, verify_ssl = server_context_vars
+    api = APIWrapper(server, PROJECT_NAME, context_path, use_ssl=use_ssl, verify_ssl=verify_ssl)
     api.security.stop_impersonating()  # Call stop impersonating incase previous test run failed while impersonating a user.
     return api
 
 
 @pytest.fixture(autouse=True, scope="session")
 def project(server_context_vars):
-    server, context_path, use_ssl = server_context_vars
-    context = ServerContext(server, "", context_path, use_ssl=use_ssl)
+    server, context_path, use_ssl, verify_ssl = server_context_vars
+    context = ServerContext(server, "", context_path, use_ssl=use_ssl, verify_ssl=verify_ssl)
 
     try:
         container.delete(context, PROJECT_NAME)
